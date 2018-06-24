@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "mocha test"
   },
@@ -11,5 +12,9 @@
     "url": "git+https://gitlab.com/herpproject/Dawayer.git"
   },
   "author": "Herp Project",
-  "license": "GPL-3.0"
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
 }
