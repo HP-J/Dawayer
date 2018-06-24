@@ -1,0 +1,15 @@
+{
+  "name": "dawayer",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/herpproject/Dawayer.git"
+  },
+  "author": "Herp Project",
+  "license": "GPL-3.0"
+}
