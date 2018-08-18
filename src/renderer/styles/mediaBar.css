@@ -33,11 +33,10 @@
 
 .playPause1
 {
-  box-sizing: border-box;
-  width: 30px;
-  height: 26px;
-  /* border-width: 13px 0px 13px 30px; */
-  border-width: 0px 0px 0px 10px;
+  box-sizing: content-box;
+  width: 0px;
+  height: 16px;
+  border-width: 5px 0px 5px 10px;
   border-color: transparent transparent transparent red;
   border-style: solid;
 
@@ -51,31 +50,10 @@
   position: relative;
   box-sizing: border-box;
   width: 30px;
-  left: 0px;
-  top: -26px;
-  /* border-width: 13px 0px 13px 30px; */
-  border-width: 13px 0px 13px 30px;
-  border-color: transparent green transparent green;
-  border-style: solid;
-
-  animation: play2 1s ease-out infinite;
-  animation-fill-mode: forwards;
-  animation-delay: 1s;
-}
-
-.playPause3
-{
-  position: relative;
-  box-sizing: content-box;
-  width: 0px;
-  height: 16px;
-  left: 0px;
-  top: -52px;
-  border-width: 5px 0px 5px 10px;
-  /* left: 10px;
-  top: -48px; */
-  /* border-width: 9px 0px 9px 19px; */
-  border-color: transparent transparent transparent yellow;
+  left: 10px;
+  top: -22px;
+  border-width: 9px 0px 9px 19px; 
+  border-color: transparent transparent transparent green;
   border-style: solid;
 
   animation: play2 1s ease-out infinite;
@@ -87,12 +65,10 @@
 {
   /* 0%
   {
-    border-width: 13px 0px 13px 15px;
   }
 
   100%
   {
-    border-width: 0px 0px 0px 10px;
   } */
 }
 
@@ -100,6 +76,5 @@
 {
   100%
   {
-    /* border-width: 0px 0px 0px 30px; */
   }
 }
