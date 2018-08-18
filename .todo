@@ -1,3 +1,10 @@
 graphics:
-  ☐ hamburger menu animation
-  ☐ play button animation
+  ☐ play/pause button animations
+  ☐ hamburger menu animation (smoothly slide to the right)
+  ☐ seek bar
+  ☐ volume bar
+  ☐ next and previous icons
+  ☐ music icon
+  ☐ shuffle icon
+  ☐ loop icon
+  ☐ volume icon

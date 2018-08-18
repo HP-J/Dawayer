@@ -23,7 +23,7 @@ body
   outline: white 1px solid;
 }
 
-.expand-icon-1, .expand-icon-2, .expand-icon-3
+.expandIcon1, .expandIcon2, .expandIcon3
 {
   background-color: red;
   position: relative;
@@ -33,25 +33,12 @@ body
   height: 2px;
 }
 
-.expand-icon-2
+.expandIcon2
 {
   top: 12px;
 }
 
-.expand-icon-3
+.expandIcon3
 {
   top: 14px;
-}
-
-.page
-{
-  flex-grow: 1;
-  background-color: yellow;
-}
-
-.media
-{
-  background-color: green;
-  width: 100vw;
-  height: 18vh;
 }
