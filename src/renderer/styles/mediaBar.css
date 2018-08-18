@@ -31,33 +31,14 @@
   height: 18vh;
 }
 
-/* .playPauseIcon1
-{
-
-  box-sizing: border-box;
-  height: 20px;
-  border-width: 13px 0px 13px 30px;
-  border-color: purple blue black white;
-  border-style: solid;
-}
-
-.playPauseIcon2
-{
-  position: relative;
-  left: -30px;
-  height: 18px;
-  border-width: 4px 0px 4px 10px;
-  border-color: purple blue black yellow;
-  border-style: solid;
-} */
-
 .playPause1
 {
   box-sizing: border-box;
   width: 30px;
   height: 26px;
-  border-width: 13px 0px 13px 30px;
-  border-color: transparent transparent transparent white;
+  /* border-width: 13px 0px 13px 30px; */
+  border-width: 0px 0px 0px 10px;
+  border-color: transparent transparent transparent red;
   border-style: solid;
 
   animation: play1 1s ease-out infinite;
@@ -70,11 +51,31 @@
   position: relative;
   box-sizing: border-box;
   width: 30px;
-  height: 26px;
   left: 0px;
   top: -26px;
+  /* border-width: 13px 0px 13px 30px; */
   border-width: 13px 0px 13px 30px;
-  border-color: transparent transparent transparent red;
+  border-color: transparent green transparent green;
+  border-style: solid;
+
+  animation: play2 1s ease-out infinite;
+  animation-fill-mode: forwards;
+  animation-delay: 1s;
+}
+
+.playPause3
+{
+  position: relative;
+  box-sizing: content-box;
+  width: 0px;
+  height: 16px;
+  left: 0px;
+  top: -52px;
+  border-width: 5px 0px 5px 10px;
+  /* left: 10px;
+  top: -48px; */
+  /* border-width: 9px 0px 9px 19px; */
+  border-color: transparent transparent transparent yellow;
   border-style: solid;
 
   animation: play2 1s ease-out infinite;
@@ -84,31 +85,21 @@
 
 @keyframes play1
 {
-
-   /* 80%
+  /* 0%
   {
-    border-color: white white white white;
-  }
-
-  100%
-  {
-    width: 10px;
-    border-width: 13px 5px 13px 5px;
-    border-color: white white white white;
-  } */
-
- 
-}
-
-@keyframes play2
-{
-  0%
-  {
-    border-width: 13px 0px 13px 10px;
+    border-width: 13px 0px 13px 15px;
   }
 
   100%
   {
     border-width: 0px 0px 0px 10px;
+  } */
+}
+
+@keyframes play2
+{
+  100%
+  {
+    /* border-width: 0px 0px 0px 30px; */
   }
 }
