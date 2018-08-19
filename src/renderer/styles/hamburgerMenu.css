@@ -85,3 +85,13 @@ body
 {
   top: 14px;
 }
+
+#seekBarLeft
+{
+  position: relative;
+  background: white;
+  width: 80%;
+  height: 3px;
+  top: 20px;
+  left: 20px;
+}

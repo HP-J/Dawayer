@@ -19,15 +19,17 @@
 #playingImageShade
 {
   position: relative;
-  background: linear-gradient(-90deg, blue 10%, transparent 95%);
-  left: -20vh;
+  background: linear-gradient(-90deg, blue 18%, transparent 100%);
+  left: -17vh;
   width: 20vh;
   height: 18vh;
 }
 
 #playingImage
 {
-  background-color: red;
+  background: url(../../Dina.jpg);
+  background-size: 18vh 18vh;
+  background-repeat: no-repeat;
   width: 18vh;
   height: 18vh;
 }
@@ -36,7 +38,7 @@
 {
   display: flex;
   position: relative;
-  width: 65px;
+  width: 55px;
   height: 45px;
   top: 0px;
   left: 0px;
@@ -53,7 +55,7 @@
   left: 16px;
   top: 5px;
 
-  border-width: 8px 0px 8px 15px;
+  border-width: 8px 0px 8px 10px;
   border-color: transparent transparent transparent red;
   border-style: solid;
 }
@@ -67,7 +69,7 @@
   left: 16px;
   top: 13px;
   
-  border-width: 9px 0px 9px 19px;
+  border-width: 9px 0px 9px 15px;
   border-color: transparent transparent transparent green;
   border-style: solid;
 }
@@ -123,7 +125,7 @@
   {
     height: 18px;
     top: 5px;
-    border-width: 8px 0px 8px 15px;
+    border-width: 8px 0px 8px 10px;
   }
 }
 
@@ -146,6 +148,7 @@
   {
     height: 18px;
     left: 16px;
-    border-width: 9px 0px 9px 19px; 
+    border-width: 9px 0px 9px 15px;
   }
 }
+
