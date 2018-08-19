@@ -19,13 +19,13 @@ let playingState = false;
 
 let menuState = false;
 
-playPauseButton.onclick = () =>
-{
-  if (!playingState)
-    pause();
-  else
-    play();
-};
+// playPauseButton.onclick = () =>
+// {
+//   if (!playingState)
+//     pause();
+//   else
+//     play();
+// };
 
 expandButton.onclick = () =>
 {

@@ -6,7 +6,6 @@
 
 #controlsBar
 {
-  display: flex;
   position: relative;
   background: blue;
   
@@ -152,3 +151,25 @@
   }
 }
 
+
+#seekBarLeft
+{
+  position: relative;
+  /* background: linear-gradient(90deg, white 50%, transparent 0%, transparent 100%); */
+  background-color: white;
+  width: 95%;
+  height: 3px;
+  top: 15px;
+  left: 20px;
+}
+
+ /* #seekBarBall
+{
+  position: relative; */
+  /* background: linear-gradient(90deg, white 50%, transparent 0%, transparent 100%); */
+  /* background-color: red;
+  width: 80%;
+  height: 3px;
+  top: 20px;
+  left: 20px;
+} */
