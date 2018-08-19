@@ -1,0 +1,151 @@
+.split
+{
+  height: 0;
+  flex-basis: 100%;
+}
+
+#controlsBar
+{
+  display: flex;
+  position: relative;
+  background: blue;
+  
+  left: 18vh;
+  top: -18vh;
+  width: calc(100vw - 18vh);
+  height: 18vh;
+}
+
+#playingImageShade
+{
+  position: relative;
+  background: linear-gradient(-90deg, blue 10%, transparent 95%);
+  left: -20vh;
+  width: 20vh;
+  height: 18vh;
+}
+
+#playingImage
+{
+  background-color: red;
+  width: 18vh;
+  height: 18vh;
+}
+
+#playPauseButton
+{
+  display: flex;
+  position: relative;
+  width: 65px;
+  height: 45px;
+  top: 0px;
+  left: 0px;
+  outline: solid 1px white;
+  outline-offset: -1px;
+}
+
+.playPauseButton1
+{
+  position: relative;
+  box-sizing: content-box;
+  width: 0px;
+  height: 18px;
+  left: 16px;
+  top: 5px;
+
+  border-width: 8px 0px 8px 15px;
+  border-color: transparent transparent transparent red;
+  border-style: solid;
+}
+
+.playPauseButton2
+{
+  position: relative;
+  box-sizing: border-box;
+  width: 30px;
+  height: 18px;
+  left: 16px;
+  top: 13px;
+  
+  border-width: 9px 0px 9px 19px;
+  border-color: transparent transparent transparent green;
+  border-style: solid;
+}
+
+.pause1
+{
+  animation: pause1 0.4s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes pause1
+{
+  100%
+  {
+    height: 28px;
+    top: 13px;
+    border-width: 0px 0px 0px 10px; 
+  }
+}
+
+.pause2
+{
+  animation: pause2 0.4s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes pause2
+{
+  100%
+  {
+    height: 28px;
+    left: 21px;
+    border-width: 0px 0px 0px 10px; 
+  }
+}
+
+.play1
+{
+  animation: play1 0.4s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes play1
+{
+  0%
+  {
+    height: 28px;
+    top: 13px;
+    border-width: 0px 0px 0px 10px; 
+  }
+  
+  100%
+  {
+    height: 18px;
+    top: 5px;
+    border-width: 8px 0px 8px 15px;
+  }
+}
+
+.play2
+{
+  animation: play2 0.4s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes play2
+{
+  0%
+  {
+    height: 28px;
+    left: 21px;
+    border-width: 0px 0px 0px 10px; 
+  }
+
+  100%
+  {
+    height: 18px;
+    left: 16px;
+    border-width: 9px 0px 9px 19px; 
+  }
+}
