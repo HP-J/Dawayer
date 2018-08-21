@@ -153,39 +153,47 @@
 
 #seekBar
 {
-  --seekBarBallX: 40px;
-
   position: relative;
-  width: 95%;
+  width: 94%;
   height: 3px;
   top: 15px;
   left: 20px;
 }
 
-.seekBarLeft
+#volumeBar
+{
+  position: relative;
+  width: 10%;
+  height: 3px;
+  top: 30px;
+  left: 20px;
+}
+
+.barLeft
 {
   background-color: white;
-  width: calc(var(--seekBarBallX) - 4px);
-  height: 100%;
+  width: calc(var(--barX) - 3px);
+  height: inherit;
 }
 
-.seekBarRight
+.barRight
 {
   position: absolute;
-  background-color: lime;
-  width: calc(100% - (var(--seekBarBallX) + 4px + 4px));
-  height: 100%;
+  background-color: #7A7A80;
+  width: calc(100% - (var(--barX) + 3px));
+  height: inherit;
   top: 0px;
-  left: calc(var(--seekBarBallX) + 15px + 4px);
+  left: calc(var(--barX) + 15px + 3px);
 }
 
- .seekBarBall
+ .barBall
 {
   position: absolute;
-  background-color: red;
-  width: 15px;
-  height: 15px;
+  background-color: transparent;
+  border: 3px solid white;
+  width: 9px;
+  height: 9px;
   top: -6px;
   border-radius: 50%;
-  left: var(--seekBarBallX);
+  left: var(--barX);
 }

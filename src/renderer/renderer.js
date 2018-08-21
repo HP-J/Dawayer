@@ -11,6 +11,9 @@ const controlBar = document.querySelector('#controlsBar');
 const playingImage = document.querySelector('#playingImage');
 const playingImageShade = document.querySelector('#playingImageShade');
 
+const seekBar = document.querySelector('#seekBar');
+const volumeBar = document.querySelector('#volumeBar');
+
 const playPauseButton = document.querySelector('#playPauseButton');
 const playPauseButton1 = document.querySelector('.playPauseButton1');
 const playPauseButton2 = document.querySelector('.playPauseButton2');
@@ -18,6 +21,9 @@ const playPauseButton2 = document.querySelector('.playPauseButton2');
 let playingState = false;
 
 let menuState = false;
+
+seekBar.style.setProperty('--barX', '10%');
+volumeBar.style.setProperty('--barX', '10%');
 
 // playPauseButton.onclick = () =>
 // {
