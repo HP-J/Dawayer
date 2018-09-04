@@ -6,12 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'">
 
-  <link rel="stylesheet" href="./renderer/styles/hamburgerMenu.css"></link>
+  <link rel="stylesheet" href="./renderer/styles/body.css"></link>
   <link rel="stylesheet" href="./renderer/styles/controlsBar.css"></link>
-  <link rel="stylesheet" href="./renderer/styles/page.css"></link>
+  <link rel="stylesheet" href="./renderer/styles/expandButton.css"></link>
+  <link rel="stylesheet" href="./renderer/styles/menu.css"></link>
+  <link rel="stylesheet" href="./renderer/styles/playPauseButton.css"></link>
+  <link rel="stylesheet" href="./renderer/styles/volumeButton.css"></link>
 </head>
 
-<body>
+<body class="preload">
 
   <div id="menu" class="collapse">
     <div id="expandButton"></div>
@@ -33,9 +36,17 @@
   <div id="playingImageShade"></div>
 
   <div id="controlsBar">
+
     <div id="playPauseButton">
-      <div class="playPauseButton1"></div>
-      <div class="playPauseButton2"></div>
+      <div class="playPauseButton1 play1"></div>
+      <div class="playPauseButton2 play2"></div>
+    </div>
+    
+    <div id="volumeButton">
+      <div class="volumeButton1"></div>
+      <div class="volumeButton2"></div>
+      <div class="volumeButton3"></div>
+      <div class="volumeButton4"></div>
     </div>
 
     <div id="seekBar">
