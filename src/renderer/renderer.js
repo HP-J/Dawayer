@@ -23,15 +23,15 @@ let playingState = false;
 let menuState = false;
 
 seekBar.style.setProperty('--barX', '10%');
-volumeBar.style.setProperty('--barX', '10%');
+// volumeBar.style.setProperty('--barX', '10%');
 
-// playPauseButton.onclick = () =>
-// {
-//   if (!playingState)
-//     pause();
-//   else
-//     play();
-// };
+playPauseButton.onclick = () =>
+{
+  if (!playingState)
+    pause();
+  else
+    play();
+};
 
 expandButton.onclick = () =>
 {

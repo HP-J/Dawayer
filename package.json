@@ -1,15 +1,31 @@
 {
   "name": "dawayer",
   "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A music player",
+  "main": "compiled/main/main.js",
   "private": true,
   "scripts": {
-    "dev": "npx babel src --out-dir public --ignore node_modules --source-maps --copy-files --watch",
-    "compile": "npx babel src --out-dir public --ignore node_modules --source-maps --copy-files",
-    "clean": "rm -r ./public/",
-    "test": "eslint ./src ./test && nyc mocha --require babel-core/register --require babel-polyfill"
+    "dev": "npx babel src --out-dir compiled --presets @babel/preset-env --copy-files --source-maps --watch",
+    "compile": "npx babel src --out-dir compiled --presets @babel/preset-env --copy-files --no-comments --minified",
+    "clean": "rm -r compiled",
+    "test": "eslint src test && nyc mocha --require @babel/register --require @babel/polyfill",
+    "pre-release": "npm version patch --no-git-tag-version && npm run clean && npm run compile",
+    "release": "npm run pre-release && npm publish && git push origin development:release"
   },
+  "build": {
+    "appId": "com.herpproject.dawayer",
+    "asar": false,
+    "files": [
+      "!.*",
+      "!src",
+      "!test",
+      "!coverage"
+    ],
+    "directories": {
+      "output": "public"
+    }
+  },
+  "homepage": "https://gitlab.com/herpproject/Dawayer",
   "repository": {
     "type": "git",
     "url": "git+https://gitlab.com/herpproject/Dawayer.git"
@@ -17,20 +33,20 @@
   "author": "Herp Project",
   "license": "MIT",
   "dependencies": {
-    "electron": "^3.0.0-beta.5",
     "fs-extra": "^7.0.0",
-    "howler": "^2.0.14"
+    "howler": "^2.0.15"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.6",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^5.3.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-eslint": "^9.0.0",
+    "electron": "^3.0.0-beta.7",
+    "electron-builder": "^20.28.3",
+    "eslint": "^5.5.0",
     "mocha": "^5.2.0",
-    "nyc": "^12.0.2",
-    "puppeteer": "^1.2.0",
-    "puppeteer-to-istanbul": "^1.2.2"
+    "nyc": "^13.0.1"
   }
 }

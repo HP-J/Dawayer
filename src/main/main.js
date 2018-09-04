@@ -27,6 +27,7 @@ function createWindow()
 
   mainWindow = new BrowserWindow(
     {
+      title: 'Dawayer',
       show: true,
       frame: true,
       resizable: true,
@@ -36,8 +37,6 @@ function createWindow()
       y: Math.round((screenSize.height - height) / 2)
     }
   );
-
-  mainWindow.setTitle('Dawayer');
 
   // and load the index.html of the app
   mainWindow.loadURL(url.format({
