@@ -14,9 +14,9 @@ const playingImageShade = document.querySelector('#playingImageShade');
 const seekBar = document.querySelector('#seekBar');
 const volumeBar = document.querySelector('#volumeBar');
 
-const playPauseButton = document.querySelector('#playPauseButton');
-const playPauseButton1 = document.querySelector('.playPauseButton1');
-const playPauseButton2 = document.querySelector('.playPauseButton2');
+const playButton = document.querySelector('#playButton');
+const playButton1 = document.querySelector('.playButton1');
+const playButton2 = document.querySelector('.playButton2');
 
 let playingState = false;
 
@@ -27,17 +27,14 @@ window.onload = () =>
   document.body.classList.remove('preload');
 };
 
-seekBar.style.setProperty('--barX', '50%');
+// seekBar.style.setProperty('--barX', '50%');
 
 // volumeBar.style.setProperty('--barX', '10%');
 
-// playPauseButton.onclick = () =>
-// {
-//   if (!playingState)
-//     pause();
-//   else
-//     play();
-// };
+playButton.onclick = () =>
+{
+  togglePlayButton();
+};
 
 expandButton.onclick = () =>
 {
@@ -47,26 +44,12 @@ expandButton.onclick = () =>
     collapse();
 };
 
-function play()
+function togglePlayButton()
 {
-  playingState = false;
+  playingState = !playingState;
 
-  playPauseButton1.classList.remove('pause1');
-  playPauseButton2.classList.remove('pause2');
-  
-  playPauseButton1.classList.add('play1');
-  playPauseButton2.classList.add('play2');
-}
-
-function pause()
-{
-  playingState = true;
-
-  playPauseButton1.classList.remove('play1');
-  playPauseButton2.classList.remove('play2');
-  
-  playPauseButton1.classList.add('pause1');
-  playPauseButton2.classList.add('pause2');
+  playButton1.classList.toggle('pauseButton1');
+  playButton2.classList.toggle('pauseButton2');
 }
 
 function expand()

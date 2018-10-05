@@ -1,0 +1,87 @@
+#playButton
+{
+  position: relative;
+  
+  top: 0px;
+  left: 0px;
+  width: 55px;
+  height: 45px;
+
+  background-color: red;
+}
+
+.playButton1
+{
+  position: relative;
+
+  background-color: transparent;
+
+  top: 10px;
+  left: 10px;
+  width: 0px;
+  height: 0px;
+
+  border-style: solid;
+  border-width: 14px 0px 0px 28px;
+  border-color: transparent transparent transparent white;
+
+  transform-origin: 50% 50% 0;
+  transform: rotateZ(0deg);
+
+  transition-property: transform, transform-origin, border-width;
+  transition-duration:  0.4s;
+  transition-timing-function: cubic-bezier(0.6, -0.28, 0.74, 0.05);
+}
+
+.playButton2
+{
+  position: relative;
+
+  background-color: transparent;
+
+  top: 10px;
+  left: 10px;
+  width: 0px;
+  height: 0px;
+
+  border-style: solid;
+  border-width: 14px 28px 0px 0px;
+  border-color: white transparent transparent transparent;
+
+  transform-origin: 50% 50% 0;
+  transform: rotateZ(0deg);
+
+  transition-property: transform, transform-origin, border-width;
+  transition-duration:  0.4s;
+  transition-timing-function: cubic-bezier(0.6, -0.28, 0.74, 0.05);
+}
+
+.pauseButton1
+{
+  background-color: white;
+
+  /* width: 28px;
+  height: 9px;
+
+  border-width: 0px 0px 0px 0px; */
+
+  border-width: 9px 0px 0px 28px;
+
+  transform-origin: 14px 14px 0;
+  transform: rotateZ(90deg);
+}
+
+.pauseButton2
+{
+  background-color: white;
+
+  /* width: 28px;
+  height: 9px;
+
+  border-width: 0px 0px 0px 0px; */
+
+  border-width: 9px 28px 0px 0px;
+
+  transform-origin: 11px 2px 0;
+  transform: rotateZ(90deg);
+}

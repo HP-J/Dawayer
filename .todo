@@ -10,8 +10,8 @@ graphics:
   ☐ loop icon
   ☐ and finally time for scaling
 
-technical:
+audio:
   ☐ playing and pausing a song
-  ☐ show progress in seek bar
+  ☐ update progress in the seek bar
   ☐ allow the user to change the position of the playback using the seek bar
   ☐ change the global volume using the volume bar
