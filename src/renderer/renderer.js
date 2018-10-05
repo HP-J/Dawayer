@@ -31,10 +31,10 @@ window.onload = () =>
 
 // volumeBar.style.setProperty('--barX', '10%');
 
-playButton.onclick = () =>
-{
-  togglePlayButton();
-};
+// playButton.onclick = () =>
+// {
+//   togglePlayButton();
+// };
 
 expandButton.onclick = () =>
 {

@@ -1,0 +1,63 @@
+doctype html
+
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1')
+  meta(http-equiv='Content-Security-Policy' content="script-src 'unsafe-inline'")
+
+  link(rel='stylesheet' href='./renderer/styles/body.css')
+  link(rel='stylesheet' href='./renderer/styles/controlsBar.css')
+  link(rel='stylesheet' href='./renderer/styles/expandButton.css')
+  link(rel='stylesheet' href='./renderer/styles/menu.css')
+  link(rel='stylesheet' href='./renderer/styles/playButton.css')
+  link(rel='stylesheet' href='./renderer/styles/volumeButton.css')
+
+body(class='preload')
+  #menu.collapse
+    #expandButton
+    #hamburger
+      .expandButton1
+      .expandButton2
+      .expandButton3
+
+  #page
+    p HELLO
+
+  //- split from page to put playing image and control bar in new line
+  //- TODO fix layout so that split is not needed
+  .split
+
+  #playingImage
+  #playingImageShade
+
+  #controlsBar
+    //- #playButton
+    //-   .playButton1
+    //-   .playButton2
+
+    #nextButton
+      .nextButton1
+      .nextButton2
+
+    //- #volumeButton
+    //-   .volumeButton1
+    //-   .volumeButton2
+    //-   .volumeButton3
+    //-   .volumeButton4
+
+    //- #seekBar
+    //-   .barLeft
+    //-   .barRight
+    //-   .barBall
+
+    //- #volumeBar
+    //-   .barLeft
+    //-   .barRight
+    //-   .barBall
+
+script.
+  window.onerror = function(message, url, line, column, error)
+  {
+    require('electron').ipcRenderer.send('rendererError', error.stack || error);
+  };
+  require('./renderer/renderer.js');
