@@ -27,7 +27,8 @@ window.onload = () =>
   document.body.classList.remove('preload');
 };
 
-seekBar.style.setProperty('--barX', '10%');
+seekBar.style.setProperty('--barX', '50%');
+
 // volumeBar.style.setProperty('--barX', '10%');
 
 // playPauseButton.onclick = () =>

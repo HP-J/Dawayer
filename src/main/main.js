@@ -1,13 +1,51 @@
-import { BrowserWindow, app, screen } from 'electron';
+import { BrowserWindow, app, screen, ipcMain, dialog, Menu } from 'electron';
 
 import path from 'path';
 import url from 'url';
+
+import { setWindow, setApp, reload, focus, quit } from './window.js';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 /** @type { BrowserWindow }
 */
 let mainWindow;
+
+const menuTemplate = Menu.buildFromTemplate([
+  {
+    label: 'Window',
+    submenu:
+  [
+    {
+      label: 'Reload', accelerator: 'CmdOrCtrl+R', click()
+      {
+        reload();
+      }
+    },
+    {
+      label: 'Zoom In', accelerator: 'CmdOrCtrl+=', role: 'zoomin'
+    },
+    {
+      label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', role: 'zoomout'
+    },
+    {
+      label: 'Reset Zoom', accelerator: 'CmdOrCtrl+Shift+=', role: 'resetzoom'
+    },
+    {
+      label: 'Developer Tools', accelerator: 'CmdOrCtrl+Shift+I', click()
+      {
+        mainWindow.webContents.toggleDevTools();
+      }
+    },
+    {
+      label: 'Quit', accelerator: 'CmdOrCtrl+Q', click()
+      {
+        quit();
+      }
+    },
+  ]
+  }
+]);
 
 function createWindow()
 {
@@ -25,11 +63,15 @@ function createWindow()
   const width = Math.round(screenSize.width * 0.7);
   const height = Math.round(screenSize.height * 0.85);
 
+  // replace the default menu
+  Menu.setApplicationMenu(menuTemplate);
+
   mainWindow = new BrowserWindow(
     {
       title: 'Dawayer',
       show: true,
       frame: true,
+      skipTaskbar: false,
       resizable: true,
       width: width,
       height: height,
@@ -38,6 +80,9 @@ function createWindow()
     }
   );
 
+  setWindow(mainWindow);
+  setApp(app);
+
   // and load the index.html of the app
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, '../index.html'),
@@ -45,37 +90,16 @@ function createWindow()
     slashes: true
   }));
 
-  // Emitted when the window is closed.
+  // emits when the window is closed
   mainWindow.on('closed', () =>
   {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
     mainWindow = null;
   });
 }
 
-function focus()
-{
-  mainWindow.restore();
-
-  mainWindow.show();
-  
-  mainWindow.focus();
-}
-
-// if the user tried to open a new instance while a one is already open
-// and the new instance is not inside a debug environment
-// then quit the new instance and focus on the opened instance
-app.on('second-instance', () =>
-{
-  if (mainWindow)
-    focus();
-});
-
 if (!app.requestSingleInstanceLock())
 {
-  app.quit();
+  quit();
 }
 else
 {
@@ -87,6 +111,20 @@ else
   // Some APIs can only be used after this event occurs.
   app.on('ready', createWindow);
 
+  app.on('second-instance', () =>
+  {
+    if (mainWindow)
+      focus();
+  });
+
+  // handle any errors at the renderer process
+  ipcMain.on('rendererError', (event, data) =>
+  {
+    dialog.showErrorBox('A Javascript error occurred in the renderer process', data);
+      
+    quit();
+  });
+
   // Quit when all windows are closed.
   app.on('window-all-closed', () =>
   {
@@ -95,11 +133,6 @@ else
     if (process.platform !== 'darwin')
       app.quit();
   });
-
-  // app.on('will-quit', () =>
-  // {
-
-  // });
 
   app.on('activate', () =>
   {

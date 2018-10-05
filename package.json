@@ -1,52 +1,62 @@
 {
   "name": "dawayer",
+  "productName": "Dawayer",
   "version": "0.1.0",
   "description": "A music player",
   "main": "compiled/main/main.js",
   "private": true,
   "scripts": {
-    "dev": "npx babel src --out-dir compiled --presets @babel/preset-env --copy-files --source-maps --watch",
-    "compile": "npx babel src --out-dir compiled --presets @babel/preset-env --copy-files --no-comments --minified",
+    "dev": "npx babel src --out-dir compiled --copy-files --source-maps --watch",
+    "compile": "npx babel src --out-dir compiled --copy-files --no-comments --minified",
     "clean": "rm -r compiled",
-    "test": "eslint src test && nyc mocha --require @babel/register --require @babel/polyfill",
-    "pre-release": "npm version patch --no-git-tag-version && npm run clean && npm run compile",
-    "release": "npm run pre-release && npm publish && git push origin development:release"
+    "patch": "npm version patch --no-git-tag-version"
   },
   "build": {
     "appId": "com.herpproject.dawayer",
-    "asar": false,
+    "asar": true,
     "files": [
-      "!.*",
-      "!src",
-      "!test",
-      "!coverage"
+      "index.js",
+      "build.json",
+      "LICENSE",
+      "README.md",
+      "CHANGELOG.md"
     ],
     "directories": {
-      "output": "public"
+      "output": "./public"
+    },
+    "linux": {
+      "artifactName": "Dawayer.${ext}",
+      "executableName": "Dawayer",
+      "category": "Audio"
+    },
+    "nsis": {
+      "artifactName": "Dawayer-Setup.exe",
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "uninstallDisplayName": "Dawayer",
+      "shortcutName": "Dawayer"
     }
   },
   "homepage": "https://gitlab.com/herpproject/Dawayer",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/herpproject/Dawayer.git"
+    "url": "https://gitlab.com/herpproject/Dawayer.git"
   },
-  "author": "Herp Project",
+  "author": "Herp Project <herpproject0@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "fs-extra": "^7.0.0",
     "howler": "^2.0.15"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
     "@babel/register": "^7.0.0",
-    "babel-eslint": "^9.0.0",
-    "electron": "^3.0.0-beta.7",
-    "electron-builder": "^20.28.3",
-    "eslint": "^5.5.0",
-    "mocha": "^5.2.0",
-    "nyc": "^13.0.1"
+    "babel-eslint": "^10.0.1",
+    "electron": "^3.0.2",
+    "electron-builder": "^20.28.4",
+    "eslint": "^5.6.1"
   }
 }

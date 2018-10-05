@@ -5,12 +5,15 @@
       "name": "Debug Main Process",
       "type": "node",
       "request": "launch",
+      "sourceMaps": true,
+      "internalConsoleOptions": "neverOpen",
       "cwd": "${workspaceRoot}",
-      "env": {
-        "DEBUG": "1"
-      },
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-      "program": "${workspaceRoot}",
+      "args": [
+        ".",
+        "--debug"
+      ],
+      "program": "${workspaceRoot}/compiled/main/main.js",
       "console": "integratedTerminal",
       "protocol": "inspector"
     },
@@ -21,12 +24,10 @@
       "sourceMaps": true,
       "internalConsoleOptions": "openOnSessionStart",
       "webRoot": "${workspaceRoot}",
-      "env": {
-        "DEBUG": "1"
-      },
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
       "runtimeArgs": [
-        "${workspaceRoot}"
+        "${workspaceRoot}",
+        "--debug"
       ]
     }
   ]

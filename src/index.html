@@ -42,12 +42,12 @@
       <div class="playPauseButton2 play2"></div>
     </div>
     
-    <div id="volumeButton">
+    <!-- <div id="volumeButton">
       <div class="volumeButton1"></div>
       <div class="volumeButton2"></div>
       <div class="volumeButton3"></div>
       <div class="volumeButton4"></div>
-    </div>
+    </div> -->
 
     <div id="seekBar">
       <div class="barLeft"></div>
@@ -65,6 +65,11 @@
 </body>
 
 <script>
+  window.onerror = function(message, url, line, column, error)
+  {
+    require('electron').ipcRenderer.send('rendererError', error.stack || error);
+  };
+
   require('./renderer/renderer.js');
 </script>
 
