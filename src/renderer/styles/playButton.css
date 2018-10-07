@@ -28,9 +28,10 @@
   transform-origin: 50% 50% 0;
   transform: rotateZ(0deg);
 
-  transition-property: transform, transform-origin, border-width;
-  transition-duration:  0.4s;
-  transition-timing-function: cubic-bezier(0.6, -0.28, 0.74, 0.05);
+  transition: 
+  transform 0.2s cubic-bezier(0.47, 0, 0.75, 0.72),
+  transform-origin 0.2s cubic-bezier(0.47, 0, 0.75, 0.72),
+  border-width 0.2s cubic-bezier(0.47, 0, 0.75, 0.72) 0.05s;
 }
 
 .playButton2
@@ -51,19 +52,15 @@
   transform-origin: 50% 50% 0;
   transform: rotateZ(0deg);
 
-  transition-property: transform, transform-origin, border-width;
-  transition-duration:  0.4s;
-  transition-timing-function: cubic-bezier(0.6, -0.28, 0.74, 0.05);
+  transition: 
+  transform 0.2s cubic-bezier(0.47, 0, 0.75, 0.72),
+  transform-origin 0.2s cubic-bezier(0.47, 0, 0.75, 0.72),
+  border-width 0.2s cubic-bezier(0.47, 0, 0.75, 0.72) 0.05s;
 }
 
 .pauseButton1
 {
   background-color: white;
-
-  /* width: 28px;
-  height: 9px;
-
-  border-width: 0px 0px 0px 0px; */
 
   border-width: 9px 0px 0px 28px;
 
@@ -74,11 +71,6 @@
 .pauseButton2
 {
   background-color: white;
-
-  /* width: 28px;
-  height: 9px;
-
-  border-width: 0px 0px 0px 0px; */
 
   border-width: 9px 28px 0px 0px;
 

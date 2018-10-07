@@ -1,2 +1,2 @@
 # Welcome to Dawayer
-#### A music player
+#### An ordinary music player

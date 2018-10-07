@@ -23,6 +23,7 @@
   background: url(../../Dina.jpg);
   background-size: 18vh 18vh;
   background-repeat: no-repeat;
+
   width: 18vh;
   height: 18vh;
 }
@@ -30,24 +31,27 @@
 #seekBar
 {
   position: relative;
-  width: 94%;
-  height: 3px;
+
   top: 15px;
   left: 20px;
+  width: 94%;
+  height: 3px;
 }
 
 #volumeBar
 {
   position: relative;
-  width: 10%;
-  height: 3px;
+
   top: 30px;
   left: 20px;
+  width: 10%;
+  height: 3px;
 }
 
 .barLeft
 {
   background-color: white;
+
   width: calc(var(--barX) - 5px);
   height: inherit;
 }
@@ -56,20 +60,23 @@
 {
   position: absolute;
   background-color: #7A7A80;
-  width: calc(100% - (var(--barX) + 5px));
-  height: inherit;
+
   top: 0px;
   left: calc(var(--barX) + 15px + 5px);
+  width: calc(100% - (var(--barX) + 5px));
+  height: inherit;
 }
 
  .barBall
 {
   position: absolute;
   background-color: transparent;
-  border: 3px solid white;
+
+  top: -6px;
+  left: var(--barX);
   width: 9px;
   height: 9px;
-  top: -6px;
+
+  border: 3px solid white;
   border-radius: 50%;
-  left: var(--barX);
 }

@@ -99,7 +99,7 @@ function createWindow()
 
 if (!app.requestSingleInstanceLock())
 {
-  quit();
+  app.quit();
 }
 else
 {

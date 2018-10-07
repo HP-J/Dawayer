@@ -2,7 +2,7 @@
   "name": "dawayer",
   "productName": "Dawayer",
   "version": "0.1.0",
-  "description": "A music player",
+  "description": "An ordinary music player",
   "main": "compiled/main/main.js",
   "private": true,
   "scripts": {

@@ -5,12 +5,13 @@
 
 #page
 {
-  flex-grow: 1;
   background-color: yellow;
+
+  flex-grow: 1;
 }
 
 .split
 {
-  height: 0;
   flex-basis: 100%;
+  height: 0px;
 }
