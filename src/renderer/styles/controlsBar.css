@@ -1,7 +1,8 @@
 #controlsBar
 {
-  position: relative;
   background: blue;
+  
+  position: relative;
   
   left: 18vh;
   top: -18vh;

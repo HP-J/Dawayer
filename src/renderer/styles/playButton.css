@@ -1,13 +1,13 @@
 #playButton
 {
+  background-color: red;
+
   position: relative;
   
   top: 0px;
   left: 0px;
   width: 55px;
   height: 45px;
-
-  background-color: red;
 }
 
 .playButton1

@@ -1,0 +1,17 @@
+@font-face {
+  font-family: Oxygen;
+  src: url(../fonts/Oxygen-Light.ttf);
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: Oxygen;
+  src: url(../fonts/Oxygen-Regular.ttf);
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: Oxygen;
+  src: url(../fonts/Oxygen-Bold.ttf);
+  font-weight: 700;
+}

@@ -8,11 +8,14 @@ head
   link(rel='stylesheet' href='./renderer/styles/body.css')
   link(rel='stylesheet' href='./renderer/styles/controlsBar.css')
   link(rel='stylesheet' href='./renderer/styles/expandButton.css')
+  link(rel='stylesheet' href='./renderer/styles/fonts.css')
   link(rel='stylesheet' href='./renderer/styles/menu.css')
   link(rel='stylesheet' href='./renderer/styles/musicButton.css')
   link(rel='stylesheet' href='./renderer/styles/nextButton.css')
   link(rel='stylesheet' href='./renderer/styles/playButton.css')
   link(rel='stylesheet' href='./renderer/styles/previousButton.css')
+  link(rel='stylesheet' href='./renderer/styles/repeatButton.css')
+  link(rel='stylesheet' href='./renderer/styles/shuffleButton.css')
   link(rel='stylesheet' href='./renderer/styles/volumeButton.css')
 
 body(class='preload')
@@ -50,6 +53,16 @@ body(class='preload')
     //-   .musicButton1
     //-   .musicButton2
     //-   .musicButton3
+
+    #repeatButton.thisSong
+      .repeatButtonArrow1
+        .repeatArrow1
+        .repeatArrow2
+        .repeatArrow3
+      .repeatButtonArrow2
+        .repeatArrow1
+        .repeatArrow2
+        .repeatArrow3
 
     //- #volumeButton
     //-   .volumeButton1
