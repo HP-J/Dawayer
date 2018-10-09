@@ -1,4 +1,4 @@
-3graphics:
+graphics:
   ✔ play/pause button animations @done (10/5/2018, 6:29:32 AM)
 
   ✔ hamburger menu animation (smoothly slide to the right) @done (8/19/2018, 12:22:58 PM)
@@ -16,8 +16,14 @@
   ☐ shuffle icon
   ✔ repeat icon @done (10/8/2018, 9:23:24 PM)
 
-  ☐ time for scaling
+  ☐ scaling
+  ☐ layout
 
+  ☐ color thief
+
+  ☐ songs page
+  ☐ albums page
+  
 audio:
   ☐ playing and pausing a song
   ☐ update progress in the seek bar
