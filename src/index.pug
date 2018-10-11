@@ -12,6 +12,7 @@ head
   link(rel='stylesheet' href='./renderer/styles/menu.css')
   link(rel='stylesheet' href='./renderer/styles/musicButton.css')
   link(rel='stylesheet' href='./renderer/styles/nextButton.css')
+  link(rel='stylesheet' href='./renderer/styles/page.css')
   link(rel='stylesheet' href='./renderer/styles/playButton.css')
   link(rel='stylesheet' href='./renderer/styles/previousButton.css')
   link(rel='stylesheet' href='./renderer/styles/repeatButton.css')
@@ -22,21 +23,16 @@ body(class='preload')
   #menu.default
     #expandButton
       #expandButtonHamburger
-        .expandButton1
-        .expandButton2
-        .expandButton3
+    //-     .expandButton1
+    //-     .expandButton2
+    //-     .expandButton3
 
-  //- #page
-  //-   p HELLO
+  #page
+    p HELLO WORLD
 
-  //- split from page to put playing image and control bar in new line
-  //- TODO fix layout so that split is not needed
-  //- .split
-
-  //- #playingImage
-  //- #playingImageShade
-
-  //- #controlsBar
+  #controlsBar
+    #playingImage
+      #playingImageShade
     //- #playButton
     //-   .playButton1
     //-   .playButton2

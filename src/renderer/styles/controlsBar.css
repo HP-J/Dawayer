@@ -1,32 +1,33 @@
 #controlsBar
 {
-  background: blue;
-  
-  position: relative;
-  
-  left: 18vh;
-  top: -18vh;
-  width: calc(100vw - 18vh);
-  height: 18vh;
-}
+  grid-area: controlBar;
 
-#playingImageShade
-{
+  background: green;
+  
   position: relative;
-  background: linear-gradient(-90deg, blue 18%, transparent 100%);
-  left: -17vh;
-  width: 20vh;
+
+  min-height: 75px;
+  width: 100%;
   height: 18vh;
 }
 
 #playingImage
 {
   background: url(../../cover.jpeg);
-  background-size: 18vh 18vh;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
 
+  min-width: 75px;
   width: 18vh;
-  height: 18vh;
+  height: 100%;
+}
+
+#playingImageShade
+{
+  background: linear-gradient(-90deg, blue 18%, transparent 100%);
+
+  width: 100%;
+  height: 100%;
 }
 
 #seekBar

@@ -36,7 +36,7 @@ window.onresize = () =>
     document.body.classList.add('noMotion');
 
   // set a new resize-end timeout
-  resizeEndTimeout = setTimeout(resizeEnd, 150);
+  resizeEndTimeout = setTimeout(resizeEnd, 25);
 };
 
 function resizeEnd()
@@ -65,7 +65,7 @@ function resizeEnd()
 //   togglePlayButton();
 // };
 
-expandButton.onclick = toggleMenu;
+// expandButton.onclick = toggleMenu;
 
 // function togglePlayButton()
 // {
