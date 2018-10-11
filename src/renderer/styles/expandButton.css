@@ -1,12 +1,18 @@
 #expandButton
 {
-  background-color: transparent;
-  
   width: 100%;
-  height: calc(25px + 0.5vh);
+  height: calc(var(--item-height));
 
   outline-offset: -1px;
-  outline: white 1px solid;
+  outline: red 1px solid;
+}
+
+#expandButtonHamburger
+{
+  min-width: var(--min-collapse-width);
+  width: var(--collapse-width);
+
+  height: calc(25px + 0.5vh);
 }
 
 .expandButton1, .expandButton2, .expandButton3
