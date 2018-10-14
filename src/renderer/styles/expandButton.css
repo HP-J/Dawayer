@@ -1,7 +1,14 @@
 #expandButton
 {
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-start;
+
+  min-height: var(--button-height);
+
   width: 100%;
-  height: calc(var(--item-height));
+  height: auto;
 
   outline-offset: -1px;
   outline: red 1px solid;
@@ -9,28 +16,26 @@
 
 #expandButtonHamburger
 {
-  min-width: var(--min-collapse-width);
-  width: var(--collapse-width);
+  display: flex;
+  flex-wrap: wrap;
 
-  height: calc(25px + 0.5vh);
+  align-items: center;
+  justify-content: center;
+
+  min-width: var(--min-collapse-width);
+  min-height: var(--hamburger-height);
+
+  width: var(--collapse-width);
+  height: auto;
+
+  outline-offset: -1px;
+  outline: red 1px solid;
 }
 
 .expandButton1, .expandButton2, .expandButton3
 {
   background-color: red;
-  position: relative;
-  left: 20%;
-  top: 10px;
+  
   width: 60%;
-  height: 2px;
-}
-
-.expandButton2
-{
-  top: 12px;
-}
-
-.expandButton3
-{
-  top: 14px;
+  height: calc(var(--hamburger-height) / 6);
 }

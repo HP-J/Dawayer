@@ -22,7 +22,7 @@ let resizeEndTimeout;
 
 window.onload = () =>
 {
-  document.body.classList.remove('noMotion');
+  resizeEnd();
 };
 
 window.onresize = () =>
@@ -41,6 +41,22 @@ window.onresize = () =>
 
 function resizeEnd()
 {
+  const menuItemSingularPartHeight = Math.round(menu.getBoundingClientRect().height * (2 / 100));
+  const menuHamburgerSingularPartHeight = Math.round(menu.getBoundingClientRect().height * (1.35 / 100));
+
+  let menuButtonHeight = Math.max(26, menuItemSingularPartHeight * 3);
+  let menuHamburgerHeight = Math.max(19, menuHamburgerSingularPartHeight * 3);
+  
+  // only odd number
+  if (!(menuButtonHeight % 2))
+    menuButtonHeight = menuButtonHeight + 1;
+
+  if (!(menuHamburgerHeight % 2))
+    menuHamburgerHeight = menuHamburgerHeight - 1;
+
+  menu.style.setProperty('--button-height', menuButtonHeight + 'px');
+  menu.style.setProperty('--hamburger-height', menuHamburgerHeight + 'px');
+
   // remove no-motion class
   document.body.classList.remove('noMotion');
 

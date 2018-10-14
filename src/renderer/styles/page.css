@@ -1,6 +1,6 @@
 #page
 {
-  display: page;
+  grid-area: page;
 
   background-color: yellow;
 }

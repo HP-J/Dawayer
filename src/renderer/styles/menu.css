@@ -6,8 +6,6 @@
   --min-collapse-width: 45px;
   --min-expand-width: 250px;
 
-  --item-height: 30px + 0.5vh;
-
   grid-area: menu;
 
   background-color: blue;
