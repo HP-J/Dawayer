@@ -20,7 +20,8 @@
       "build.json",
       "LICENSE",
       "README.md",
-      "CHANGELOG.md"
+      "CHANGELOG.md",
+      "tray.png"
     ],
     "directories": {
       "output": "./public"
@@ -47,6 +48,7 @@
   "author": "Herp Project <herpproject0@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "electron-json-config": "^1.5.3",
     "fs-extra": "^7.0.0",
     "howler": "^2.0.15"
   },
