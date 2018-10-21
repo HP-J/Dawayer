@@ -2,12 +2,6 @@ body
 {
   overflow: hidden;
 
-  display: grid;
-
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto 1fr;
-  grid-template-areas: "menu page" "controlBar controlBar";
-
   border: 0;
   margin: 0;
   padding: 0;
