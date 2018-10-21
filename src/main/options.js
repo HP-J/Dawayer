@@ -4,6 +4,8 @@ import { join } from 'path';
 
 import * as settings from 'electron-json-config';
 
+import { showHide } from './window.js';
+
 /** @type { Tray }
 */
 export let trayIcon;
@@ -15,6 +17,18 @@ const trayMenuTemplate = [
   },
   {
     type: 'separator'
+  },
+  {
+    label: 'Play/Pause'
+  },
+  {
+    type: 'separator'
+  },
+  {
+    label: 'Show/Hide', click()
+    {
+      showHide();
+    }
   },
   {
     label: 'Quit', click()

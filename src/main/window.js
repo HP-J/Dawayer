@@ -50,3 +50,31 @@ export function quit()
 {
   app.quit();
 }
+
+/** shows/hides the main window
+*/
+export function showHide()
+{
+  if (!mainWindow.isVisible() || !mainWindow.isFocused())
+  {
+    mainWindow.restore();
+
+    mainWindow.show();
+
+    mainWindow.focus();
+    
+    mainWindow.setSkipTaskbar(false);
+  }
+  else
+  {
+    mainWindow.blur();
+    mainWindow.hide();
+
+    mainWindow.setSkipTaskbar(true);
+  }
+}
+
+export function setSkipTaskbar(state)
+{
+  mainWindow.setSkipTaskbar(state);
+}
