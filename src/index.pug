@@ -9,11 +9,21 @@ head
   link(rel='stylesheet' href='./renderer/styles/fonts.css')
 
 body(class='noMotion')
-    p HELLO WORLD
+    img(class='design', src="../build/2nd page.png")
+
+    div(class='page')
+    div(class='controlBar')
+
+    div(class='menu')
+      div(class='menuItem wrapper selected expanded')
+        div(class='menuItem child')
+      div(class='menuItem wrapper selected expanded')
+        div(class='menuItem child')
 
 script.
   window.onerror = function(message, url, line, column, error)
   {
     require('electron').ipcRenderer.send('rendererError', error.stack || error);
   };
+  
   require('./renderer/renderer.js');

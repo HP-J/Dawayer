@@ -22,3 +22,85 @@ body
 {
   transition: none !important;
 }
+
+.design
+{
+  position: absolute;
+  
+  left: 0;
+  top: 0;
+
+  opacity: 0.85;
+}
+
+.page
+{
+  background-color: var(--color-1);
+
+  width: 100%;
+  height: 72.5vh;
+}
+
+.controlBar
+{
+  background-color: var(--color-2);
+
+  width: 100%;
+  height: 27.5vh;
+}
+
+.menu
+{
+  display: flex;
+
+  position: absolute;
+  justify-content: center;
+
+  top: 2.5vh;
+  width: 100%;
+  height: auto;
+
+  outline: 1px solid black;
+  outline-offset: -1px;
+}
+
+.menuItem.wrapper
+{
+  margin: 0px 0.5vw;
+}
+
+.menuItem.wrapper.expanded
+{
+  min-width: 60px;
+  width: 6.85vw;
+}
+
+.menuItem.wrapper.collapsed
+{
+  min-width: 45px;
+  width: 5.25vw;
+}
+
+.menuItem.expanded > .menuItem.child
+{
+  width: 100%;
+  padding-bottom: 55%;
+  border-radius: 30% / 50%;
+}
+
+.menuItem.collapsed > .menuItem.child
+{
+  width: 100%;
+  padding-bottom: 15%;
+  border-radius: 10% / 50%;
+}
+
+.menuItem.selected > .menuItem.child
+{
+  background-color: red;
+}
+
+.menuItem.normal > .menuItem.child
+{
+  background-color: red;
+}
