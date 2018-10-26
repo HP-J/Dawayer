@@ -1,6 +1,8 @@
 import { Menu, Tray, app, nativeImage } from 'electron';
 
 import { join } from 'path';
+import { platform } from 'os';
+import { existsSync } from 'fs';
 
 import * as settings from 'electron-json-config';
 
@@ -53,9 +55,12 @@ function loadTrayIcon()
   if (enabled)
   {
     const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-    const trayIconImage = nativeImage.createFromPath(join(__dirname, '../../tray.png'));
+    const iconPath = join(__dirname, '../../tray-' + platform() + '.png');
   
-    trayIcon = new Tray(trayIconImage);
+    if (!existsSync(iconPath))
+      return;
+
+    trayIcon = new Tray(nativeImage.createFromPath(iconPath));
 
     trayIcon._setContextMenu = trayIcon.setContextMenu;
 

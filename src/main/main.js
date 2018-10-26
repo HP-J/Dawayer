@@ -3,7 +3,7 @@ import { BrowserWindow, app, screen, ipcMain, dialog, Menu } from 'electron';
 import path from 'path';
 import url from 'url';
 
-import { setWindow, setApp, reload, focus, quit } from './window.js';
+import { setWindow, setApp, focus } from './window.js';
 import { loadOptions } from './options.js';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -20,7 +20,7 @@ const menuTemplate = Menu.buildFromTemplate([
     {
       label: 'Reload', accelerator: 'CmdOrCtrl+R', click()
       {
-        reload();
+        mainWindow.reload();
       }
     },
     {
@@ -41,7 +41,7 @@ const menuTemplate = Menu.buildFromTemplate([
     {
       label: 'Quit', accelerator: 'CmdOrCtrl+Q', click()
       {
-        quit();
+        app.quit();
       }
     },
   ]
@@ -61,8 +61,22 @@ function createWindow()
   // set the electron window location
   // to the center of the screen
 
-  const width = Math.round(screenSize.width * 0.7);
-  const height = Math.round(screenSize.height * 0.85);
+  // let width = Math.round(screenSize.width * 0.7);
+  // let height = Math.round(screenSize.height * 0.82);
+
+  // TODO re-enable auto size
+
+  const minWidth = 350;
+  const minHeight = 510;
+
+  let width = 955;
+  let height = 607;
+
+  if (minWidth > width)
+    width = minWidth;
+
+  if (minHeight > height)
+    height = minHeight;
 
   // replace the default menu
   Menu.setApplicationMenu(menuTemplate);
@@ -76,6 +90,8 @@ function createWindow()
       resizable: true,
       width: width,
       height: height,
+      minWidth: minWidth,
+      minHeight: minHeight,
       x: Math.round((screenSize.width - width) / 2),
       y: Math.round((screenSize.height - height) / 2)
     }
@@ -92,6 +108,9 @@ function createWindow()
     protocol: 'file:',
     slashes: true
   }));
+
+  // TODO disable dev tools
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
 
   // emits when the window is closed
   mainWindow.on('closed', () =>
@@ -125,7 +144,7 @@ else
   {
     dialog.showErrorBox('A Javascript error occurred in the renderer process', data);
       
-    quit();
+    app.quit();
   });
 
   // Quit when all windows are closed.

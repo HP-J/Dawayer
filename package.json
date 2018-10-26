@@ -2,7 +2,7 @@
   "name": "dawayer",
   "productName": "Dawayer",
   "version": "0.1.0",
-  "description": "An ordinary music player",
+  "description": "An ordinary audio player",
   "main": "compiled/main/main.js",
   "private": true,
   "scripts": {
@@ -26,6 +26,44 @@
     "directories": {
       "output": "./public"
     },
+    "fileAssociations": [
+      {
+        "ext": "mp3",
+        "mimeType": "audio/mpeg3"
+      },
+      {
+        "ext": "mp4",
+        "mimeType": "audio/mp4"
+      },
+      {
+        "ext": "mpeg",
+        "mimeType": "audio/mpeg"
+      },
+      {
+        "ext": "opus",
+        "mimeType": "audio/opus"
+      },
+      {
+        "ext": "ogg",
+        "mimeType": "audio/ogg"
+      },
+      {
+        "ext": "wav",
+        "mimeType": "audio/wav"
+      },
+      {
+        "ext": "aac",
+        "mimeType": "audio/aac"
+      },
+      {
+        "ext": "m4a",
+        "mimeType": "audio/m4a"
+      },
+      {
+        "ext": "flac",
+        "mimeType": "audio/flac"
+      }
+    ],
     "linux": {
       "artifactName": "Dawayer.${ext}",
       "executableName": "Dawayer",
