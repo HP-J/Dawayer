@@ -1,29 +1,34 @@
 doctype html
+html(lang="en")
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible' content='ie=edge')
+    meta(http-equiv='Content-Security-Policy' content="script-src 'unsafe-inline'")
 
-head
-  meta(charset='UTF-8')
-  meta(name='viewport' content='width=device-width, initial-scale=1')
-  meta(http-equiv='Content-Security-Policy' content="script-src 'unsafe-inline'")
+    link(rel='stylesheet' href='./renderer/styles/albums.css')
+    link(rel='stylesheet' href='./renderer/styles/body.css')
+    link(rel='stylesheet' href='./renderer/styles/controlBar.css')
+    link(rel='stylesheet' href='./renderer/styles/fonts.css')
+    link(rel='stylesheet' href='./renderer/styles/menu.css')
 
-  link(rel='stylesheet' href='./renderer/styles/body.css')
-  link(rel='stylesheet' href='./renderer/styles/fonts.css')
+  body(class='noMotion')
+    //- img(src='../build/2nd page.png').design
 
-body(class='noMotion')
-    img(class='design', src="../build/2nd page.png")
+    .menu
+      .menuItem.expanded.selected
 
-    div(class='page')
-    div(class='controlBar')
-
-    div(class='menu')
-      div(class='menuItem wrapper selected expanded')
-        div(class='menuItem child')
-      div(class='menuItem wrapper selected expanded')
-        div(class='menuItem child')
-
-script.
-  window.onerror = function(message, url, line, column, error)
-  {
-    require('electron').ipcRenderer.send('rendererError', error.stack || error);
-  };
+    .page.wrapper
+      .page.container.albums
+        .page.child.albums
+    
+    .controlBar
+      .controls.container
+      .queue.container
   
-  require('./renderer/renderer.js');
+  script.
+    window.onerror = function(message, url, line, column, error)
+    {
+      require('electron').ipcRenderer.send('rendererError', error.stack || error);
+    };
+    require('./renderer/renderer.js');

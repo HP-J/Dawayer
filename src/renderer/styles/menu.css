@@ -1,0 +1,60 @@
+.menu
+{
+  grid-area: menu;
+
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+  height: auto;
+
+  outline: 1px solid black;
+  outline-offset: -1px;
+}
+
+.menuItem
+{
+  margin: 0px 0.6vw;
+}
+
+.menuItem.expanded
+{
+  min-width: 60px;
+  width: 6.65vw;
+}
+
+.menuItem.expanded::before
+{
+  content: "";
+  display: block;
+
+  width: 100%;
+  border-radius: 40% / 50%;
+  padding-bottom: 60%;
+}
+
+.menuItem.collapsed
+{
+  min-width: 45px;
+  width: 5.25vw;
+}
+
+.menuItem.collapsed::before
+{
+  content: "";
+  display: block;
+
+  width: 100%;
+  border-radius: 10% / 50%;
+  padding-bottom: 15%;
+}
+
+.menuItem.selected::before
+{
+  background-color: gold;
+}
+
+.menuItem.normal::before
+{
+  background-color: gold;
+}

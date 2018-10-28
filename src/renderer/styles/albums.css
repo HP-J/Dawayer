@@ -1,0 +1,27 @@
+.page.container.albums
+{
+  background-color: green;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  width: 50%;
+  height: 94%;
+}
+
+.page.child.albums
+{
+  width: 15%;
+  min-width: 115px;
+}
+
+.page.child.albums::before
+{
+  content: "";
+  display: block;
+
+  background-color: orange;
+  
+  width: 100%;
+  padding-bottom: 142%;
+}
