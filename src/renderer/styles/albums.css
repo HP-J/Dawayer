@@ -1,4 +1,4 @@
-.page.container.albums
+.page.parent.container
 {
   display: flex;
   flex-wrap: wrap;
@@ -13,27 +13,41 @@
   height: 100%;
 }
 
-.page.container.albums:hover
+.page.parent.container:hover
 {
   overflow-y: overlay;
 }
 
-.page.child.albums
+.page.child.albums.wrapper
 {
+  position: relative;
+
   min-width: 115px;
+
   width: 28%;
 
-  margin: 0px 2.5%;
-  margin-top: 5%;
+  margin: 2.5%;
 }
 
-.page.child.albums::before
+.page.child.albums.wrapper:before
 {
   content: "";
   display: block;
 
-  background-color: orange;
-  
   width: 100%;
-  padding-bottom: 152.5%;
+  padding-top: 152.5%;
+}
+
+.page.child.albums.container
+{
+  position: absolute;
+
+  background-color: red;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+
+  padding-top: 152.5%;
 }

@@ -41,7 +41,7 @@ body
   opacity: 0.85;
 }
 
-.page.wrapper
+.page.parent.wrapper
 {
   grid-area: page;
 

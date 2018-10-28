@@ -12,49 +12,75 @@
   outline-offset: -1px;
 }
 
-.menuItem
+.menuItem.wrapper
 {
   margin: 0px 0.6vw;
 }
 
-.menuItem.expanded
+.menuItem.wrapper.expanded
 {
+  position: relative;
+
   min-width: 60px;
   width: 5.65vw;
 }
 
-.menuItem.expanded::before
+.menuItem.wrapper.expanded:before
 {
   content: "";
   display: block;
 
   width: 100%;
-  border-radius: 40% / 50%;
   padding-bottom: 60%;
 }
 
-.menuItem.collapsed
+.menuItem.wrapper.expanded > .menuItem.container
 {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  border-radius: 30% / 50%;
+  padding-bottom: 60%;
+}
+
+.menuItem.wrapper.collapsed
+{
+  position: relative;
+
   min-width: 45px;
   width: 5.25vw;
 }
 
-.menuItem.collapsed::before
+.menuItem.wrapper.collapsed:before
 {
   content: "";
   display: block;
 
   width: 100%;
+  padding-bottom: 15%;
+}
+
+.menuItem.wrapper.collapsed > .menuItem.container
+{
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+
   border-radius: 10% / 50%;
   padding-bottom: 15%;
 }
 
-.menuItem.selected::before
+.menuItem.wrapper.selected > .menuItem.container
 {
   background-color: gold;
 }
 
-.menuItem.normal::before
+.menuItem.wrapper.normal > .menuItem.container
 {
   background-color: gold;
 }

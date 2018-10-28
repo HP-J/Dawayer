@@ -13,18 +13,20 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/menu.css')
 
   body(class='noMotion')
-    img(src='../build/2nd page.png').design
+    //- img(src='../build/2nd page.png').design
 
     .menu
-      .menuItem.expanded.selected
+      .menuItem.wrapper.expanded.selected
+       .menuItem.container
 
-    .page.wrapper
-      .page.container.albums
-        .page.child.albums
+    .page.parent.wrapper
+      .page.parent.container
+        .page.child.albums.wrapper
+         .page.child.albums.container
     
     .controlBar
-      .controls.container
-      .queue.container
+      .controls.parent.container
+      .queue.parent.container
   
   script.
     window.onerror = function(message, url, line, column, error)
