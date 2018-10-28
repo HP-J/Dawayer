@@ -46,11 +46,26 @@ body
   grid-area: page;
 
   display: flex;
-  align-items: flex-end;
   justify-content: center;
 
   background-color: blue;
 
+  min-width: 0;
+  min-height: 0;
+
   width: 100%;
   height: auto;
+}
+
+::-webkit-scrollbar
+{
+  background: transparent;
+  
+  min-width: 5px;
+  width: 0.5vw;
+}
+
+::-webkit-scrollbar-thumb
+{
+  background: orange;
 }

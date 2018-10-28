@@ -20,7 +20,7 @@
 .menuItem.expanded
 {
   min-width: 60px;
-  width: 6.65vw;
+  width: 5.65vw;
 }
 
 .menuItem.expanded::before

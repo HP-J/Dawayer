@@ -1,18 +1,30 @@
 .page.container.albums
 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
   background-color: green;
 
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
 
-  width: 50%;
-  height: 94%;
+  width: 52%;
+  height: 100%;
+}
+
+.page.container.albums:hover
+{
+  overflow-y: overlay;
 }
 
 .page.child.albums
 {
-  width: 15%;
   min-width: 115px;
+  width: 28%;
+
+  margin: 0px 2.5%;
+  margin-top: 5%;
 }
 
 .page.child.albums::before
@@ -23,5 +35,5 @@
   background-color: orange;
   
   width: 100%;
-  padding-bottom: 142%;
+  padding-bottom: 152.5%;
 }
