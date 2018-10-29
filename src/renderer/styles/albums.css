@@ -1,53 +1,75 @@
-.page.parent.container
-{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-
-  background-color: green;
-
-  overflow-x: hidden;
-  overflow-y: hidden;
-
-  width: 52%;
-  height: 100%;
-}
-
-.page.parent.container:hover
-{
-  overflow-y: overlay;
-}
-
-.page.child.albums.wrapper
+.pageItem.albums.wrapper
 {
   position: relative;
 
+  top: 11px;
   min-width: 115px;
+  max-height: fit-content;
+  width: 27%;
 
-  width: 28%;
-
+  overflow: hidden;
   margin: 2.5%;
 }
 
-.page.child.albums.wrapper:before
+.pageItem.albums.wrapper:before
 {
   content: "";
   display: block;
 
   width: 100%;
-  padding-top: 152.5%;
+  padding-bottom: 161%;
 }
 
-.page.child.albums.container
+.pageItem.albums.container
 {
   position: absolute;
 
-  background-color: red;
-
   top: 0;
-  left: 0;
+  height: 100%;
   width: 100%;
-  height: 0;
+}
 
-  padding-top: 152.5%;
+.pageItem.albums.cover
+{
+  width: 100%;
+  height: 79%;
+
+  background-size: cover;
+  background-position: center;
+}
+
+.pageItem.albums.card
+{
+  display: flex;
+
+  align-items: stretch;
+  flex-wrap: wrap;
+  white-space: pre;
+
+  background-color: white;
+
+  width: 90%;
+  height: 21%;
+
+  padding: 0px 8%;
+
+  font-family: Lato, sans-serif;
+  font-size: calc(3.1px + 0.3vw + 0.35vh);
+  font-weight: 400;
+}
+
+.pageItem.albums.title
+{
+  display: flex;
+  align-items: flex-end;
+  
+  width: 100%;
+
+  font-size: calc(5px + 0.5vw + 0.45vh);
+  font-weight: 700;
+}
+
+.pageItem.albums.artist
+{
+  color: var(--color-3);
 }

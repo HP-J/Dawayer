@@ -13,16 +13,21 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/menu.css')
 
   body(class='noMotion')
-    //- img(src='../build/2nd page.png').design
+    img(src='../build/2nd page.png').design
 
     .menu
       .menuItem.wrapper.expanded.selected
-       .menuItem.container
-
-    .page.parent.wrapper
-      .page.parent.container
-        .page.child.albums.wrapper
-         .page.child.albums.container
+        .menuItem.container
+        
+    .page.wrapper
+      .page.container
+        .pageItem.albums.wrapper
+          .pageItem.albums.container
+            .pageItem.albums.cover(style='background-image: url(../build/Dina2.png);')
+            .pageItem.albums.card
+              .pageItem.albums.title Slumber
+              .pageItem.albums.text by 
+              .pageItem.albums.artist Dina El-Wedidi
     
     .controlBar
       .controls.parent.container

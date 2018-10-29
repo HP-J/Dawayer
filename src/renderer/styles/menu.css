@@ -22,6 +22,7 @@
   position: relative;
 
   min-width: 60px;
+  max-height: fit-content;
   width: 5.65vw;
 }
 
@@ -34,23 +35,12 @@
   padding-bottom: 60%;
 }
 
-.menuItem.wrapper.expanded > .menuItem.container
-{
-  position: absolute;
-
-  top: 0;
-  left: 0;
-  width: 100%;
-
-  border-radius: 30% / 50%;
-  padding-bottom: 60%;
-}
-
 .menuItem.wrapper.collapsed
 {
   position: relative;
 
   min-width: 45px;
+  max-height: fit-content;
   width: 5.25vw;
 }
 
@@ -63,16 +53,26 @@
   padding-bottom: 15%;
 }
 
-.menuItem.wrapper.collapsed > .menuItem.container
+.menuItem.wrapper.expanded > .menuItem.container 
 {
   position: absolute;
 
   top: 0;
-  left: 0;
+  height: 100%;
+  width: 100%;
+
+  border-radius: 30% / 50%;
+}
+
+.menuItem.wrapper.collapsed > .menuItem.container 
+{
+  position: absolute;
+
+  top: 0;
+  height: 100%;
   width: 100%;
 
   border-radius: 10% / 50%;
-  padding-bottom: 15%;
 }
 
 .menuItem.wrapper.selected > .menuItem.container

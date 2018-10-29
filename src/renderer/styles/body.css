@@ -41,7 +41,7 @@ body
   opacity: 0.85;
 }
 
-.page.parent.wrapper
+.page.wrapper
 {
   grid-area: page;
 
@@ -55,6 +55,26 @@ body
 
   width: 100%;
   height: auto;
+}
+
+.page.container
+{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  background-color: green;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+  width: 52%;
+  height: 100%;
+}
+
+.page.container:hover
+{
+  overflow-y: overlay;
 }
 
 ::-webkit-scrollbar
