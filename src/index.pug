@@ -1,4 +1,9 @@
 doctype html
+
+mixin icon(name)
+  svg(class="icon")
+    use(xlink:href=`../build/icons.svg#${name}`)
+
 html(lang="en")
   head
     meta(charset='UTF-8')
@@ -13,7 +18,7 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/menu.css')
 
   body(class='noMotion')
-    img(src='../build/2nd page.png').design
+    //- img(src='../build/2nd page.png').design
 
     .menu
       .menuItem.wrapper.expanded.selected
@@ -30,8 +35,15 @@ html(lang="en")
               .pageItem.albums.artist Dina El-Wedidi
     
     .controlBar
-      .controls.parent.container
-      .queue.parent.container
+      .controls.container
+        .seekBar.played
+        .seekBar.remaining
+        .playButton.paused
+          .pause
+            +icon('pause')
+          .play
+            +icon('play')
+      .queue.container
   
   script.
     window.onerror = function(message, url, line, column, error)

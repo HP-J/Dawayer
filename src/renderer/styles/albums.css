@@ -5,10 +5,10 @@
   top: 11px;
   min-width: 115px;
   max-height: fit-content;
-  width: 27%;
+  width: calc(14vw + 2vh);
 
   overflow: hidden;
-  margin: 2.5%;
+  margin: 2%;
 }
 
 .pageItem.albums.wrapper:before
@@ -17,7 +17,7 @@
   display: block;
 
   width: 100%;
-  padding-bottom: 161%;
+  padding-bottom: 150%;
 }
 
 .pageItem.albums.container
@@ -44,7 +44,9 @@
 
   align-items: stretch;
   flex-wrap: wrap;
+
   white-space: pre;
+  user-select: none;
 
   background-color: white;
 
@@ -54,7 +56,7 @@
   padding: 0px 8%;
 
   font-family: Lato, sans-serif;
-  font-size: calc(3.1px + 0.3vw + 0.35vh);
+  font-size: calc(3px + 0.3vw + 0.35vh);
   font-weight: 400;
 }
 

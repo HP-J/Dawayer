@@ -6,7 +6,7 @@ html
 
   --color-4: white;
   --color-5: black;
-  --color-6: rgba(255, 255, 255, 0.25);
+  --color-6: #806969;
 }
 
 body
@@ -39,6 +39,18 @@ body
   top: 0;
 
   opacity: 0.85;
+}
+
+svg.icon
+{
+  width: 100%;
+  height: 100%;
+}
+
+svg.icon > *
+{
+  fill: white;
+  stroke: white;
 }
 
 .page.wrapper
