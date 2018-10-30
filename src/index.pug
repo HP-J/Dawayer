@@ -2,7 +2,7 @@ doctype html
 
 mixin icon(name)
   svg(class="icon")
-    use(xlink:href=`../build/icons.svg#${name}`)
+    use(xlink:href=`./icons.svg#${name}`)
 
 html(lang="en")
   head
@@ -14,11 +14,12 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/albums.css')
     link(rel='stylesheet' href='./renderer/styles/body.css')
     link(rel='stylesheet' href='./renderer/styles/controlBar.css')
+    link(rel='stylesheet' href='./renderer/styles/controls.css')
     link(rel='stylesheet' href='./renderer/styles/fonts.css')
     link(rel='stylesheet' href='./renderer/styles/menu.css')
 
   body(class='noMotion')
-    //- img(src='../build/2nd page.png').design
+    img(src='../build/2nd page.png').design
 
     .menu
       .menuItem.wrapper.expanded.selected
@@ -43,6 +44,13 @@ html(lang="en")
             +icon('pause')
           .play
             +icon('play')
+        .previousButton
+          +icon('next')
+        .nextButton
+          +icon('next')
+        .rewindButton
+          +icon('forward')
+          .rewindTime 10
       .queue.container
   
   script.

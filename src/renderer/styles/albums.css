@@ -8,7 +8,7 @@
   width: calc(14vw + 2vh);
 
   overflow: hidden;
-  margin: 2%;
+  margin: 1.5%;
 }
 
 .pageItem.albums.wrapper:before

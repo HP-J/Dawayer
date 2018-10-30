@@ -17,10 +17,13 @@
 
 .controls.container
 {
+  position: relative;
+
   align-self: center;
 
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-end;
 
   background-color: gold;
 
@@ -30,6 +33,8 @@
 
 .queue.container
 {
+  position: relative;
+
   align-self: flex-end;
 
   background-color: gold;
@@ -48,7 +53,7 @@
 
   .controls.container
   {
-    background-color: black;
+    background-color: yellow;
 
     width: 100%;
     height: 60%;
@@ -63,41 +68,4 @@
     
     margin: auto;
   }
-}
-
-.seekBar.played
-{
-  width: 20%;
-  height: 5%;
-  background-color: var(--color-6);
-}
-
-.seekBar.remaining
-{
-  width: 80%;
-  height: 5%;
-  background-color: var(--color-4);
-}
-
-.playButton
-{
-  background-color: black;
-  width: calc(3.5vw + 5vh);
-  height: 95%;
-}
-
-.pause, .play
-{
-  width: 100%;
-  height: 100%;
-}
-
-.paused > .pause
-{
-  display: none;
-}
-
-.playing > .play
-{
-  display: none;
 }
