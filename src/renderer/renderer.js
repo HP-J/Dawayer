@@ -4,6 +4,9 @@ import textFit from 'textfit';
 
 let resizeEndTimeout;
 
+const rewindTimeText = document.body.querySelector('.rewindTime');
+const forwardTimeText = document.body.querySelector('.forwardTime');
+
 window.onload = () =>
 {
   resizeEnd();
@@ -15,9 +18,6 @@ window.onresize = () =>
   if (resizeEndTimeout)
     clearTimeout(resizeEndTimeout);
 
-  // text that need to fit in container
-  textFit(document.body.querySelector('.rewindTime'));
-
   // add no-motion class
   if (!document.body.classList.contains('noMotion'))
     document.body.classList.add('noMotion');
@@ -28,6 +28,20 @@ window.onresize = () =>
 
 function resizeEnd()
 {
+  // text that need to fit in container
+  const cached = [ rewindTimeText.innerText, forwardTimeText.innerText ];
+
+  rewindTimeText.innerText = forwardTimeText.innerText = '00';
+  
+  textFit(
+    [
+      rewindTimeText,
+      forwardTimeText
+    ]);
+
+  rewindTimeText.children[0].innerText = cached[0];
+  forwardTimeText.children[0].innerText = cached[1];
+
   // remove no-motion class
   document.body.classList.remove('noMotion');
 }
