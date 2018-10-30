@@ -19,7 +19,7 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/menu.css')
 
   body(class='noMotion')
-    img(src='../build/2nd page.png').design
+    img(src='../test-materials/2nd page.png').design
 
     .menu
       .menuItem.wrapper.expanded.selected
@@ -29,7 +29,7 @@ html(lang="en")
       .page.container
         .pageItem.albums.wrapper
           .pageItem.albums.container
-            .pageItem.albums.cover(style='background-image: url(../build/Dina2.png);')
+            .pageItem.albums.cover(style='background-image: url(../test-materials/Dina2.png);')
             .pageItem.albums.card
               .pageItem.albums.title Slumber
               .pageItem.albums.text by 
@@ -51,6 +51,9 @@ html(lang="en")
         .rewindButton
           +icon('forward')
           .rewindTime 10
+        .forwardButton
+          +icon('forward')
+          .forwardTime 30
       .queue.container
   
   script.

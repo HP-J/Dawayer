@@ -99,5 +99,5 @@ svg.icon > *
 
 ::-webkit-scrollbar-thumb
 {
-  background: orange;
+  background: var(--color-4);
 }

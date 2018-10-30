@@ -1,5 +1,7 @@
 // import { remote } from 'electron';
 
+import textFit from 'textfit';
+
 let resizeEndTimeout;
 
 window.onload = () =>
@@ -12,6 +14,9 @@ window.onresize = () =>
   // clear old resize-end timeout event
   if (resizeEndTimeout)
     clearTimeout(resizeEndTimeout);
+
+  // text that need to fit in container
+  textFit(document.body.querySelector('.rewindTime'));
 
   // add no-motion class
   if (!document.body.classList.contains('noMotion'))
