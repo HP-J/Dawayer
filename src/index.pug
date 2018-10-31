@@ -24,6 +24,16 @@ html(lang="en")
     .menu
       .menuItem.wrapper.expanded.selected
         .menuItem.container
+          +icon('playing')
+      .menuItem.wrapper.expanded.selected
+        .menuItem.container
+          +icon('albums')
+      .menuItem.wrapper.expanded.selected
+        .menuItem.container
+          +icon('podcast')
+      .menuItem.wrapper.expanded.selected
+        .menuItem.container
+          +icon('settings')
         
     .page.wrapper
       .page.container
@@ -82,6 +92,15 @@ html(lang="en")
         .forwardButton
           +icon('forward')
           .forwardTime 30
+        .shuffleButton
+          +icon('shuffle')
+        .repeatButton.looping
+          .loop
+            +icon('loop')
+          .repeat
+            +icon('repeat')
+        .volumeButton
+          +icon('volume')
       .queue.container
   
   script.

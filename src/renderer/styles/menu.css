@@ -77,10 +77,10 @@
 
 .menuItem.wrapper.selected > .menuItem.container
 {
-  background-color: gold;
+  background-color: #4e4617;
 }
 
 .menuItem.wrapper.normal > .menuItem.container
 {
-  background-color: gold;
+  background-color: #4e4617;
 }

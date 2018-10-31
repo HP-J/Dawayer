@@ -6,6 +6,7 @@
   "main": "compiled/main/main.js",
   "private": true,
   "scripts": {
+    "svgo": "svgo --config='{ \"plugins\": [ { \"removeAttrs\": { \"attrs\": \"(fill|stroke)\" } } ] }' ./icons",
     "sprite": "create-svg-sprite --input ./icons --output ./compiled",
     "dev": "npm run sprite & npx babel src --out-dir compiled --copy-files --source-maps --watch & npx pug src --out compiled --pretty --watch &",
     "compile": "npm run sprite && npx babel src --out-dir compiled --copy-files --no-comments --minified && npx pug src --out compiled && rm compiled/*.pug",
