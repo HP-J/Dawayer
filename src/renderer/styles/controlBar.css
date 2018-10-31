@@ -23,13 +23,12 @@
 
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
   justify-content: space-between;
 
   background-color: gold;
 
   width: 58.5%;
-  height: 60%;
+  height: 50%;
 }
 
 .queue.container

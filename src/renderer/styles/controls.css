@@ -1,6 +1,8 @@
 
 .seekBar.played
 {
+  align-self: flex-start;
+
   background-color: var(--color-6);
 
   width: 10%;
@@ -9,6 +11,8 @@
 
 .seekBar.remaining
 {
+  align-self: flex-start;
+
   background-color: var(--color-4);
 
   width: 90%;
@@ -19,11 +23,13 @@
 .rewindButton, .forwardButton, .shuffleButton,
 .repeatButton, .volumeButton
 {
+  align-self: center;
+
   position: relative;
   background-color: black;
 
   width: calc(3.5vw + 5vh);
-  height: 95%;
+  height: 70%;
 }
 
 .rewindButton, .forwardButton
@@ -35,7 +41,7 @@
   align-self: flex-end;
 
   width: 12%;
-  height: 70%;
+  height: 60%;
 }
 
 .shuffleButton, .repeatButton, .volumeButton
@@ -43,7 +49,7 @@
   align-self: flex-end;
 
   width: 8%;
-  height: 41%;
+  height: 45%;
 }
 
 .previousButton > .icon
@@ -71,7 +77,9 @@
   color: var(--color-4);
 
   width: 30%;
-  height: 20%;
+  height: 25%;
+
+  user-select: none;
   
   font-family: Montserrat, sans-serif;
   font-size: 12px;

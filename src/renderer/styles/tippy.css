@@ -1,0 +1,11 @@
+.tippy-backdrop
+{
+  background-color: var(--color-5);
+}
+
+.tippy-content
+{
+  font-family: Montserrat, sans-serif;
+  font-size: calc(5px + 0.8vw + 0.35vh);
+  font-weight: 700;
+}

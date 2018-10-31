@@ -17,6 +17,7 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/controls.css')
     link(rel='stylesheet' href='./renderer/styles/fonts.css')
     link(rel='stylesheet' href='./renderer/styles/menu.css')
+    link(rel='stylesheet' href='./renderer/styles/tippy.css')
 
   body(class='noMotion')
     img(src='../test-materials/2nd page.png').design
@@ -77,27 +78,27 @@ html(lang="en")
       .controls.container
         .seekBar.played
         .seekBar.remaining
-        .playButton.paused
-          .pause
+        .playButton.playing
+          .pause(data-tippy="Pause")
             +icon('pause')
-          .play
+          .play(data-tippy="Play")
             +icon('play')
-        .previousButton
+        .previousButton(data-tippy="Previous Track")
           +icon('next')
-        .nextButton
+        .nextButton(data-tippy="Next Track")
           +icon('next')
-        .rewindButton
+        .rewindButton(data-tippy="Rewind 10s")
           +icon('forward')
           .rewindTime 10
-        .forwardButton
+        .forwardButton(data-tippy="Forward 30s")
           +icon('forward')
           .forwardTime 30
-        .shuffleButton
+        .shuffleButton(data-tippy="Shuffle")
           +icon('shuffle')
         .repeatButton.looping
-          .loop
+          .loop(data-tippy="Looping the queue")
             +icon('loop')
-          .repeat
+          .repeat(data-tippy="Repeating the track")
             +icon('repeat')
         .volumeButton
           +icon('volume')
