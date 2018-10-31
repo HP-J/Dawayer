@@ -3,7 +3,7 @@
 
 # Licenses
 This project is licensed under the [MIT License](https://gitlab.com/herpproject/Dawayer/blob/development/LICENSE)  
-All icons inside the [icons folder](https://gitlab.com/herpproject/Dawayer/tree/development/icons) are made by us and is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+All icons inside the [icons folder](https://gitlab.com/herpproject/Dawayer/tree/development/icons) are made by us and are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 # Acknowledgments
 Dawayer's design is heavily inspired by [Phonograph](https://play.google.com/store/apps/details?id=com.kabouzeid.gramophone).  
