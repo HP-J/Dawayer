@@ -86,34 +86,49 @@
   font-weight: 700;
 }
 
-.pause, .play
+.playButton > .pause,
+.playButton > .play,
+.shuffleButton > .shuffle,
+.shuffleButton > .linear,
+.repeatButton > .loop,
+.repeatButton > .repeat,
+.repeatButton > .singular
 {
   width: 100%;
   height: 100%;
 }
 
-.paused > .pause
+.playButton.paused > .pause
 {
   display: none;
 }
 
-.playing > .play
+.playButton.playing > .play
 {
   display: none;
 }
 
-.loop, .repeat
-{
-  width: 100%;
-  height: 100%;
-}
-
-.looping > .repeat
+.shuffleButton.shuffled > .linear
 {
   display: none;
 }
 
-.repeating > .loop
+.shuffleButton.normal > .shuffle
+{
+  display: none;
+}
+
+.repeatButton.looping > .repeat, .repeatButton.looping > .singular
+{
+  display: none;
+}
+
+.repeatButton.repeating > .loop, .repeatButton.repeating > .singular
+{
+  display: none;
+}
+
+.repeatButton.once > .repeat, .repeatButton.once > .loop
 {
   display: none;
 }

@@ -78,7 +78,7 @@ html(lang="en")
       .controls.container
         .seekBar.played
         .seekBar.remaining
-        .playButton.playing
+        .playButton.paused
           .pause(data-tippy="Pause")
             +icon('pause')
           .play(data-tippy="Play")
@@ -87,19 +87,24 @@ html(lang="en")
           +icon('next')
         .nextButton(data-tippy="Next Track")
           +icon('next')
-        .rewindButton(data-tippy="Rewind 10s")
+        .rewindButton
           +icon('forward')
-          .rewindTime 10
-        .forwardButton(data-tippy="Forward 30s")
+          .rewindTime 00
+        .forwardButton
           +icon('forward')
-          .forwardTime 30
-        .shuffleButton(data-tippy="Shuffle")
-          +icon('shuffle')
+          .forwardTime 00
+        .shuffleButton.shuffled
+          .shuffle(data-tippy="Shuffled queue")
+            +icon('shuffle')
+          .linear(data-tippy="Normal queue")
+            +icon('linear')
         .repeatButton.looping
           .loop(data-tippy="Looping the queue")
             +icon('loop')
           .repeat(data-tippy="Repeating the track")
             +icon('repeat')
+          .singular(data-tippy="Playing the queue once")
+            +icon('singular')
         .volumeButton
           +icon('volume')
       .queue.container

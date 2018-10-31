@@ -5,15 +5,36 @@ import tippy from 'tippy.js';
 
 let resizeEndTimeout;
 
-const rewindTimeText = document.body.querySelector('.rewindTime');
-const forwardTimeText = document.body.querySelector('.forwardTime');
+let rewindTime = 10;
+let forwardTime = 30;
+
+const rewindButton = document.body.querySelector('.rewindButton');
+const forwardButton = document.body.querySelector('.forwardButton');
+
+const rewindTimeText = rewindButton.children[1];
+const forwardTimeText = forwardButton.children[1];
+
+/** @typedef { import('tippy.js').Instance } TippyInstance
+*/
+
+/** @type { TippyInstance }
+*/
+let rewindTimeTooltip;
+
+/** @type { TippyInstance }
+*/
+let forwardTimeTooltip;
+
+/** @type { TippyInstance }
+*/
+let volumeTooltip;
+
 const volumeButton = document.body.querySelector('.volumeButton');
 
 function resizeEnd()
 {
-  // text that need to fit in container
-  const cached = [ rewindTimeText.innerText, forwardTimeText.innerText ];
-
+  // to force rewindTimeText amd forwardTimeText
+  // to share the same new size
   rewindTimeText.innerText = forwardTimeText.innerText = '00';
   
   textFit(
@@ -22,8 +43,9 @@ function resizeEnd()
       forwardTimeText
     ]);
 
-  rewindTimeText.children[0].innerText = cached[0];
-  forwardTimeText.children[0].innerText = cached[1];
+  // set text to the actual timings back
+  rewindTimeText.children[0].innerText = rewindTime;
+  forwardTimeText.children[0].innerText = forwardTime;
 
   // remove no-motion class
   document.body.classList.remove('noMotion');
@@ -31,17 +53,42 @@ function resizeEnd()
 
 function init()
 {
+  // create and configure tooltips
   tippy.setDefaults({ a11y: false, delay: [ 200, 50 ] });
 
-  tippy(volumeButton, { interactive: true, content: 'Volume' });
+  rewindTimeTooltip = tippy(rewindButton, { content: `Rewind ${rewindTime}s` }).instances[0];
+  forwardTimeTooltip = tippy(forwardButton, { content: `Forward ${forwardTime}s` }).instances[0];
+
+  volumeTooltip = tippy(volumeButton, { interactive: true, content: 'Volume' }).instances[0];
+
+  // events
+  window.onload = onload;
+  window.onresize = onresize;
 }
 
-window.onload = () =>
+/** @param { number } rewind
+* @param { number } forward
+*/
+function changeRewindForwardTimings(rewind, forward)
+{
+  rewindTime = rewind;
+  forwardTime = forward;
+
+  // the icon text
+  rewindTimeText.children[0].innerText = rewindTime;
+  forwardTimeText.children[0].innerText = forwardTime;
+
+  // the tooltips text
+  rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
+  forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
+}
+
+function onload()
 {
   resizeEnd();
-};
+}
 
-window.onresize = () =>
+function onresize()
 {
   // clear old resize-end timeout event
   if (resizeEndTimeout)
@@ -53,6 +100,6 @@ window.onresize = () =>
 
   // set a new resize-end timeout
   resizeEndTimeout = setTimeout(resizeEnd, 25);
-};
+}
 
 init();
