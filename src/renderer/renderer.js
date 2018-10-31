@@ -1,6 +1,5 @@
 // import { remote } from 'electron';
 
-import textFit from 'textfit';
 import tippy from 'tippy.js';
 
 let resizeEndTimeout;
@@ -10,6 +9,9 @@ let forwardTime = 30;
 
 const rewindButton = document.body.querySelector('.rewindButton');
 const forwardButton = document.body.querySelector('.forwardButton');
+
+const pagesButton = document.body.querySelector('.pages');
+const volumeButton = document.body.querySelector('.volumeButton');
 
 const rewindTimeText = rewindButton.children[1];
 const forwardTimeText = forwardButton.children[1];
@@ -27,26 +29,14 @@ let forwardTimeTooltip;
 
 /** @type { TippyInstance }
 */
-let volumeTooltip;
+let pagesTooltip;
 
-const volumeButton = document.body.querySelector('.volumeButton');
+/** @type { TippyInstance }
+*/
+let volumeTooltip;
 
 function resizeEnd()
 {
-  // to force rewindTimeText amd forwardTimeText
-  // to share the same new size
-  rewindTimeText.innerText = forwardTimeText.innerText = '00';
-  
-  textFit(
-    [
-      rewindTimeText,
-      forwardTimeText
-    ]);
-
-  // set text to the actual timings back
-  rewindTimeText.children[0].innerText = rewindTime;
-  forwardTimeText.children[0].innerText = forwardTime;
-
   // remove no-motion class
   document.body.classList.remove('noMotion');
 }
@@ -56,9 +46,10 @@ function init()
   // create and configure tooltips
   tippy.setDefaults({ a11y: false, delay: [ 200, 50 ] });
 
-  rewindTimeTooltip = tippy(rewindButton, { content: `Rewind ${rewindTime}s` }).instances[0];
-  forwardTimeTooltip = tippy(forwardButton, { content: `Forward ${forwardTime}s` }).instances[0];
+  rewindTimeTooltip = tippy(rewindButton).instances[0];
+  forwardTimeTooltip = tippy(forwardButton).instances[0];
 
+  pagesTooltip = tippy(pagesButton, { interactive: true, content: 'Albums' }).instances[0];
   volumeTooltip = tippy(volumeButton, { interactive: true, content: 'Volume' }).instances[0];
 
   // events
@@ -75,8 +66,8 @@ function changeRewindForwardTimings(rewind, forward)
   forwardTime = forward;
 
   // the icon text
-  rewindTimeText.children[0].innerText = rewindTime;
-  forwardTimeText.children[0].innerText = forwardTime;
+  rewindTimeText.innerText = rewindTime;
+  forwardTimeText.innerText = forwardTime;
 
   // the tooltips text
   rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
@@ -86,6 +77,9 @@ function changeRewindForwardTimings(rewind, forward)
 function onload()
 {
   resizeEnd();
+
+  // set values
+  changeRewindForwardTimings(rewindTime, forwardTime);
 }
 
 function onresize()

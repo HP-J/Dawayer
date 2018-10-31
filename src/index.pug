@@ -17,23 +17,24 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/controls.css')
     link(rel='stylesheet' href='./renderer/styles/fonts.css')
     link(rel='stylesheet' href='./renderer/styles/menu.css')
+    link(rel='stylesheet' href='./renderer/styles/queue.css')
     link(rel='stylesheet' href='./renderer/styles/tippy.css')
 
   body(class='noMotion')
     img(src='../test-materials/2nd page.png').design
 
     .menu
-      .menuItem.wrapper.expanded.selected
-        .menuItem.container
+      .menuItem.wrapper.playing
+        .menuItem.container(data-tippy="Playing Now", data-tippy-arrow="true")
           +icon('playing')
-      .menuItem.wrapper.expanded.selected
+      .menuItem.wrapper.pages.selected
         .menuItem.container
           +icon('albums')
-      .menuItem.wrapper.expanded.selected
-        .menuItem.container
+      .menuItem.wrapper.podcasts
+        .menuItem.container(data-tippy="Podcasts", data-tippy-arrow="true")
           +icon('podcast')
-      .menuItem.wrapper.expanded.selected
-        .menuItem.container
+      .menuItem.wrapper.options
+        .menuItem.container(data-tippy="Options", data-tippy-arrow="true")
           +icon('settings')
         
     .page.wrapper
@@ -108,6 +109,14 @@ html(lang="en")
         .volumeButton
           +icon('volume')
       .queue.container
+        .queue.playing.card
+          .queue.playing.cover.wrapper
+            .queue.playing.cover.container
+              .queue.playing.cover.content(style='background-image: url(../test-materials/Dina1.jpeg);')
+          .queue.playing.artist Dina El-Wedidi
+          .queue.playing.title Dawayer (Circles) [ft. Mazaher]
+        .queue.text Up Next
+        .queue.tracks
   
   script.
     window.onerror = function(message, url, line, column, error)

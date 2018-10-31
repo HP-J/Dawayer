@@ -9,10 +9,10 @@
   background-color: var(--color-2);
 
   min-height: 125px;
-  width: 95%;
+  width: 96%;
   height: 30vh;
 
-  padding: 0px 2.5%;
+  padding: 0px 2%;
 }
 
 .controls.container
@@ -33,14 +33,24 @@
 
 .queue.container
 {
+  display: grid;
+
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 5% 1fr;
+  grid-template-areas: "playing playing" "text text" "tracks tracks";
+
   position: relative;
 
   align-self: flex-end;
 
-  background-color: gold;
+  background-color: rgba(255, 217, 0, 0.308);
 
-  width: 38.5%;
-  height: 90%;
+  /* top: 49vh; */
+  width: 35.5%;
+  height: 75vh;
+
+  padding: 0px 1.5%;
+  padding-top: 1%;
 }
 
 @media screen and (max-width: 700px)
@@ -63,8 +73,8 @@
   {
     position: relative;
     
-    top: -3.5%;
-    width: 85%;
+    top: -5.5%;
+    width: 75%;
     
     margin: auto;
   }

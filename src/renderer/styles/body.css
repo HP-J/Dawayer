@@ -49,8 +49,8 @@ svg.icon
 
 svg.icon > *
 {
-  fill: white;
-  stroke: white;
+  fill: var(--color-4);
+  stroke: var(--color-4);
 }
 
 .page.wrapper

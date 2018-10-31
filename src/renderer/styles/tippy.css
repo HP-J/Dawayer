@@ -1,6 +1,26 @@
-.tippy-backdrop
+.tippy-backdrop, .tippy-tooltip
 {
   background-color: var(--color-5);
+}
+
+.tippy-popper[x-placement^='top'] .tippy-arrow
+{
+  border-top-color: var(--color-5);
+}
+
+.tippy-popper[x-placement^='bottom'] .tippy-arrow
+{
+  border-bottom-color: var(--color-5);
+}
+
+.tippy-popper[x-placement^='left'] .tippy-arrow
+{
+  border-left-color: var(--color-5);
+}
+
+.tippy-popper[x-placement^='right'] .tippy-arrow
+{
+  border-right-color: var(--color-5);
 }
 
 .tippy-content

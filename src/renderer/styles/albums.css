@@ -6,6 +6,7 @@
   min-width: 115px;
   max-height: fit-content;
   width: calc(14vw + 2vh);
+  height: auto;
 
   overflow: hidden;
   margin: 1.5%;
