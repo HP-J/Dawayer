@@ -49,7 +49,7 @@ function init()
   rewindTimeTooltip = tippy(rewindButton).instances[0];
   forwardTimeTooltip = tippy(forwardButton).instances[0];
 
-  pagesTooltip = tippy(pagesButton, { interactive: true, content: 'Albums' }).instances[0];
+  pagesTooltip = tippy(pagesButton, { interactive: true, arrow: true, content: 'Albums' }).instances[0];
   volumeTooltip = tippy(volumeButton, { interactive: true, content: 'Volume' }).instances[0];
 
   // events

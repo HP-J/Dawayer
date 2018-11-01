@@ -21,7 +21,7 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/tippy.css')
 
   body(class='noMotion')
-    img(src='../test-materials/2nd page.png').design
+    //- img(src='../test-materials/2nd page.png').design
 
     .menu
       .menuItem.wrapper.playing
@@ -46,34 +46,34 @@ html(lang="en")
               .pageItem.albums.title Slumber
               .pageItem.albums.text by 
               .pageItem.albums.artist Dina El-Wedidi
-        //- .pageItem.albums.wrapper.placeholder
-        //-   .pageItem.albums.container
-        //-     .pageItem.albums.cover
-        //-     .pageItem.albums.card
-        //-       .pageItem.albums.title
-        //-       .pageItem.albums.text
-        //-       .pageItem.albums.artist
-        //- //- .pageItem.albums.wrapper
-        //-   .pageItem.albums.container
-        //-     .pageItem.albums.cover(style='background-image: url(../test-materials/Maryam1.jpg);')
-        //-     .pageItem.albums.card
-        //-       .pageItem.albums.title Ana Mesh Baghanny
-        //-       .pageItem.albums.text by 
-        //-       .pageItem.albums.artist Maryam Saleh
-        //- .pageItem.albums.wrapper
-        //-   .pageItem.albums.container
-        //-     .pageItem.albums.cover(style='background-image: url(../test-materials/Ramy1.png);')
-        //-     .pageItem.albums.card
-        //-       .pageItem.albums.title Mamnoua
-        //-       .pageItem.albums.text by 
-        //-       .pageItem.albums.artist Ramy Essam
-        //- .pageItem.albums.wrapper
-        //-   .pageItem.albums.container
-        //-     .pageItem.albums.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
-        //-     .pageItem.albums.card
-        //-       .pageItem.albums.title Turning Back
-        //-       .pageItem.albums.text by 
-        //-       .pageItem.albums.artist Dina El-Wedidi
+        .pageItem.albums.wrapper.placeholder
+          .pageItem.albums.container
+            .pageItem.albums.cover
+            .pageItem.albums.card
+              .pageItem.albums.title
+              .pageItem.albums.text
+              .pageItem.albums.artist
+        .pageItem.albums.wrapper
+          .pageItem.albums.container
+            .pageItem.albums.cover(style='background-image: url(../test-materials/Maryam1.jpg);')
+            .pageItem.albums.card
+              .pageItem.albums.title Ana Mesh Baghanny
+              .pageItem.albums.text by 
+              .pageItem.albums.artist Maryam Saleh
+        .pageItem.albums.wrapper
+          .pageItem.albums.container
+            .pageItem.albums.cover(style='background-image: url(../test-materials/Ramy1.png);')
+            .pageItem.albums.card
+              .pageItem.albums.title Mamnoua
+              .pageItem.albums.text by 
+              .pageItem.albums.artist Ramy Essam
+        .pageItem.albums.wrapper
+          .pageItem.albums.container
+            .pageItem.albums.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
+            .pageItem.albums.card
+              .pageItem.albums.title Turning Back
+              .pageItem.albums.text by 
+              .pageItem.albums.artist Dina El-Wedidi
     
     .controlBar
       .controls.container
@@ -90,10 +90,10 @@ html(lang="en")
           +icon('next')
         .rewindButton
           +icon('forward')
-          .rewindTime 00
+          .rewindTime
         .forwardButton
           +icon('forward')
-          .forwardTime 00
+          .forwardTime
         .shuffleButton.shuffled
           .shuffle(data-tippy="Shuffled queue")
             +icon('shuffle')
@@ -117,6 +117,10 @@ html(lang="en")
           .queue.playing.title Dawayer (Circles) [ft. Mazaher]
         .queue.text Up Next
         .queue.tracks
+          .queueItem.container
+            .queueItem.index -1
+            .queueItem.artist Dina El-Wedidi
+            .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
   
   script.
     window.onerror = function(message, url, line, column, error)
