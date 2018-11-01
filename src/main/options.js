@@ -6,7 +6,7 @@ import { existsSync } from 'fs';
 
 import * as settings from 'electron-json-config';
 
-import { showHide } from './window.js';
+import { showHide, isDebug } from './window.js';
 
 /** @type { Tray }
 */
@@ -42,6 +42,9 @@ const trayMenuTemplate = [
 
 export function loadOptions()
 {
+  if (isDebug())
+    return;
+  
   loadTrayIcon();
 }
 

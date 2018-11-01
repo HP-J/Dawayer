@@ -77,8 +77,10 @@ html(lang="en")
     
     .controlBar
       .controls.container
-        .seekBar.played
-        .seekBar.remaining
+        .seekBar.container
+          .seekBar.played
+          .seekBar.controller
+          .seekBar.remaining
         .playButton.paused
           .pause(data-tippy="Pause")
             +icon('pause')

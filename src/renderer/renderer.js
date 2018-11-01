@@ -44,7 +44,7 @@ function resizeEnd()
 function init()
 {
   // create and configure tooltips
-  tippy.setDefaults({ a11y: false, delay: [ 200, 50 ] });
+  tippy.setDefaults({ a11y: false, delay: [ 350, 50 ] });
 
   rewindTimeTooltip = tippy(rewindButton).instances[0];
   forwardTimeTooltip = tippy(forwardButton).instances[0];
