@@ -2,6 +2,8 @@
 {
   position: relative;
 
+  background-color: var(--color-4);
+
   top: 11px;
   min-width: 115px;
   max-height: fit-content;
@@ -10,6 +12,10 @@
 
   overflow: hidden;
   margin: 1.5%;
+
+  transition-property: margin, width;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .pageItem.albums.wrapper:before
@@ -30,8 +36,18 @@
   width: 100%;
 }
 
+.pageItem.albums.wrapper:not(.placeholder):hover
+{
+  width: calc(14.5vw + 2.5vh);
+
+  margin: 1.5% 0.5%;
+}
+
 .pageItem.albums.cover
 {
+  position: absolute;
+
+  top: 0;
   width: 100%;
   height: 79%;
 
@@ -39,6 +55,35 @@
 
   background-size: cover;
   background-position: center;
+
+  transition-property: height;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.pageItem.albums.cover:after
+{
+  content: "";
+  display: block;
+
+  background-color: rgba(255, 255, 255, 0);
+
+  width: 100%;
+  height: 100%;
+
+  transition-property: background-color;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.pageItem.albums.wrapper:not(.placeholder):hover > * > .pageItem.albums.cover
+{
+  height: 100%;
+}
+
+.pageItem.albums.wrapper:not(.placeholder):hover > * > .pageItem.albums.cover:after
+{
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .pageItem.albums.card
@@ -46,31 +91,59 @@
   display: grid;
 
   grid-template-columns: auto 1fr;
+  grid-template-rows: 91% 9%;
   grid-template-areas: "title title" "text artist";
 
+  position: relative;
   white-space: pre;
   user-select: none;
 
-  background-color: white;
-
+  top: 0;
   width: 90%;
-  height: 21%;
+  height: 100%;
   padding: 0px 5%;
 
   font-family: Lato, sans-serif;
   font-size: calc(3px + 0.3vw + 0.35vh);
   font-weight: 400;
+
+  transition-property: background-color, top;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.pageItem.albums.background
+{
+  z-index: 1;
+  position: absolute;
+
+  background-color: var(--color-4);
+
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 21%;
+
+  transition-property: bottom;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.pageItem.albums.wrapper:not(.placeholder):hover > * > .pageItem.albums.card > .pageItem.albums.background
+{
+  bottom: -21%;
 }
 
 .pageItem.albums.title
 {
+  z-index: 1;
   grid-area: title;
 
   display: flex;
   align-items: flex-end;
-  
+
   width: 100%;
-  
+
   overflow: hidden;
   font-size: calc(4px + 0.55vw + 0.5vh);
   font-weight: 700;
@@ -78,12 +151,15 @@
 
 .pageItem.albums.text
 {
+  z-index: 1;
   grid-area: text;
 }
 
 .pageItem.albums.artist
 {
+  z-index: 1;
   grid-area: artist;
+
   color: var(--color-3);
 
   overflow: hidden;
@@ -95,19 +171,18 @@
 .placeholder > .container > .card > .pageItem.albums.title,
 .placeholder > .container > .card > .pageItem.albums.artist
 {
-  position: relative;
   background-color: #F6F6F6;
 }
 
-.placeholder > .container > .pageItem.albums.cover:before,
-.placeholder > .container > .card > .pageItem.albums.title:before,
-.placeholder > .container > .card > .pageItem.albums.artist:before
+.placeholder > .container:after
 {
+  z-index: 3;
+
   content: "";
   display: block;
 
   position: absolute;
-  background: linear-gradient(to left, rgba(15,15,15,0) 0%, rgba(218, 215, 215, 0.3) 50%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(to left, rgba(15,15,15,0) 0%, rgba(189, 189, 189, 0.3) 50%, rgba(255,255,255,0) 100%);
 
   top: 0;
   width: 100%;
@@ -119,6 +194,7 @@
 .placeholder > .container > .card > .pageItem.albums.title
 {
   margin: 2.5% 0px;
+  margin-top: 135%;
 }
 
 .placeholder > .container > .card > .pageItem.albums.artist

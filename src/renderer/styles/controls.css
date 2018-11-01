@@ -55,23 +55,31 @@
 
 .playButton:hover > * > .icon > *, .previousButton:hover > .icon > *, .nextButton:hover > .icon > *,
 .rewindButton:hover > .icon > *, .forwardButton:hover > .icon > *, .shuffleButton:hover > * >.icon > *,
-.rewindButton:hover > .rewindTime, .forwardButton:hover > .forwardTime,
-.repeatButton:hover > * > .icon > *, .volumeButton:hover > .icon > *
+.repeatButton:hover > * > .icon > *, .volumeButton:hover > .icon > *,
+.rewindButton:hover > .rewindTime, .forwardButton:hover > .forwardTime
 {
   fill: var(--color-7);
   stroke: var(--color-7);
   color: var(--color-7);
 }
 
-.playButton:active > * > .icon > *, .previousButton:active > .icon > *, .nextButton:active > .icon > *,
-.rewindButton:active > .icon > *, .forwardButton:active > .icon > *, .shuffleButton:active > * >.icon > *,
-.rewindButton:active > .rewindTime, .forwardButton:active > .forwardTime,
-.repeatButton:active > * > .icon > *,  .volumeButton:active > .icon > *
+.playButton:active > * > .icon, .nextButton:active > .icon,
+.forwardButton:active > .icon, .shuffleButton:active > * > .icon,
+.repeatButton:active > * > .icon,  .volumeButton:active > .icon,
+.rewindButton:active > .rewindTime, .forwardButton:active > .forwardTime
 {
-  transition-duration: transform;
+  transition-property: transform;
   transition-duration: 0.05s;
   transition-timing-function: linear;
-  transform: scale(0.85) skewX(4deg) skewY(8deg);
+  transform: scale(0.85);
+}
+
+.previousButton:active > .icon, .rewindButton:active > .icon
+{
+  transition-property: transform;
+  transition-duration: 0.05s;
+  transition-timing-function: linear;
+  transform: scale(0.85) scaleX(-1);
 }
 
 .rewindButton, .forwardButton
@@ -94,12 +102,7 @@
   height: 45%;
 }
 
-.previousButton > .icon
-{
-  transform: rotateZ(180deg);
-}
-
-.rewindButton > .icon
+.previousButton > .icon, .rewindButton > .icon
 {
   transform: scaleX(-1);
 }

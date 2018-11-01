@@ -35,6 +35,7 @@
 
 .queue.container
 {
+  z-index: 5;
   position: relative;
 
   display: grid;
@@ -93,6 +94,6 @@
 
   .queue.container:hover
   {
-    top: calc(-68vh + (35vh - 2vh));
+    top: -40vh;
   }
 }
