@@ -4,6 +4,7 @@
 
   display: flex;
   justify-content: center;
+  align-items: center;
 
   max-height: fit-content;
   width: 100%;
@@ -15,16 +16,17 @@
 
 .menuItem.wrapper
 {
-  margin: 0px 0.6vw;
-}
-
-.menuItem.wrapper
-{
   position: relative;
 
   min-width: 60px;
   max-height: fit-content;
   width: 5.65vw;
+
+  margin: 0px 0.6vw;
+
+  transition-property: min-width, width, max-height, height;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 .menuItem.wrapper:before
@@ -34,59 +36,79 @@
 
   width: 100%;
   padding-bottom: 60%;
-}
 
-.menuItem.wrapper.collapsed
-{
-  position: relative;
-
-  min-width: 45px;
-  max-height: fit-content;
-  width: 6.65vw;
-}
-
-.menuItem.wrapper.collapsed:before
-{
-  content: "";
-  display: block;
-
-  width: 100%;
-  padding-bottom: 15%;
+  transition-property: padding-bottom;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 .menuItem.wrapper > .menuItem.container 
 {
   position: absolute;
-
+  
+  background-color: #4e4617;
+  
   top: 0;
   height: 100%;
   width: 100%;
-
+  
   border-radius: 30% / 50%;
+
+  pointer-events: none;
+
+  transition-property: background-color, border-radius;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.menuItem.wrapper > .menuItem.container > .icon
+{
+  opacity: 1;
+
+  transition-property: opacity;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Selected */
+
+.menuItem.wrapper.selected
+{
+  min-width: 94.35px;
+  width: 8.95vw;
+}
+
+.menuItem.wrapper.selected:before
+{
+  padding-bottom: 38%;
+}
+
+.menuItem.wrapper.selected > .menuItem.container 
+{
+  background-color: #4e4617;
+
+  border-radius: 18% / 50%;
+}
+
+/* Collapsed */
+
+.menuItem.wrapper.collapsed
+{
+  min-width: 45px;
+  width: 6.65vw;
+}
+
+.menuItem.wrapper.collapsed:before
+{
+  padding-bottom: 15%;
 }
 
 .menuItem.wrapper.collapsed > .menuItem.container 
 {
-  position: absolute;
-
-  top: 0;
-  height: 100%;
-  width: 100%;
-
   border-radius: 10% / 50%;
 }
 
-.menuItem.wrapper.collapsed > .menuItem.container > svg
+.menuItem.wrapper.collapsed > .menuItem.container > .icon
 {
-  display: none;
-}
-
-.menuItem.wrapper > .menuItem.container
-{
-  background-color: #4e4617;
-}
-
-.menuItem.wrapper.selected > .menuItem.container
-{
-  background-color: #4e4617;
+  opacity: 0;
 }

@@ -4,7 +4,6 @@
 
   background-color: var(--color-4);
 
-  top: 11px;
   min-width: 115px;
   max-height: fit-content;
   width: calc(14vw + 2vh);

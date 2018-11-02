@@ -1,13 +1,16 @@
-.seekBar.container
+.seek.bar.container
 {
-  display: flex;
-  align-items: center;
-
   width: 100%;
   height: 15%;
 }
 
-.seekBar.played
+.bar.container
+{
+  display: flex;
+  align-items: center;
+}
+
+.bar.used
 {
   background-color: var(--color-6);
 
@@ -15,28 +18,11 @@
   height: 40%;
 }
 
-.seekBar.controller
+.bar.remaining
 {
   background-color: var(--color-4);
 
-  width: 5%;
-  height: 40%;
-
-  transition-property: height;
-  transition-duration: 0.15s;
-  transition-timing-function: linear;
-}
-
-.seekBar.container:hover > .seekBar.controller
-{
-  height: 80%;
-}
-
-.seekBar.remaining
-{
-  background-color: var(--color-4);
-
-  width: 95%;
+  width: 100%;
   height: 40%;
 }
 

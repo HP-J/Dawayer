@@ -8,6 +8,7 @@ html
   --color-5: black;
   --color-6: #806969;
   --color-7: #7fffd4;
+  --color-8: #929493;
 }
 
 body
@@ -42,13 +43,15 @@ body
   opacity: 0.85;
 }
 
-svg.icon
+.icon
 {
+  pointer-events: none;
+
   width: 100%;
   height: 100%;
 }
 
-svg.icon > *
+.icon > *
 {
   fill: var(--color-4);
   stroke: var(--color-4);
@@ -82,7 +85,9 @@ svg.icon > *
   overflow-y: hidden;
 
   width: 52%;
-  height: 100%;
+  height: 95%;
+
+  padding: 2.5% 0px;
 }
 
 .page.container:hover

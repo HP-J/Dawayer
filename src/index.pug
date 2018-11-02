@@ -25,16 +25,13 @@ html(lang="en")
 
     .menu
       .menuItem.wrapper.playing
-        .menuItem.container(data-tippy="Playing Now", data-tippy-arrow="true")
+        .menuItem.container
           +icon('playing')
-      .menuItem.wrapper.pages.selected
+      .menuItem.wrapper.local.selected
         .menuItem.container
           +icon('albums')
-      .menuItem.wrapper.podcasts
-        .menuItem.container(data-tippy="Podcasts", data-tippy-arrow="true")
-          +icon('podcast')
       .menuItem.wrapper.options
-        .menuItem.container(data-tippy="Options", data-tippy-arrow="true")
+        .menuItem.container
           +icon('settings')
         
     .page.wrapper
@@ -80,10 +77,9 @@ html(lang="en")
     
     .controlBar
       .controls.container
-        .seekBar.container
-          .seekBar.played
-          .seekBar.controller
-          .seekBar.remaining
+        .seek.bar.container
+          .bar.played
+          .bar.remaining
         .playButton.paused
           .pause(data-tippy="Pause")
             +icon('pause')
@@ -115,9 +111,7 @@ html(lang="en")
           +icon('volume')
       .queue.container
         .queue.playing.card
-          .queue.playing.cover.wrapper
-            .queue.playing.cover.container
-              .queue.playing.cover.content(style='background-image: url(../test-materials/Dina1.jpeg);')
+          .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
           .queue.playing.artist Dina El-Wedidi
           .queue.playing.title Dawayer (Circles) [ft. Mazaher]
         .queue.text Up Next

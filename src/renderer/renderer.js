@@ -2,22 +2,45 @@
 
 import tippy from 'tippy.js';
 
+/** @typedef { import('tippy.js').Instance } TippyInstance
+*/
+
 let resizeEndTimeout;
 
 let rewindTime = 10;
 let forwardTime = 30;
 
+/**  @type { HTMLDivElement }
+*/
 const rewindButton = document.body.querySelector('.rewindButton');
+
+/**  @type { HTMLDivElement }
+*/
 const forwardButton = document.body.querySelector('.forwardButton');
 
-const pagesButton = document.body.querySelector('.pages');
+/**  @type { HTMLDivElement }
+*/
+const playingButton = document.body.querySelector('.menuItem.playing');
+
+/**  @type { HTMLDivElement }
+*/
+const localButton = document.body.querySelector('.menuItem.local');
+
+/**  @type { HTMLDivElement }
+*/
+const optionsButton = document.body.querySelector('.menuItem.options');
+
+/**  @type { HTMLDivElement }
+*/
 const volumeButton = document.body.querySelector('.volumeButton');
 
-const rewindTimeText = rewindButton.children[1];
-const forwardTimeText = forwardButton.children[1];
-
-/** @typedef { import('tippy.js').Instance } TippyInstance
+/**  @type { HTMLDivElement }
 */
+const rewindTimeText = rewindButton.children[1];
+
+/**  @type { HTMLDivElement }
+*/
+const forwardTimeText = forwardButton.children[1];
 
 /** @type { TippyInstance }
 */
@@ -29,7 +52,7 @@ let forwardTimeTooltip;
 
 /** @type { TippyInstance }
 */
-let pagesTooltip;
+let localTooltip;
 
 /** @type { TippyInstance }
 */
@@ -43,18 +66,70 @@ function resizeEnd()
 
 function init()
 {
+  initTippy();
+  initEvents();
+}
+
+function initTippy()
+{
   // create and configure tooltips
-  tippy.setDefaults({ a11y: false, delay: [ 350, 50 ] });
+  const normalDelay = [ 350, 50 ];
+  const menuItemsDelay = [ 250, 50 ];
+  const interactiveDelay = [ 150, 50 ];
+  
+  tippy.setDefaults({ a11y: false, delay: normalDelay });
+
+  tippy(playingButton, {
+    content: 'Playing Now',
+    placement: 'bottom',
+    arrow: true,
+    delay: menuItemsDelay
+  }).instances[0];
+
+  localTooltip = tippy(localButton, {
+    content: 'Albums',
+    placement: 'bottom',
+    interactive: true,
+    arrow: true,
+    delay: interactiveDelay
+  }).instances[0];
+
+  tippy(optionsButton, {
+    content: 'Options',
+    placement: 'bottom',
+    arrow: true,
+    delay: menuItemsDelay
+  }).instances[0];
 
   rewindTimeTooltip = tippy(rewindButton).instances[0];
   forwardTimeTooltip = tippy(forwardButton).instances[0];
 
-  pagesTooltip = tippy(pagesButton, { interactive: true, arrow: true, content: 'Albums' }).instances[0];
-  volumeTooltip = tippy(volumeButton, { interactive: true, content: 'Volume' }).instances[0];
+  volumeTooltip = tippy(volumeButton, {
+    content: 'Volume',
+    interactive: true,
+    delay: interactiveDelay
+  }).instances[0];
+}
 
-  // events
+function initEvents()
+{
+  // menu events
+  playingButton.onclick = changePage;
+  localButton.onclick = changePage;
+  optionsButton.onclick = changePage;
+
+  // window events
   window.onload = onload;
   window.onresize = onresize;
+}
+
+/** @param { MouseEvent } event
+*/
+function changePage(event)
+{
+  document.querySelector('.menuItem.selected').classList.remove('selected');
+
+  event.srcElement.classList.add('selected');
 }
 
 /** @param { number } rewind

@@ -1,5 +1,6 @@
 .controlBar
 {
+  z-index: 5;
   position: relative;
 
   grid-area: controlBar;
@@ -35,7 +36,6 @@
 
 .queue.container
 {
-  z-index: 5;
   position: relative;
 
   display: grid;
