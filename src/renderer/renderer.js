@@ -61,7 +61,7 @@ let volumeTooltip;
 function resizeEnd()
 {
   // remove no-motion class
-  document.body.classList.remove('noMotion');
+  document.body.classList.remove('fastforward');
 }
 
 function init()
@@ -164,8 +164,8 @@ function onresize()
     clearTimeout(resizeEndTimeout);
 
   // add no-motion class
-  if (!document.body.classList.contains('noMotion'))
-    document.body.classList.add('noMotion');
+  if (!document.body.classList.contains('fastforward'))
+    document.body.classList.add('fastforward');
 
   // set a new resize-end timeout
   resizeEndTimeout = setTimeout(resizeEnd, 25);

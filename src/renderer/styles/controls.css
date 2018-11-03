@@ -30,9 +30,9 @@
 .rewindButton, .forwardButton, .shuffleButton,
 .repeatButton, .volumeButton
 {
-  align-self: center;
-
   position: relative;
+  align-self: center;
+  
   background-color: black;
 
   width: calc(3.5vw + 5vh);

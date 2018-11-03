@@ -1,15 +1,15 @@
 doctype html
 
 mixin icon(name)
-  svg(class="icon")
+  svg.icon
     use(xlink:href=`./icons.svg#${name}`)
 
-html(lang="en")
+html(lang='en')
   head
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
     meta(http-equiv='X-UA-Compatible' content='ie=edge')
-    meta(http-equiv='Content-Security-Policy' content="script-src 'unsafe-inline'")
+    meta(http-equiv='Content-Security-Policy' content=`script-src 'unsafe-inline'`)
 
     link(rel='stylesheet' href='./renderer/styles/albums.css')
     link(rel='stylesheet' href='./renderer/styles/body.css')
@@ -20,74 +20,76 @@ html(lang="en")
     link(rel='stylesheet' href='./renderer/styles/queue.css')
     link(rel='stylesheet' href='./renderer/styles/tippy.css')
 
-  body(class='noMotion')
+  body.fastforward
     //- img(src='../test-materials/2nd page.png').design
 
-    .menu
-      .menuItem.wrapper.playing
-        .menuItem.container
-          +icon('playing')
-      .menuItem.wrapper.local.selected
-        .menuItem.container
-          +icon('albums')
-      .menuItem.wrapper.options
-        .menuItem.container
-          +icon('settings')
-        
-    .page.wrapper
+    .base.container
+      .menu.container
+        .menuItem.wrapper.playing
+          .menuItem.container
+            +icon('playing')
+        .menuItem.wrapper.local.selected
+          .menuItem.container
+            +icon('albums')
+        .menuItem.wrapper.options
+          .menuItem.container
+            +icon('settings')
+
       .page.container
-        .pageItem.albums.wrapper
-          .pageItem.albums.container
-            .pageItem.albums.cover(style='background-image: url(../test-materials/Dina2.png);')
-            .pageItem.albums.card
-              .pageItem.albums.background
-              .pageItem.albums.title Slumber
-              .pageItem.albums.text by 
-              .pageItem.albums.artist Dina El-Wedidi
-        .pageItem.albums.wrapper.placeholder
-          .pageItem.albums.container
+        .pageItem.wrapper.albums.placeholder
+          .pageItem.container.albums
             .pageItem.albums.cover
             .pageItem.albums.card
               .pageItem.albums.background
               .pageItem.albums.title
               .pageItem.albums.text
               .pageItem.albums.artist
-        .pageItem.albums.wrapper
-          .pageItem.albums.container
-            .pageItem.albums.cover(style='background-image: url(../test-materials/Maryam1.jpg);')
-            .pageItem.albums.card
-              .pageItem.albums.background
-              .pageItem.albums.title Ana Mesh Baghanny
-              .pageItem.albums.text by 
-              .pageItem.albums.artist Maryam Saleh
-        //- .pageItem.albums.wrapper
-        //-   .pageItem.albums.container
-        //-     .pageItem.albums.cover(style='background-image: url(../test-materials/Ramy1.png);')
-        //-     .pageItem.albums.card
-        //-       .pageItem.albums.title Mamnoua
-        //-       .pageItem.albums.text by 
-        //-       .pageItem.albums.artist Ramy Essam
-        //- .pageItem.albums.wrapper
-        //-   .pageItem.albums.container
-        //-     .pageItem.albums.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
-        //-     .pageItem.albums.card
-        //-       .pageItem.albums.title Turning Back
-        //-       .pageItem.albums.text by 
-        //-       .pageItem.albums.artist Dina El-Wedidi
-    
+
+      //- .pageItem.albums.wrapper
+            .pageItem.albums.container
+              .pageItem.albums.cover(style='background-image: url(../test-materials/Dina2.png);')
+              .pageItem.albums.card
+                .pageItem.albums.background
+                .pageItem.albums.title Slumber
+                .pageItem.albums.text by
+                .pageItem.albums.artist Dina El-Wedidi
+
+          //- .pageItem.albums.wrapper
+            .pageItem.albums.container
+              .pageItem.albums.cover(style='background-image: url(../test-materials/Maryam1.jpg);')
+              .pageItem.albums.card
+                .pageItem.albums.background
+                .pageItem.albums.title Ana Mesh Baghanny
+                .pageItem.albums.text by
+                .pageItem.albums.artist Maryam Saleh
+          //- .pageItem.albums.wrapper
+            .pageItem.albums.container
+              .pageItem.albums.cover(style='background-image: url(../test-materials/Ramy1.png);')
+              .pageItem.albums.card
+                .pageItem.albums.title Mamnoua
+                .pageItem.albums.text by
+                .pageItem.albums.artist Ramy Essam
+          //- .pageItem.albums.wrapper
+            .pageItem.albums.container
+              .pageItem.albums.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
+              .pageItem.albums.card
+                .pageItem.albums.title Turning Back
+                .pageItem.albums.text by
+                .pageItem.albums.artist Dina El-Wedidi
+
     .controlBar
       .controls.container
         .seek.bar.container
           .bar.played
           .bar.remaining
         .playButton.paused
-          .pause(data-tippy="Pause")
+          .pause(data-tippy='Pause')
             +icon('pause')
-          .play(data-tippy="Play")
+          .play(data-tippy='Pause')
             +icon('play')
-        .previousButton(data-tippy="Previous Track")
+        .previousButton(data-tippy='Previous Track')
           +icon('next')
-        .nextButton(data-tippy="Next Track")
+        .nextButton(data-tippy='Next Track')
           +icon('next')
         .rewindButton
           +icon('forward')
@@ -96,20 +98,20 @@ html(lang="en")
           +icon('forward')
           .forwardTime
         .shuffleButton.shuffled
-          .shuffle(data-tippy="Shuffled queue")
+          .shuffle(data-tippy='Shuffled queue')
             +icon('shuffle')
-          .linear(data-tippy="Normal queue")
+          .linear(data-tippy='Normal queue')
             +icon('linear')
         .repeatButton.looping
-          .loop(data-tippy="Looping the queue")
+          .loop(data-tippy='Looping the queue')
             +icon('loop')
-          .repeat(data-tippy="Repeating the track")
+          .repeat(data-tippy='Repeating the track')
             +icon('repeat')
-          .singular(data-tippy="Playing the queue once")
+          .singular(data-tippy='Playing the queue once')
             +icon('singular')
         .volumeButton
           +icon('volume')
-      .queue.container
+      //- .queue.container
         .queue.playing.card
           .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
           .queue.playing.artist Dina El-Wedidi
@@ -120,7 +122,7 @@ html(lang="en")
             .queueItem.index -1
             .queueItem.artist Dina El-Wedidi
             .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
-  
+
   script.
     window.onerror = function(message, url, line, column, error)
     {

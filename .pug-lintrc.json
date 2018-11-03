@@ -1,0 +1,16 @@
+{
+  "extends": "clock",
+  "validateIndentation": 2,
+  "disallowTrailingSpaces": true,
+  "validateAttributeQuoteMarks": "'",
+  "validateAttributeSeparator": " ",
+  "requireStrictEqualityOperators": true,
+  "requireLowerCaseTags": true,
+  "requireLowerCaseAttributes": true,
+  "validateLineBreaks": "LF",
+  "validateDivTags": true,
+  "disallowClassAttributeWithStaticValue": true,
+  "disallowClassLiteralsBeforeIdLiterals": true,
+  "disallowDuplicateAttributes": true,
+  "disallowHtmlText": true
+}

@@ -14,8 +14,10 @@ html
 body
 {
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  grid-template-areas: "menu" "page" "controlBar";
+
+  grid-template-rows: 1fr auto;
+  grid-template-columns: 100%;
+  grid-template-areas: "base" "controlBar";
   
   overflow: hidden;
   
@@ -24,11 +26,11 @@ body
   width: 100vw;
   height: 100vh;
 
-  margin: 2.8vh 0px;
+  margin: 0;
   padding: 0;
 }
 
-.noMotion *
+.fastforward *
 {
   transition: none !important;
 }
@@ -57,18 +59,23 @@ body
   stroke: var(--color-4);
 }
 
-.page.wrapper
+.base.container
 {
-  grid-area: page;
+  grid-area: base;
 
-  display: flex;
-  justify-content: center;
+  display: grid;
+  
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 100%;
+  grid-template-areas: "menu" ".";
 
-  background-color: blue;
+  background-color: green;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
 
   min-width: 0;
   min-height: 0;
-
   width: 100%;
   height: auto;
 }
@@ -79,18 +86,13 @@ body
   flex-wrap: wrap;
   justify-content: center;
 
-  background-color: green;
+  background-color: blue;
 
-  overflow-x: hidden;
-  overflow-y: hidden;
-
-  width: 52%;
-  height: 95%;
-
-  padding: 2.5% 0px;
+  width: 100%;
+  height: 100%;
 }
 
-.page.container:hover
+.base.container:hover
 {
   overflow-y: overlay;
 }

@@ -28,5 +28,6 @@
     "typescript",
     "typescriptreact",
     "yml"
-  ]
+  ],
+  "puglint.enable": true
 }

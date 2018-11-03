@@ -1,10 +1,11 @@
-.pageItem.albums.wrapper
+.pageItem.wrapper.albums
 {
   position: relative;
 
   background-color: var(--color-4);
 
   min-width: 115px;
+  max-width: 147px;
   max-height: fit-content;
   width: calc(14vw + 2vh);
   height: auto;
@@ -17,7 +18,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.albums.wrapper:before
+.pageItem.wrapper.albums:before
 {
   content: "";
   display: block;
@@ -26,7 +27,7 @@
   padding-bottom: 150%;
 }
 
-.pageItem.albums.container
+.pageItem.container.albums
 {
   position: absolute;
 
@@ -35,7 +36,7 @@
   width: 100%;
 }
 
-.pageItem.albums.wrapper:not(.placeholder):hover
+.pageItem.wrapper.albums:not(.placeholder):hover
 {
   width: calc(14.5vw + 2.5vh);
 
@@ -75,12 +76,12 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.albums.wrapper:not(.placeholder):hover > * > .pageItem.albums.cover
+.pageItem.wrapper.albums:not(.placeholder):hover > * > .pageItem.albums.cover
 {
   height: 100%;
 }
 
-.pageItem.albums.wrapper:not(.placeholder):hover > * > .pageItem.albums.cover:after
+.pageItem.wrapper.albums:not(.placeholder):hover > * > .pageItem.albums.cover:after
 {
   background-color: rgba(255, 255, 255, 0.9);
 }
@@ -128,7 +129,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.albums.wrapper:not(.placeholder):hover > * > .pageItem.albums.card > .pageItem.albums.background
+.pageItem.wrapper.albums:not(.placeholder):hover > * > .pageItem.albums.card > .pageItem.albums.background
 {
   bottom: -21%;
 }

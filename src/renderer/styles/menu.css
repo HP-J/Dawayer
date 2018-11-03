@@ -1,4 +1,10 @@
-.menu
+.menu.wrapper
+{
+  width: 100%;
+  height: auto;
+}
+
+.menu.container
 {
   grid-area: menu;
 
@@ -6,9 +12,10 @@
   justify-content: center;
   align-items: center;
 
-  max-height: fit-content;
+  min-height: 48px;
+  max-height: 60px;
   width: 100%;
-  height: auto;
+  height: calc(6.85vh + 1.85vw);
 
   outline: 1px solid black;
   outline-offset: -1px;
@@ -18,7 +25,8 @@
 {
   position: relative;
 
-  min-width: 60px;
+  min-width: 65px;
+  max-width: 74px;
   max-height: fit-content;
   width: 5.65vw;
 
@@ -26,7 +34,7 @@
 
   transition-property: min-width, width, max-height, height;
   transition-duration: 0.35s;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
 .menuItem.wrapper:before
@@ -39,7 +47,7 @@
 
   transition-property: padding-bottom;
   transition-duration: 0.35s;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-timing-function: cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
 .menuItem.wrapper > .menuItem.container 
@@ -74,7 +82,8 @@
 
 .menuItem.wrapper.selected
 {
-  min-width: 94.35px;
+  min-width: 101px;
+  max-width: 115px;
   width: 8.95vw;
 }
 

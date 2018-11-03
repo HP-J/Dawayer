@@ -99,10 +99,12 @@
     "@babel/preset-env": "^7.1.0",
     "babel-eslint": "^10.0.1",
     "create-svg-sprite": "^1.0.4",
-    "electron": "^3.0.6",
-    "electron-builder": "^20.29.0",
+    "electron": "^3.0.7",
+    "electron-builder": "^20.31.2",
     "eslint": "^5.8.0",
     "pug": "^2.0.3",
-    "pug-cli": "^1.0.0-alpha6"
+    "pug-cli": "^1.0.0-alpha6",
+    "pug-lint": "^2.5.0",
+    "pug-lint-config-clock": "^2.0.0"
   }
 }
