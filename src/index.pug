@@ -79,9 +79,9 @@ html(lang='en')
 
     .controlBar
       .controls.container
-        .seek.bar.container
-          .bar.played
-          .bar.remaining
+        .seekBar.container
+          .seekBar.played
+          .seekBar.remaining
         .playButton.paused
           .pause(data-tippy='Pause')
             +icon('pause')
@@ -111,7 +111,7 @@ html(lang='en')
             +icon('singular')
         .volumeButton
           +icon('volume')
-      //- .queue.container
+      .queue.container
         .queue.playing.card
           .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
           .queue.playing.artist Dina El-Wedidi
@@ -122,6 +122,15 @@ html(lang='en')
             .queueItem.index -1
             .queueItem.artist Dina El-Wedidi
             .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
+
+    .submenu.container.local
+      .submenu.button.local.albums Albums
+      .submenu.button.local.tracks Tracks
+      .submenu.button.local.artist Artist
+
+    .volumeBar.container
+      .volumeBar.played
+      .volumeBar.remaining
 
   script.
     window.onerror = function(message, url, line, column, error)

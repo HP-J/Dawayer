@@ -36,6 +36,18 @@ const volumeButton = document.body.querySelector('.volumeButton');
 
 /**  @type { HTMLDivElement }
 */
+const albumsButton = document.body.querySelector('.button.albums');
+
+/**  @type { HTMLDivElement }
+*/
+const tracksButton = document.body.querySelector('.button.tracks');
+
+/**  @type { HTMLDivElement }
+*/
+const artistButton = document.body.querySelector('.button.artist');
+
+/**  @type { HTMLDivElement }
+*/
 const rewindTimeText = rewindButton.children[1];
 
 /**  @type { HTMLDivElement }
@@ -87,7 +99,7 @@ function initTippy()
   }).instances[0];
 
   localTooltip = tippy(localButton, {
-    content: 'Albums',
+    content: document.body.querySelector('.submenu.container.local'),
     placement: 'bottom',
     interactive: true,
     arrow: true,
@@ -105,7 +117,7 @@ function initTippy()
   forwardTimeTooltip = tippy(forwardButton).instances[0];
 
   volumeTooltip = tippy(volumeButton, {
-    content: 'Volume',
+    content: document.body.querySelector('.volumeBar.container'),
     interactive: true,
     delay: interactiveDelay
   }).instances[0];

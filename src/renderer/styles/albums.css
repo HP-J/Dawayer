@@ -36,10 +36,14 @@
   width: 100%;
 }
 
+.pageItem.wrapper.albums:not(.placeholder)
+{
+  cursor: pointer;
+}
+
 .pageItem.wrapper.albums:not(.placeholder):hover
 {
   width: calc(14.5vw + 2.5vh);
-
   margin: 1.5% 0.5%;
 }
 
@@ -176,7 +180,7 @@
 
 .placeholder > .container:after
 {
-  z-index: 3;
+  z-index: 2;
 
   content: "";
   display: block;

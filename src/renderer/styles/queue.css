@@ -11,6 +11,8 @@
 
   background-color: purple;
 
+  overflow: hidden;
+
   width: 100%;
   height: 9vh;
 }
@@ -100,6 +102,8 @@
   overflow: hidden;
 
   background-color: #ff000045;
+
+  overflow: hidden;
 
   width: 100%;
   height: 13%;
