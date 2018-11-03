@@ -1,4 +1,4 @@
-.controlBar
+.controlBar.container
 {
   z-index: 5;
   position: relative;
@@ -7,15 +7,23 @@
 
   display: flex;
   flex-wrap: nowrap;
-  justify-content: space-between;
-
-  background-color: var(--color-2);
+  justify-content: space-around;
 
   min-height: 125px;
   width: 96%;
   height: 30vh;
 
   padding: 0px 2%;
+}
+
+.controlBar.background
+{
+  position: absolute;
+  
+  background-color: var(--color-2);
+
+  width: 100%;
+  height: 100%;
 }
 
 .controls.container
@@ -30,6 +38,7 @@
 
   background-color: gold;
 
+  max-width: 660px;
   width: 58.5%;
   height: 50%;
 }
@@ -49,6 +58,8 @@
   background-color: rgba(255, 217, 0, 0.308);
 
   top: 151%;
+
+  max-width: 420px;
   width: 35.5%;
   height: 68vh;
 
