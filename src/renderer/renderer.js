@@ -10,6 +10,8 @@ let resizeEndTimeout;
 let rewindTime = 10;
 let forwardTime = 30;
 
+let localSubPageIndex = 0;
+
 /**  @type { HTMLDivElement }
 */
 const rewindButton = document.body.querySelector('.rewindButton');
@@ -36,18 +38,6 @@ const volumeButton = document.body.querySelector('.volumeButton');
 
 /**  @type { HTMLDivElement }
 */
-const albumsButton = document.body.querySelector('.button.albums');
-
-/**  @type { HTMLDivElement }
-*/
-const tracksButton = document.body.querySelector('.button.tracks');
-
-/**  @type { HTMLDivElement }
-*/
-const artistButton = document.body.querySelector('.button.artist');
-
-/**  @type { HTMLDivElement }
-*/
 const rewindTimeText = rewindButton.children[1];
 
 /**  @type { HTMLDivElement }
@@ -61,14 +51,6 @@ let rewindTimeTooltip;
 /** @type { TippyInstance }
 */
 let forwardTimeTooltip;
-
-/** @type { TippyInstance }
-*/
-let localTooltip;
-
-/** @type { TippyInstance }
-*/
-let volumeTooltip;
 
 function resizeEnd()
 {
@@ -88,7 +70,7 @@ function initTippy()
   const normalDelay = [ 350, 50 ];
   const menuItemsDelay = [ 250, 50 ];
   const interactiveDelay = [ 150, 50 ];
-  
+
   tippy.setDefaults({ a11y: false, delay: normalDelay });
 
   tippy(playingButton, {
@@ -98,7 +80,7 @@ function initTippy()
     delay: menuItemsDelay
   }).instances[0];
 
-  localTooltip = tippy(localButton, {
+  tippy(localButton, {
     content: document.body.querySelector('.submenu.container.local'),
     placement: 'bottom',
     interactive: true,
@@ -116,7 +98,7 @@ function initTippy()
   rewindTimeTooltip = tippy(rewindButton).instances[0];
   forwardTimeTooltip = tippy(forwardButton).instances[0];
 
-  volumeTooltip = tippy(volumeButton, {
+  tippy(volumeButton, {
     content: document.body.querySelector('.volumeBar.container'),
     interactive: true,
     delay: interactiveDelay
@@ -126,22 +108,70 @@ function initTippy()
 function initEvents()
 {
   // menu events
-  playingButton.onclick = changePage;
-  localButton.onclick = changePage;
-  optionsButton.onclick = changePage;
+  playingButton.onclick = () => changePage(playingButton);
+
+  localButton.onclick = () =>
+  {
+    // only switch sub-page when the page is selected
+    if (!changePage(localButton))
+      localSubPageIndex = changeSubPage(localButton.children[0], localSubPageIndex);
+  };
+
+  optionsButton.onclick = () => changePage(optionsButton);
 
   // window events
   window.onload = onload;
   window.onresize = onresize;
 }
 
-/** @param { MouseEvent } event
+/** @param { HTMLDivElement } element
 */
-function changePage(event)
+function changePage(element)
 {
-  document.querySelector('.menuItem.selected').classList.remove('selected');
+  const selected = document.querySelector('.menuItem.selected');
 
-  event.srcElement.classList.add('selected');
+  if (selected !== element)
+  {
+    // const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
+
+    selected.classList.remove('selected');
+    element.classList.add('selected');
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/** @param { HTMLDivElement } element
+* @param { number } index
+*/
+function changeSubPage(element, index)
+{
+  if ((index + 1) >= element.children.length)
+  {
+    index = 0;
+  }
+  else
+  {
+    index = index + 1;
+  }
+
+  element.parentElement.scrollTop = 50;
+
+  // scroll to icon
+  requestAnimationFrame(() =>
+  {
+    element.children.item(index).scrollIntoView({
+      behavior: 'smooth',
+      inline: 'nearest',
+      block: 'nearest'
+    });
+  });
+
+  return index;
 }
 
 /** @param { number } rewind
@@ -159,6 +189,15 @@ function changeRewindForwardTimings(rewind, forward)
   // the tooltips text
   rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
   forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
+}
+
+/** @param { HTMLDivElement } element
+* @param { number } current
+* @param { number } max
+*/
+function changeBarPercentage(element, current, max)
+{
+
 }
 
 function onload()
