@@ -5,13 +5,13 @@
   grid-area: menu;
   
   display: flex;
-  position: sticky;
+  /* position: sticky; */
 
   justify-content: center;
   align-items: center;
 
-  top: 0;
-  left: 0;
+  /* top: 0;
+  left: 0; */
   min-height: 48px;
   max-height: 60px;
   width: 100%;
@@ -96,25 +96,6 @@
 
   padding-bottom: 38%;
   border-radius: 18% / 50%;
-}
-
-/* Collapsed */
-
-.menuItem.wrapper.collapsed
-{
-  min-width: 45px;
-  width: 6.65vw;
-}
-
-.menuItem.wrapper.collapsed:before
-{
-  padding-bottom: 15%;
-  border-radius: 10% / 50%;
-}
-
-.menuItem.wrapper.collapsed > .menuItem.container > .icon
-{
-  opacity: 0;
 }
 
 /* Sub-Menu */
