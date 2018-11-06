@@ -17,7 +17,7 @@ body
 
   grid-template-rows: 1fr auto;
   grid-template-columns: 100%;
-  grid-template-areas: "base" "controlBar";
+  grid-template-areas: "page" "controlBar";
   
   overflow: hidden;
   
@@ -59,9 +59,9 @@ body
   stroke: var(--color-4);
 }
 
-.base.container
+.page.wrapper
 {
-  grid-area: base;
+  grid-area: page;
 
   display: grid;
   
@@ -88,11 +88,12 @@ body
 
   background-color: blue;
 
-  width: 100%;
+  width: 80%;
   height: 100%;
+  padding: 0 10%;
 }
 
-.base.container:hover
+.page.wrapper:hover
 {
   overflow-y: overlay;
 }
@@ -101,7 +102,7 @@ body
 {
   background: transparent;
   
-  min-width: 5px;
+  min-width: 8px;
   width: 0.5vw;
 }
 

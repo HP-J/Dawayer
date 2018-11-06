@@ -52,16 +52,113 @@ let rewindTimeTooltip;
 */
 let forwardTimeTooltip;
 
-function resizeEnd()
+
+/** @param { HTMLDivElement } element
+*/
+function changePage(element)
 {
-  // remove no-motion class
-  document.body.classList.remove('fastforward');
+  const selected = document.querySelector('.menuItem.selected');
+
+  if (selected !== element)
+  {
+    // const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
+
+    selected.classList.remove('selected');
+    element.classList.add('selected');
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
-function init()
+/** @param { HTMLDivElement } element
+* @param { number } index
+*/
+function changeSubPage(element, index)
 {
-  initTippy();
-  initEvents();
+  if ((index + 1) >= element.children.length)
+    index = 0;
+  else
+    index = index + 1;
+
+  // scroll to icon
+  requestAnimationFrame(() =>
+  {
+    element.children.item(index).scrollIntoView({
+      behavior: 'smooth',
+      inline: 'nearest',
+      block: 'nearest'
+    });
+  });
+
+  return index;
+}
+
+/** @param { number } rewind
+* @param { number } forward
+*/
+function changeRewindForwardTimings(rewind, forward)
+{
+  rewindTime = rewind;
+  forwardTime = forward;
+
+  // the icon text
+  rewindTimeText.innerText = rewindTime;
+  forwardTimeText.innerText = forwardTime;
+
+  // the tooltip text
+  rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
+  forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
+}
+
+/** @param { HTMLDivElement } element
+* @param { number } current
+* @param { number } max
+*/
+function changeBarPercentage(element, current, max)
+{
+
+}
+
+function initEvents()
+{
+  // menu events
+  playingButton.onclick = () => changePage(playingButton);
+
+  localButton.onclick = () =>
+  {
+    // only switch sub-page when the page is selected
+    if (!changePage(localButton))
+      localSubPageIndex = changeSubPage(localButton.children[0], localSubPageIndex);
+  };
+
+  optionsButton.onclick = () => changePage(optionsButton);
+
+  // sub-menu events
+  document.body.querySelector('.submenu.albums').onclick = () =>
+  {
+    changePage(localButton);
+    localSubPageIndex = changeSubPage(localButton.children[0], -1);
+  };
+
+  document.body.querySelector('.submenu.tracks').onclick = () =>
+  {
+    changePage(localButton);
+    localSubPageIndex = changeSubPage(localButton.children[0], 0);
+  };
+
+  document.body.querySelector('.submenu.artist').onclick = () =>
+  {
+    changePage(localButton);
+    localSubPageIndex = changeSubPage(localButton.children[0], 1);
+  };
+
+  // window events
+  window.onload = onload;
+  window.onresize = onresize;
 }
 
 function initTippy()
@@ -105,99 +202,17 @@ function initTippy()
   }).instances[0];
 }
 
-function initEvents()
+function init()
 {
-  // menu events
-  playingButton.onclick = () => changePage(playingButton);
+  initEvents();
 
-  localButton.onclick = () =>
-  {
-    // only switch sub-page when the page is selected
-    if (!changePage(localButton))
-      localSubPageIndex = changeSubPage(localButton.children[0], localSubPageIndex);
-  };
-
-  optionsButton.onclick = () => changePage(optionsButton);
-
-  // window events
-  window.onload = onload;
-  window.onresize = onresize;
+  initTippy();
 }
 
-/** @param { HTMLDivElement } element
-*/
-function changePage(element)
+function resizeEnd()
 {
-  const selected = document.querySelector('.menuItem.selected');
-
-  if (selected !== element)
-  {
-    // const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
-
-    selected.classList.remove('selected');
-    element.classList.add('selected');
-
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
-/** @param { HTMLDivElement } element
-* @param { number } index
-*/
-function changeSubPage(element, index)
-{
-  if ((index + 1) >= element.children.length)
-  {
-    index = 0;
-  }
-  else
-  {
-    index = index + 1;
-  }
-
-  element.parentElement.scrollTop = 50;
-
-  // scroll to icon
-  requestAnimationFrame(() =>
-  {
-    element.children.item(index).scrollIntoView({
-      behavior: 'smooth',
-      inline: 'nearest',
-      block: 'nearest'
-    });
-  });
-
-  return index;
-}
-
-/** @param { number } rewind
-* @param { number } forward
-*/
-function changeRewindForwardTimings(rewind, forward)
-{
-  rewindTime = rewind;
-  forwardTime = forward;
-
-  // the icon text
-  rewindTimeText.innerText = rewindTime;
-  forwardTimeText.innerText = forwardTime;
-
-  // the tooltips text
-  rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
-  forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
-}
-
-/** @param { HTMLDivElement } element
-* @param { number } current
-* @param { number } max
-*/
-function changeBarPercentage(element, current, max)
-{
-
+  // remove no-motion class
+  document.body.classList.remove('fastforward');
 }
 
 function onload()
@@ -213,6 +228,13 @@ function onresize()
   // clear old resize-end timeout event
   if (resizeEndTimeout)
     clearTimeout(resizeEndTimeout);
+
+  // reset scroll
+  localButton.children[0].children.item(localSubPageIndex).scrollIntoView({
+    behavior: 'instant',
+    inline: 'nearest',
+    block: 'nearest'
+  });
 
   // add no-motion class
   if (!document.body.classList.contains('fastforward'))

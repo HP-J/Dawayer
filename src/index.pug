@@ -23,7 +23,7 @@ html(lang='en')
   body.fastforward
     //- img(src='../test-materials/2nd page.png').design
 
-    .base.container
+    .page.wrapper
       .menu.container
         .menuItem.wrapper.playing
           .menuItem.container
@@ -36,7 +36,6 @@ html(lang='en')
         .menuItem.wrapper.options
           .menuItem.container
             +icon('settings')
-
       .page.container
         .pageItem.wrapper.albums.placeholder
           .pageItem.container.albums
@@ -46,7 +45,6 @@ html(lang='en')
               .pageItem.albums.title
               .pageItem.albums.text
               .pageItem.albums.artist
-
       //- .pageItem.albums.wrapper
             .pageItem.albums.container
               .pageItem.albums.cover(style='background-image: url(../test-materials/Dina2.png);')
@@ -55,7 +53,6 @@ html(lang='en')
                 .pageItem.albums.title Slumber
                 .pageItem.albums.text by
                 .pageItem.albums.artist Dina El-Wedidi
-
           //- .pageItem.albums.wrapper
             .pageItem.albums.container
               .pageItem.albums.cover(style='background-image: url(../test-materials/Maryam1.jpg);')
@@ -127,9 +124,9 @@ html(lang='en')
             .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
 
     .submenu.container.local
-      .submenu.button.local.albums Albums
-      .submenu.button.local.tracks Tracks
-      .submenu.button.local.artist Artist
+      .submenu.button.albums Albums
+      .submenu.button.tracks Tracks
+      .submenu.button.artist Artist
 
     .volumeBar.container
       .volumeBar.played
