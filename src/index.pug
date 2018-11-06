@@ -23,105 +23,87 @@ html(lang='en')
   body.fastforward
     //- img(src='../test-materials/2nd page.png').design
 
-    .page.wrapper
-      .menu.container
-        .menuItem.wrapper.playing
-          .menuItem.container
-            +icon('playing')
-        .menuItem.wrapper.local.selected
-          .menuItem.container
-            +icon('albums')
-            +icon('music')
-            +icon('artist')
-        .menuItem.wrapper.options
-          .menuItem.container
-            +icon('settings')
-      .page.container
-        .pageItem.wrapper.albums.placeholder
-          .pageItem.container.albums
-            .pageItem.albums.cover
-            .pageItem.albums.card
-              .pageItem.albums.background
-              .pageItem.albums.title
-              .pageItem.albums.text
-              .pageItem.albums.artist
-      //- .pageItem.albums.wrapper
-            .pageItem.albums.container
-              .pageItem.albums.cover(style='background-image: url(../test-materials/Dina2.png);')
-              .pageItem.albums.card
-                .pageItem.albums.background
-                .pageItem.albums.title Slumber
-                .pageItem.albums.text by
-                .pageItem.albums.artist Dina El-Wedidi
-          //- .pageItem.albums.wrapper
-            .pageItem.albums.container
-              .pageItem.albums.cover(style='background-image: url(../test-materials/Maryam1.jpg);')
-              .pageItem.albums.card
-                .pageItem.albums.background
-                .pageItem.albums.title Ana Mesh Baghanny
-                .pageItem.albums.text by
-                .pageItem.albums.artist Maryam Saleh
-          //- .pageItem.albums.wrapper
-            .pageItem.albums.container
-              .pageItem.albums.cover(style='background-image: url(../test-materials/Ramy1.png);')
-              .pageItem.albums.card
-                .pageItem.albums.title Mamnoua
-                .pageItem.albums.text by
-                .pageItem.albums.artist Ramy Essam
-          //- .pageItem.albums.wrapper
-            .pageItem.albums.container
-              .pageItem.albums.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
-              .pageItem.albums.card
-                .pageItem.albums.title Turning Back
-                .pageItem.albums.text by
-                .pageItem.albums.artist Dina El-Wedidi
+    .page.container.playing
 
-    .controlBar.container
-      .controlBar.background
-      .controls.container
-        .seekBar.container
-          .seekBar.played
-          .seekBar.remaining
-        .playButton.paused
-          .pause(data-tippy='Pause')
-            +icon('pause')
-          .play(data-tippy='Pause')
-            +icon('play')
-        .previousButton(data-tippy='Previous Track')
-          +icon('next')
-        .nextButton(data-tippy='Next Track')
-          +icon('next')
-        .rewindButton
-          +icon('forward')
-          .rewindTime
-        .forwardButton
-          +icon('forward')
-          .forwardTime
-        .shuffleButton.shuffled
-          .shuffle(data-tippy='Shuffled queue')
-            +icon('shuffle')
-          .linear(data-tippy='Normal queue')
-            +icon('linear')
-        .repeatButton.looping
-          .loop(data-tippy='Looping the queue')
-            +icon('loop')
-          .repeat(data-tippy='Repeating the track')
-            +icon('repeat')
-          .singular(data-tippy='Playing the queue once')
-            +icon('singular')
-        .volumeButton
-          +icon('volume')
-      .queue.container
-        .queue.playing.card
-          .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
-          .queue.playing.artist Dina El-Wedidi
-          .queue.playing.title Dawayer (Circles) [ft. Mazaher]
-        .queue.text Up Next
-        .queue.tracks
-          .queueItem.container
-            .queueItem.index -1
-            .queueItem.artist Dina El-Wedidi
-            .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
+    .page.container.local
+      .page.extended.local
+        .menu.container
+          .menuItem.wrapper.playing
+            .menuItem.container
+              +icon('playing')
+          .menuItem.wrapper.local.selected
+            .menuItem.container
+              +icon('albums')
+              +icon('music')
+              +icon('artist')
+          .menuItem.wrapper.options
+            .menuItem.container
+              +icon('settings')
+        .albums.container
+          .album.wrapper.placeholder
+            .album.container
+              .album.cover
+              .album.card
+                .album.background
+                .album.title
+                .album.text
+                .album.artist
+          //- .album.wrapper
+            .album.container
+              .album.cover(style='background-image: url(../test-materials/Dina2.png);')
+              .album.card
+                .album.background
+                .album.title Slumber
+                .album.text by
+                .album.artist Dina El-Wedidi
+      .controlBar.container
+        .controlBar.background
+        .controls.container
+          .seekBar.container
+            .seekBar.played
+            .seekBar.remaining
+          .playButton.paused
+            .pause(data-tippy='Pause')
+              +icon('pause')
+            .play(data-tippy='Pause')
+              +icon('play')
+          .previousButton(data-tippy='Previous Track')
+            +icon('next')
+          .nextButton(data-tippy='Next Track')
+            +icon('next')
+          .rewindButton
+            +icon('forward')
+            .rewindTime
+          .forwardButton
+            +icon('forward')
+            .forwardTime
+          .shuffleButton.shuffled
+            .shuffle(data-tippy='Shuffled queue')
+              +icon('shuffle')
+            .linear(data-tippy='Normal queue')
+              +icon('linear')
+          .repeatButton.looping
+            .loop(data-tippy='Looping the queue')
+              +icon('loop')
+            .repeat(data-tippy='Repeating the track')
+              +icon('repeat')
+            .singular(data-tippy='Playing the queue once')
+              +icon('singular')
+          .volumeButton
+            +icon('volume')
+        .queue.container
+          .queue.playing.card
+            .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
+            .queue.playing.artist Dina El-Wedidi
+            .queue.playing.title Dawayer (Circles) [ft. Mazaher]
+          .queue.text Up Next
+          .queue.tracks
+            .queueItem.container
+              .queueItem.index -1
+              .queueItem.artist Dina El-Wedidi
+              .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
+
+    .page.container.options
 
     .submenu.container.local
       .submenu.button.albums Albums

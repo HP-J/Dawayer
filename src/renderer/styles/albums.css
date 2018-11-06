@@ -1,4 +1,17 @@
-.pageItem.wrapper.albums
+.albums.container
+{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  background-color: blue;
+
+  width: 80%;
+  height: 100%;
+  padding: 0 10%;
+}
+
+.album.wrapper
 {
   position: relative;
 
@@ -18,7 +31,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.wrapper.albums:before
+.album.wrapper:before
 {
   content: "";
   display: block;
@@ -27,7 +40,7 @@
   padding-bottom: 150%;
 }
 
-.pageItem.container.albums
+.album.container
 {
   position: absolute;
 
@@ -36,18 +49,18 @@
   width: 100%;
 }
 
-.pageItem.wrapper.albums:not(.placeholder)
+.album.wrapper:not(.placeholder)
 {
   cursor: pointer;
 }
 
-.pageItem.wrapper.albums:not(.placeholder):hover
+.album.wrapper:not(.placeholder):hover
 {
   width: calc(14.5vw + 2.5vh);
   margin: 1.5% 0.5%;
 }
 
-.pageItem.albums.cover
+.album.cover
 {
   position: absolute;
 
@@ -65,7 +78,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.albums.cover:after
+.album.cover:after
 {
   content: "";
   display: block;
@@ -80,17 +93,17 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.wrapper.albums:not(.placeholder):hover > * > .pageItem.albums.cover
+.album.wrapper:not(.placeholder):hover > * > .album.cover
 {
   height: 100%;
 }
 
-.pageItem.wrapper.albums:not(.placeholder):hover > * > .pageItem.albums.cover:after
+.album.wrapper:not(.placeholder):hover > * > .album.cover:after
 {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-.pageItem.albums.card
+.album.card
 {
   display: grid;
 
@@ -116,7 +129,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.albums.background
+.album.background
 {
   z-index: 1;
   position: absolute;
@@ -133,12 +146,12 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.pageItem.wrapper.albums:not(.placeholder):hover > * > .pageItem.albums.card > .pageItem.albums.background
+.album.wrapper:not(.placeholder):hover > * > .album.card > .album.background
 {
   bottom: -21%;
 }
 
-.pageItem.albums.title
+.album.title
 {
   z-index: 1;
   grid-area: title;
@@ -153,13 +166,13 @@
   font-weight: 700;
 }
 
-.pageItem.albums.text
+.album.text
 {
   z-index: 1;
   grid-area: text;
 }
 
-.pageItem.albums.artist
+.album.artist
 {
   z-index: 1;
   grid-area: artist;
@@ -171,9 +184,9 @@
 
 /* Content Placeholders */
 
-.placeholder > .container > .pageItem.albums.cover,
-.placeholder > .container > .card > .pageItem.albums.title,
-.placeholder > .container > .card > .pageItem.albums.artist
+.placeholder > .container > .album.cover,
+.placeholder > .container > .card > .album.title,
+.placeholder > .container > .card > .album.artist
 {
   background-color: #F6F6F6;
 }
@@ -195,13 +208,13 @@
   animation: placeholder-animation 1s linear infinite;
 }
 
-.placeholder > .container > .card > .pageItem.albums.title
+.placeholder > .container > .card > .album.title
 {
   margin: 2.5% 0px;
   margin-top: 135%;
 }
 
-.placeholder > .container > .card > .pageItem.albums.artist
+.placeholder > .container > .card > .album.artist
 {
   margin-bottom: 5%;
   margin-right: 30%;
