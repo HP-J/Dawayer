@@ -25,6 +25,8 @@
 
 .tippy-content
 {
+  user-select: none;
+  
   font-family: Montserrat, sans-serif;
   font-size: calc(6px + 0.55vw + 0.35vh);
   font-weight: 700;

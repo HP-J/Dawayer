@@ -10,31 +10,69 @@ let resizeEndTimeout;
 let rewindTime = 10;
 let forwardTime = 30;
 
-let localSubPageIndex = 0;
+/**  @type { HTMLDivElement }
+*/
+let selectedPage;
 
 /**  @type { HTMLDivElement }
 */
-const rewindButton = document.body.querySelector('.rewindButton');
+let selectedLocalIcon;
 
 /**  @type { HTMLDivElement }
 */
-const forwardButton = document.body.querySelector('.forwardButton');
+let selectedLocalSubPage;
 
 /**  @type { HTMLDivElement }
 */
-const playingButton = document.body.querySelector('.menuItem.playing');
+const menu = document.body.querySelector('.menu.container');
 
 /**  @type { HTMLDivElement }
 */
-const localButton = document.body.querySelector('.menuItem.local');
+const controlBar = document.body.querySelector('.controlBar.container');
 
 /**  @type { HTMLDivElement }
 */
-const optionsButton = document.body.querySelector('.menuItem.options');
+const pagesContainer = document.body.querySelector('.pages.container');
 
 /**  @type { HTMLDivElement }
 */
-const volumeButton = document.body.querySelector('.volumeButton');
+const localSubPagesContainer = document.body.querySelector('.page.extended.local');
+
+/**  @type { HTMLDivElement }
+*/
+const seekBar = controlBar.querySelector('.seekBar.container');
+
+/**  @type { HTMLDivElement }
+*/
+const rewindButton = controlBar.querySelector('.rewindButton');
+
+/**  @type { HTMLDivElement }
+*/
+const forwardButton = controlBar.querySelector('.forwardButton');
+
+/**  @type { HTMLDivElement }
+*/
+const volumeButton = controlBar.querySelector('.volumeButton');
+
+/**  @type { HTMLDivElement }
+*/
+const volumeBar = document.body.querySelector('.volumeBar.container');
+
+/**  @type { HTMLDivElement }
+*/
+const playingButton = menu.querySelector('.menuItem.playing');
+
+/**  @type { HTMLDivElement }
+*/
+const localButton = menu.querySelector('.menuItem.local');
+
+/**  @type { HTMLDivElement }
+*/
+const localIconsContainer = localButton.children[0];
+
+/**  @type { HTMLDivElement }
+*/
+const optionsButton = menu.querySelector('.menuItem.options');
 
 /**  @type { HTMLDivElement }
 */
@@ -52,7 +90,6 @@ let rewindTimeTooltip;
 */
 let forwardTimeTooltip;
 
-
 /** @param { HTMLDivElement } element
 */
 function changePage(element)
@@ -61,10 +98,21 @@ function changePage(element)
 
   if (selected !== element)
   {
-    // const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
-
     selected.classList.remove('selected');
     element.classList.add('selected');
+
+    // get the index of the button
+    const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
+
+    // the index of the button is the same the the page
+    selectedPage = pagesContainer.children.item(pageIndex);
+    
+    // scroll to page
+    selectedPage.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'start',
+      block: 'nearest'
+    });
 
     return true;
   }
@@ -74,27 +122,31 @@ function changePage(element)
   }
 }
 
-/** @param { HTMLDivElement } element
-* @param { number } index
+/** @param { number } index
 */
-function changeSubPage(element, index)
+function changeLocalSubPage(index)
 {
-  if ((index + 1) >= element.children.length)
+  if ((index + 1) >= localIconsContainer.children.length)
     index = 0;
   else
     index = index + 1;
+  
+  selectedLocalIcon = localIconsContainer.children.item(index);
+  selectedLocalSubPage = localSubPagesContainer.children.item(index);
 
   // scroll to icon
-  requestAnimationFrame(() =>
-  {
-    element.children.item(index).scrollIntoView({
-      behavior: 'smooth',
-      inline: 'nearest',
-      block: 'nearest'
-    });
+  selectedLocalIcon.scrollIntoView({
+    behavior: 'instant',
+    inline: 'start',
+    block: 'nearest'
   });
 
-  return index;
+  // scroll to sub-page
+  selectedLocalSubPage.scrollIntoView({
+    behavior: 'smooth',
+    inline: 'start',
+    block: 'nearest'
+  });
 }
 
 /** @param { number } rewind
@@ -115,6 +167,13 @@ function changeRewindForwardTimings(rewind, forward)
 }
 
 /** @param { HTMLDivElement } element
+*/
+function initBar(element)
+{
+
+}
+
+/** @param { HTMLDivElement } element
 * @param { number } current
 * @param { number } max
 */
@@ -132,7 +191,7 @@ function initEvents()
   {
     // only switch sub-page when the page is selected
     if (!changePage(localButton))
-      localSubPageIndex = changeSubPage(localButton.children[0], localSubPageIndex);
+      changeLocalSubPage(Array.prototype.indexOf.call(localSubPagesContainer.children, selectedLocalSubPage));
   };
 
   optionsButton.onclick = () => changePage(optionsButton);
@@ -141,19 +200,19 @@ function initEvents()
   document.body.querySelector('.submenu.albums').onclick = () =>
   {
     changePage(localButton);
-    localSubPageIndex = changeSubPage(localButton.children[0], -1);
+    changeLocalSubPage(-1);
   };
 
   document.body.querySelector('.submenu.tracks').onclick = () =>
   {
     changePage(localButton);
-    localSubPageIndex = changeSubPage(localButton.children[0], 0);
+    changeLocalSubPage(0);
   };
 
-  document.body.querySelector('.submenu.artist').onclick = () =>
+  document.body.querySelector('.submenu.artists').onclick = () =>
   {
     changePage(localButton);
-    localSubPageIndex = changeSubPage(localButton.children[0], 1);
+    changeLocalSubPage(1);
   };
 
   // window events
@@ -196,7 +255,7 @@ function initTippy()
   forwardTimeTooltip = tippy(forwardButton).instances[0];
 
   tippy(volumeButton, {
-    content: document.body.querySelector('.volumeBar.container'),
+    content: volumeBar,
     interactive: true,
     delay: interactiveDelay
   }).instances[0];
@@ -209,6 +268,43 @@ function init()
   initTippy();
 }
 
+function initPages()
+{
+  // default page is local(1):albums(0)
+  selectedPage = pagesContainer.children.item(1);
+  selectedLocalIcon = localIconsContainer.children.item(0);
+  selectedLocalSubPage = localSubPagesContainer.children.item(0);
+
+  selectedLocalSubPage.scrollIntoView({
+    behavior: 'instant',
+    inline: 'start',
+    block: 'nearest'
+  });
+}
+
+/** scroll coordinates break on resizing the containers and need to be reset every time
+*/
+function resetPagesScroll()
+{
+  selectedLocalIcon.scrollIntoView({
+    behavior: 'instant',
+    inline: 'start',
+    block: 'nearest'
+  });
+
+  selectedLocalSubPage.scrollIntoView({
+    behavior: 'instant',
+    inline: 'start',
+    block: 'nearest'
+  });
+
+  selectedPage.scrollIntoView({
+    behavior: 'instant',
+    inline: 'start',
+    block: 'nearest'
+  });
+}
+
 function resizeEnd()
 {
   // remove no-motion class
@@ -217,6 +313,7 @@ function resizeEnd()
 
 function onload()
 {
+  initPages();
   resizeEnd();
 
   // set values
@@ -230,11 +327,7 @@ function onresize()
     clearTimeout(resizeEndTimeout);
 
   // reset scroll
-  localButton.children[0].children.item(localSubPageIndex).scrollIntoView({
-    behavior: 'instant',
-    inline: 'nearest',
-    block: 'nearest'
-  });
+  resetPagesScroll();
 
   // add no-motion class
   if (!document.body.classList.contains('fastforward'))

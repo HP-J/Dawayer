@@ -9,7 +9,7 @@
     "svgo": "svgo --config='{ \"plugins\": [ { \"removeAttrs\": { \"attrs\": \"(fill|stroke)\" } } ] }' ./icons",
     "sprite": "create-svg-sprite --input ./icons --output ./compiled",
     "dev": "npm run sprite & npx babel src --out-dir compiled --copy-files --source-maps --watch & npx pug src --out compiled --pretty --watch &",
-    "compile": "npm run sprite && npx babel src --out-dir compiled --copy-files --no-comments --minified && npx pug src --out compiled && rm compiled/*.pug",
+    "compile": "npm run svgo && npm run sprite && npx babel src --out-dir compiled --copy-files --no-comments --minified && npx pug src --out compiled && rm compiled/*.pug",
     "clean": "rm -rf compiled",
     "patch": "npm version patch --no-git-tag-version"
   },
@@ -23,7 +23,8 @@
       "LICENSE",
       "README.md",
       "CHANGELOG.md",
-      "tray.png"
+      "tray-linux.png",
+      "tray-win32.png"
     ],
     "directories": {
       "output": "./public"

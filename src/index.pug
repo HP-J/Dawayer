@@ -12,6 +12,7 @@ html(lang='en')
     meta(http-equiv='Content-Security-Policy' content=`script-src 'unsafe-inline'`)
 
     link(rel='stylesheet' href='./renderer/styles/albums.css')
+    link(rel='stylesheet' href='./renderer/styles/artists.css')
     link(rel='stylesheet' href='./renderer/styles/body.css')
     link(rel='stylesheet' href='./renderer/styles/controlBar.css')
     link(rel='stylesheet' href='./renderer/styles/controls.css')
@@ -19,6 +20,7 @@ html(lang='en')
     link(rel='stylesheet' href='./renderer/styles/menu.css')
     link(rel='stylesheet' href='./renderer/styles/queue.css')
     link(rel='stylesheet' href='./renderer/styles/tippy.css')
+    link(rel='stylesheet' href='./renderer/styles/tracks.css')
 
   body.fastforward
     //- img(src='../test-materials/2nd page.png').design
@@ -83,35 +85,36 @@ html(lang='en')
             .queueItem.artist Dina El-Wedidi
             .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
 
-    .page.container.playing
-
-    .page.container.local
-      .page.extended.local
-        .albums.wrapper
-          .albums.container
-            .album.wrapper.placeholder
-              .album.container
-                .album.cover
-                .album.card
-                  .album.background
-                  .album.title
-                  .album.text
-                  .album.artist
-            //- .album.wrapper
-              .album.container
-                .album.cover(style='background-image: url(../test-materials/Dina2.png);')
-                .album.card
-                  .album.background
-                  .album.title Slumber
-                  .album.text by
-                  .album.artist  Dina El-Wedidi
-
-    .page.container.options
+    .pages.container
+      .page.container.playing
+      .page.container.local
+        .page.extended.local
+          .albums.wrapper
+            .albums.container
+              .album.wrapper.placeholder
+                .album.container
+                  .album.cover
+                  .album.card
+                    .album.background
+                    .album.title
+                    .album.text
+                    .album.artist
+              //- .album.wrapper
+                .album.container
+                  .album.cover(style='background-image: url(../test-materials/Dina2.png);')
+                  .album.card
+                    .album.background
+                    .album.title Slumber
+                    .album.text by
+                    .album.artist  Dina El-Wedidi
+          .tracks.wrapper
+          .artists.wrapper
+      .page.container.options
 
     .submenu.container.local
       .submenu.button.albums Albums
       .submenu.button.tracks Tracks
-      .submenu.button.artist Artist
+      .submenu.button.artists Artists
 
     .volumeBar.container
       .volumeBar.played
