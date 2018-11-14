@@ -20,6 +20,10 @@
 
   outline: 1px solid black;
   outline-offset: -1px;
+
+  transition-property: top;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
 }
 
 .menuItem.wrapper
@@ -62,22 +66,17 @@
 
 .menuItem.container 
 {
+  display: flex;
+  flex-wrap: wrap;
+  
   position: absolute;
   
   top: 0;
   height: 100%;
   width: 100%;
 
+  overflow: hidden;
   pointer-events: none;
-}
-
-.menuItem.container > .icon
-{
-  opacity: 1;
-
-  transition-property: opacity;
-  transition-duration: 0.35s;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 /* Selected */

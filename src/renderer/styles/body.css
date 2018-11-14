@@ -60,6 +60,8 @@ body
 {
   grid-area: pages;
 
+  position: relative;
+  top: 0;
   width: 100%;
   height: 100%;
 
@@ -68,6 +70,10 @@ body
   grid-template-areas: "playing local options";
 
   overflow: hidden;
+
+  transition-property: top, height;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in;
 }
 
 .page.container
@@ -93,6 +99,8 @@ body
 .page.container.options
 {
   grid-area: options;
+
+  background-color: darkorange;
 }
 
 .page.extended.local

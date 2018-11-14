@@ -2,8 +2,12 @@
 
 import tippy from 'tippy.js';
 
+import scroll from './scroll.js';
+
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
+
+let isMenuCollapsed = false;
 
 let resizeEndTimeout;
 
@@ -82,6 +86,18 @@ const rewindTimeText = rewindButton.children[1];
 */
 const forwardTimeText = forwardButton.children[1];
 
+/**  @type { TippyInstance }
+*/
+let playingSubMenuTooltip;
+
+/**  @type { TippyInstance }
+*/
+let localSubMenuTooltip;
+
+/**  @type { TippyInstance }
+*/
+let optionsSubMenuTooltip;
+
 /** @type { TippyInstance }
 */
 let rewindTimeTooltip;
@@ -91,8 +107,9 @@ let rewindTimeTooltip;
 let forwardTimeTooltip;
 
 /** @param { HTMLDivElement } element
+* @param { () => void } callback
 */
-function changePage(element)
+function changePage(element, callback)
 {
   const selected = document.querySelector('.menuItem.selected');
 
@@ -108,16 +125,18 @@ function changePage(element)
     selectedPage = pagesContainer.children.item(pageIndex);
     
     // scroll to page
-    selectedPage.scrollIntoView({
-      behavior: 'smooth',
-      inline: 'start',
-      block: 'nearest'
-    });
+    scroll(selectedPage, { callback: callback });
+
+    // callback
+    onPageChange(pageIndex);
 
     return true;
   }
   else
   {
+    if (callback)
+      callback();
+    
     return false;
   }
 }
@@ -134,19 +153,8 @@ function changeLocalSubPage(index)
   selectedLocalIcon = localIconsContainer.children.item(index);
   selectedLocalSubPage = localSubPagesContainer.children.item(index);
 
-  // scroll to icon
-  selectedLocalIcon.scrollIntoView({
-    behavior: 'instant',
-    inline: 'start',
-    block: 'nearest'
-  });
-
-  // scroll to sub-page
-  selectedLocalSubPage.scrollIntoView({
-    behavior: 'smooth',
-    inline: 'start',
-    block: 'nearest'
-  });
+  scroll(selectedLocalIcon, { direction: 'vertical' });
+  scroll(selectedLocalSubPage, { direction: 'vertical' });
 }
 
 /** @param { number } rewind
@@ -185,6 +193,7 @@ function changeBarPercentage(element, current, max)
 function initEvents()
 {
   // menu events
+
   playingButton.onclick = () => changePage(playingButton);
 
   localButton.onclick = () =>
@@ -197,22 +206,30 @@ function initEvents()
   optionsButton.onclick = () => changePage(optionsButton);
 
   // sub-menu events
+
+  document.body.querySelector('.submenu.playing').onclick = () =>
+  {
+    changePage(playingButton);
+  };
+
   document.body.querySelector('.submenu.albums').onclick = () =>
   {
-    changePage(localButton);
-    changeLocalSubPage(-1);
+    changePage(localButton, () => changeLocalSubPage(-1));
   };
 
   document.body.querySelector('.submenu.tracks').onclick = () =>
   {
-    changePage(localButton);
-    changeLocalSubPage(0);
+    changePage(localButton, () => changeLocalSubPage(0));
   };
 
   document.body.querySelector('.submenu.artists').onclick = () =>
   {
-    changePage(localButton);
-    changeLocalSubPage(1);
+    changePage(localButton, () => changeLocalSubPage(1));
+  };
+
+  document.body.querySelector('.submenu.options').onclick = () =>
+  {
+    changePage(optionsButton);
   };
 
   // window events
@@ -223,20 +240,20 @@ function initEvents()
 function initTippy()
 {
   // create and configure tooltips
-  const normalDelay = [ 350, 50 ];
-  const menuItemsDelay = [ 250, 50 ];
-  const interactiveDelay = [ 150, 50 ];
+  const normalDelay = [ 350, 25 ];
+  const interactiveDelay = [ 150, 25 ];
 
   tippy.setDefaults({ a11y: false, delay: normalDelay });
 
-  tippy(playingButton, {
-    content: 'Playing Now',
+  playingSubMenuTooltip = tippy(playingButton, {
+    content: document.body.querySelector('.submenu.container.playing'),
+    interactive: true,
     placement: 'bottom',
     arrow: true,
-    delay: menuItemsDelay
+    delay: interactiveDelay
   }).instances[0];
 
-  tippy(localButton, {
+  localSubMenuTooltip = tippy(localButton, {
     content: document.body.querySelector('.submenu.container.local'),
     placement: 'bottom',
     interactive: true,
@@ -244,11 +261,12 @@ function initTippy()
     delay: interactiveDelay
   }).instances[0];
 
-  tippy(optionsButton, {
-    content: 'Options',
+  optionsSubMenuTooltip = tippy(optionsButton, {
+    content: document.body.querySelector('.submenu.container.options'),
+    interactive: true,
     placement: 'bottom',
     arrow: true,
-    delay: menuItemsDelay
+    delay: interactiveDelay
   }).instances[0];
 
   rewindTimeTooltip = tippy(rewindButton).instances[0];
@@ -258,7 +276,7 @@ function initTippy()
     content: volumeBar,
     interactive: true,
     delay: interactiveDelay
-  }).instances[0];
+  });
 }
 
 function init()
@@ -270,39 +288,75 @@ function init()
 
 function initPages()
 {
-  // default page is local(1):albums(0)
   selectedPage = pagesContainer.children.item(1);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
-  selectedLocalSubPage.scrollIntoView({
-    behavior: 'instant',
-    inline: 'start',
-    block: 'nearest'
-  });
+  scroll(selectedPage, { duration: 0 });
+}
+
+/** @param { number } offset
+*/
+function stickyMenu(offset)
+{
+  const height = menu.getBoundingClientRect().height;
+  const maxOffset = (height * 0.7);
+
+  if (offset === undefined)
+    offset = maxOffset;
+  else
+    offset = Math.min(maxOffset, offset);
+
+  menu.style.top =  pagesContainer.style.top = `-${offset}px`;
+
+  pagesContainer.style.height = `calc(100% + ${offset}px)`;
+}
+
+/** @param { number } pageIndex
+*/
+function collapseMenu(pageIndex)
+{
+  const collapsedMenuIndices = [ 0 ];
+
+  if (collapsedMenuIndices.includes(pageIndex))
+  {
+    isMenuCollapsed = true;
+
+    menu.onmouseenter =
+    playingSubMenuTooltip.popper.onmouseenter =
+    localSubMenuTooltip.popper.onmouseenter =
+    optionsSubMenuTooltip.popper.onmouseenter =
+    () => stickyMenu(0);
+
+    menu.onmouseleave =
+    playingSubMenuTooltip.popper.onmouseleave =
+    localSubMenuTooltip.popper.onmouseleave =
+    optionsSubMenuTooltip.popper.onmouseleave =
+    () => stickyMenu();
+  }
+  else
+  {
+    isMenuCollapsed = false;
+
+    menu.onmouseenter =
+    playingSubMenuTooltip.popper.onmouseenter =
+    localSubMenuTooltip.popper.onmouseenter =
+    optionsSubMenuTooltip.popper.onmouseenter =
+    menu.onmouseleave =
+    playingSubMenuTooltip.popper.onmouseleave =
+    localSubMenuTooltip.popper.onmouseleave =
+    optionsSubMenuTooltip.popper.onmouseleave =
+    undefined;
+  }
 }
 
 /** scroll coordinates break on resizing the containers and need to be reset every time
 */
 function resetPagesScroll()
 {
-  selectedLocalIcon.scrollIntoView({
-    behavior: 'instant',
-    inline: 'start',
-    block: 'nearest'
-  });
-
-  selectedLocalSubPage.scrollIntoView({
-    behavior: 'instant',
-    inline: 'start',
-    block: 'nearest'
-  });
-
-  selectedPage.scrollIntoView({
-    behavior: 'instant',
-    inline: 'start',
-    block: 'nearest'
-  });
+  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical', delay: 350 });
+  scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
+  scroll(selectedPage, { duration: 0 });
 }
 
 function resizeEnd()
@@ -315,7 +369,9 @@ function onload()
 {
   initPages();
   resizeEnd();
-
+  
+  // stickyMenu();
+  
   // set values
   changeRewindForwardTimings(rewindTime, forwardTime);
 }
@@ -326,6 +382,9 @@ function onresize()
   if (resizeEndTimeout)
     clearTimeout(resizeEndTimeout);
 
+  // stick the menu
+  // stickyMenu();
+
   // reset scroll
   resetPagesScroll();
 
@@ -335,6 +394,13 @@ function onresize()
 
   // set a new resize-end timeout
   resizeEndTimeout = setTimeout(resizeEnd, 25);
+}
+
+/** @param { number } pageIndex
+*/
+function onPageChange(pageIndex)
+{
+  collapseMenu(pageIndex);
 }
 
 init();

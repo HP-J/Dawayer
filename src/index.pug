@@ -23,8 +23,6 @@ html(lang='en')
     link(rel='stylesheet' href='./renderer/styles/tracks.css')
 
   body.fastforward
-    //- img(src='../test-materials/2nd page.png').design
-
     .menu.container
       .menuItem.wrapper.playing
         .menuItem.container
@@ -111,10 +109,16 @@ html(lang='en')
           .artists.wrapper
       .page.container.options
 
+    .submenu.container.playing
+      .submenu.button.playing Playing Now
+
     .submenu.container.local
       .submenu.button.albums Albums
       .submenu.button.tracks Tracks
       .submenu.button.artists Artists
+
+    .submenu.container.options
+      .submenu.button.options Options
 
     .volumeBar.container
       .volumeBar.played
