@@ -354,7 +354,7 @@ function collapseMenu(pageIndex)
 */
 function resetPagesScroll()
 {
-  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical', delay: 350 });
+  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical', delay: 200 });
   scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
   scroll(selectedPage, { duration: 0 });
 }
