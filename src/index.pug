@@ -36,6 +36,32 @@ html(lang='en')
         .menuItem.container
           +icon('settings')
 
+    .pages.container
+      .page.container.playing
+      .page.container.local
+        .page.extended.local
+          .albums.wrapper
+            .albums.container
+              .album.wrapper.placeholder
+                .album.container
+                  .album.cover
+                  .album.card
+                    .album.background
+                    .album.title
+                    .album.text
+                    .album.artist
+              //- .album.wrapper
+                .album.container
+                  .album.cover(style='background-image: url(../test-materials/Dina2.png);')
+                  .album.card
+                    .album.background
+                    .album.title Slumber
+                    .album.text by
+                    .album.artist  Dina El-Wedidi
+          .tracks.wrapper
+          .artists.wrapper
+      .page.container.options
+
     .controlBar.container
       .controlBar.background
       .controls.container
@@ -82,32 +108,6 @@ html(lang='en')
             .queueItem.index -1
             .queueItem.artist Dina El-Wedidi
             .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
-
-    .pages.container
-      .page.container.playing
-      .page.container.local
-        .page.extended.local
-          .albums.wrapper
-            .albums.container
-              .album.wrapper.placeholder
-                .album.container
-                  .album.cover
-                  .album.card
-                    .album.background
-                    .album.title
-                    .album.text
-                    .album.artist
-              //- .album.wrapper
-                .album.container
-                  .album.cover(style='background-image: url(../test-materials/Dina2.png);')
-                  .album.card
-                    .album.background
-                    .album.title Slumber
-                    .album.text by
-                    .album.artist  Dina El-Wedidi
-          .tracks.wrapper
-          .artists.wrapper
-      .page.container.options
 
     .submenu.container.playing
       .submenu.button.playing Playing Now

@@ -127,9 +127,6 @@ function changePage(element, callback)
     // scroll to page
     scroll(selectedPage, { callback: callback });
 
-    // callback
-    onPageChange(pageIndex);
-
     return true;
   }
   else
@@ -240,33 +237,32 @@ function initEvents()
 function initTippy()
 {
   // create and configure tooltips
-  const normalDelay = [ 350, 25 ];
-  const interactiveDelay = [ 150, 25 ];
 
-  tippy.setDefaults({ a11y: false, delay: normalDelay });
+  tippy.setDefaults({
+    a11y: false,
+    delay: [ 200, 5 ],
+    duration: [ 235, 200 ]
+  });
 
   playingSubMenuTooltip = tippy(playingButton, {
     content: document.body.querySelector('.submenu.container.playing'),
-    interactive: true,
     placement: 'bottom',
-    arrow: true,
-    delay: interactiveDelay
+    interactive: true,
+    arrow: true
   }).instances[0];
 
   localSubMenuTooltip = tippy(localButton, {
     content: document.body.querySelector('.submenu.container.local'),
     placement: 'bottom',
     interactive: true,
-    arrow: true,
-    delay: interactiveDelay
+    arrow: true
   }).instances[0];
 
   optionsSubMenuTooltip = tippy(optionsButton, {
     content: document.body.querySelector('.submenu.container.options'),
-    interactive: true,
     placement: 'bottom',
-    arrow: true,
-    delay: interactiveDelay
+    interactive: true,
+    arrow: true
   }).instances[0];
 
   rewindTimeTooltip = tippy(rewindButton).instances[0];
@@ -274,8 +270,7 @@ function initTippy()
 
   tippy(volumeButton, {
     content: volumeBar,
-    interactive: true,
-    delay: interactiveDelay
+    interactive: true
   });
 }
 
@@ -293,61 +288,6 @@ function initPages()
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
   scroll(selectedPage, { duration: 0 });
-}
-
-/** @param { number } offset
-*/
-function stickyMenu(offset)
-{
-  const height = menu.getBoundingClientRect().height;
-  const maxOffset = (height * 0.7);
-
-  if (offset === undefined)
-    offset = maxOffset;
-  else
-    offset = Math.min(maxOffset, offset);
-
-  menu.style.top =  pagesContainer.style.top = `-${offset}px`;
-
-  pagesContainer.style.height = `calc(100% + ${offset}px)`;
-}
-
-/** @param { number } pageIndex
-*/
-function collapseMenu(pageIndex)
-{
-  const collapsedMenuIndices = [ 0 ];
-
-  if (collapsedMenuIndices.includes(pageIndex))
-  {
-    isMenuCollapsed = true;
-
-    menu.onmouseenter =
-    playingSubMenuTooltip.popper.onmouseenter =
-    localSubMenuTooltip.popper.onmouseenter =
-    optionsSubMenuTooltip.popper.onmouseenter =
-    () => stickyMenu(0);
-
-    menu.onmouseleave =
-    playingSubMenuTooltip.popper.onmouseleave =
-    localSubMenuTooltip.popper.onmouseleave =
-    optionsSubMenuTooltip.popper.onmouseleave =
-    () => stickyMenu();
-  }
-  else
-  {
-    isMenuCollapsed = false;
-
-    menu.onmouseenter =
-    playingSubMenuTooltip.popper.onmouseenter =
-    localSubMenuTooltip.popper.onmouseenter =
-    optionsSubMenuTooltip.popper.onmouseenter =
-    menu.onmouseleave =
-    playingSubMenuTooltip.popper.onmouseleave =
-    localSubMenuTooltip.popper.onmouseleave =
-    optionsSubMenuTooltip.popper.onmouseleave =
-    undefined;
-  }
 }
 
 /** scroll coordinates break on resizing the containers and need to be reset every time
@@ -370,8 +310,6 @@ function onload()
   initPages();
   resizeEnd();
   
-  // stickyMenu();
-  
   // set values
   changeRewindForwardTimings(rewindTime, forwardTime);
 }
@@ -382,9 +320,6 @@ function onresize()
   if (resizeEndTimeout)
     clearTimeout(resizeEndTimeout);
 
-  // stick the menu
-  // stickyMenu();
-
   // reset scroll
   resetPagesScroll();
 
@@ -394,13 +329,6 @@ function onresize()
 
   // set a new resize-end timeout
   resizeEndTimeout = setTimeout(resizeEnd, 25);
-}
-
-/** @param { number } pageIndex
-*/
-function onPageChange(pageIndex)
-{
-  collapseMenu(pageIndex);
 }
 
 init();

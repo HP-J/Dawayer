@@ -60,7 +60,7 @@
 
   background-color: rgba(255, 217, 0, 0.308);
 
-  top: 151%;
+  bottom: -153%;
 
   max-width: 420px;
   width: 35.5%;
@@ -68,14 +68,14 @@
 
   padding: 1% 1.5%;
 
-  transition-property: top;
+  transition-property: bottom;
   transition-duration: 0.35s;
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .queue.container:hover
 {
-  top: 0;
+  bottom: 0;
 }
 
 @media screen and (max-width: 800px)
@@ -103,13 +103,8 @@
   {
     position: absolute;
 
-    top: 55%;
+    bottom: -186%;
     max-width: 450px;
     width: 75%;
-  }
-
-  .queue.container:hover
-  {
-    top: -39vh;
   }
 }
