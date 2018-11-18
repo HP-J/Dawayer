@@ -1,6 +1,6 @@
 .controlBar.container
 {
-  z-index: 5;
+  z-index: 3;
   position: relative;
 
   grid-area: controlBar;

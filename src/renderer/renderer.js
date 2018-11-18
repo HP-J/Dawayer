@@ -175,7 +175,41 @@ function changeRewindForwardTimings(rewind, forward)
 */
 function initBar(element)
 {
+  /** @param { MouseEvent } event
+  */
+  function update(event)
+  {
+    requestAnimationFrame(() =>
+    {
+      const rect = element.getBoundingClientRect();
 
+      const width = Math.round(rect.width);
+      const left = Math.round(rect.left);
+
+      const x = Math.max(Math.min(event.clientX - left, width), 0);
+      
+      changeBarPercentage(element, x, width);
+    });
+  }
+
+  element.onmousedown = () =>
+  {
+    element.mouseDown = true;
+
+    update(event);
+  };
+
+  window.addEventListener('mouseup', () =>
+  {
+    if (element.mouseDown)
+      element.mouseDown = false;
+  });
+
+  window.addEventListener('mousemove', (event) =>
+  {
+    if (element.mouseDown)
+      update(event);
+  });
 }
 
 /** @param { HTMLDivElement } element
@@ -184,7 +218,11 @@ function initBar(element)
 */
 function changeBarPercentage(element, current, max)
 {
+  const playedPercentage = current / max;
+  const remainingPercentage = 1 - playedPercentage;
 
+  element.querySelector('.played').style.width = `${playedPercentage * 100}%`;
+  element.querySelector('.remaining').style.width = `${remainingPercentage * 100}%`;
 }
 
 function initEvents()
@@ -308,6 +346,10 @@ function resizeEnd()
 function onload()
 {
   initPages();
+  
+  initBar(seekBar);
+  initBar(volumeBar);
+
   resizeEnd();
   
   // set values

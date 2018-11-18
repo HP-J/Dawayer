@@ -1,4 +1,5 @@
 graphics:
+  ☐ the only way to do a now playing background is to create an position absolute element in body and z-indexing it corrected
 
 audio:
   ☐ playing and pausing a song
