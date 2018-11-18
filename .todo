@@ -1,5 +1,6 @@
 graphics:
-  ☐ the only way to do a now playing background is to create an position absolute element in body and z-indexing it corrected
+  ☐ bigger seek bar to make dragging easier
+  ☐ the only way to do a now playing background is to create an position absolute element in body and z-indexing it correctly
 
 audio:
   ☐ playing and pausing a song

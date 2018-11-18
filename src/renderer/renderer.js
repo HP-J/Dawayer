@@ -7,12 +7,15 @@ import scroll from './scroll.js';
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
 
-let isMenuCollapsed = false;
-
 let resizeEndTimeout;
 
 let rewindTime = 10;
 let forwardTime = 30;
+
+let seekTime = 0;
+
+let currentVolume = 0.75;
+let lastRememberedVolume = 1;
 
 /**  @type { HTMLDivElement }
 */
@@ -44,26 +47,6 @@ const localSubPagesContainer = document.body.querySelector('.page.extended.local
 
 /**  @type { HTMLDivElement }
 */
-const seekBar = controlBar.querySelector('.seekBar.container');
-
-/**  @type { HTMLDivElement }
-*/
-const rewindButton = controlBar.querySelector('.rewindButton');
-
-/**  @type { HTMLDivElement }
-*/
-const forwardButton = controlBar.querySelector('.forwardButton');
-
-/**  @type { HTMLDivElement }
-*/
-const volumeButton = controlBar.querySelector('.volumeButton');
-
-/**  @type { HTMLDivElement }
-*/
-const volumeBar = document.body.querySelector('.volumeBar.container');
-
-/**  @type { HTMLDivElement }
-*/
 const playingButton = menu.querySelector('.menuItem.playing');
 
 /**  @type { HTMLDivElement }
@@ -80,23 +63,47 @@ const optionsButton = menu.querySelector('.menuItem.options');
 
 /**  @type { HTMLDivElement }
 */
+const seekBar = controlBar.querySelector('.seekBar.container');
+
+/**  @type { HTMLDivElement }
+*/
+const playButton = controlBar.querySelector('.playButton');
+
+/**  @type { HTMLDivElement }
+*/
+const rewindButton = controlBar.querySelector('.rewindButton');
+
+/**  @type { HTMLDivElement }
+*/
+const forwardButton = controlBar.querySelector('.forwardButton');
+
+/**  @type { HTMLDivElement }
+*/
 const rewindTimeText = rewindButton.children[1];
 
 /**  @type { HTMLDivElement }
 */
 const forwardTimeText = forwardButton.children[1];
 
-/**  @type { TippyInstance }
+/**  @type { HTMLDivElement }
 */
-let playingSubMenuTooltip;
+const shuffleButton = controlBar.querySelector('.shuffleButton');
 
-/**  @type { TippyInstance }
+/**  @type { HTMLDivElement }
 */
-let localSubMenuTooltip;
+const repeatButton = controlBar.querySelector('.repeatButton');
 
-/**  @type { TippyInstance }
+/**  @type { HTMLDivElement }
 */
-let optionsSubMenuTooltip;
+const volumeButton = controlBar.querySelector('.volumeButton');
+
+/**  @type { HTMLDivElement }
+*/
+const volumeBar = document.body.querySelector('.volumeBar.container');
+
+/** @type { TippyInstance }
+*/
+let seekTooltip;
 
 /** @type { TippyInstance }
 */
@@ -171,60 +178,6 @@ function changeRewindForwardTimings(rewind, forward)
   forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
 }
 
-/** @param { HTMLDivElement } element
-*/
-function initBar(element)
-{
-  /** @param { MouseEvent } event
-  */
-  function update(event)
-  {
-    requestAnimationFrame(() =>
-    {
-      const rect = element.getBoundingClientRect();
-
-      const width = Math.round(rect.width);
-      const left = Math.round(rect.left);
-
-      const x = Math.max(Math.min(event.clientX - left, width), 0);
-      
-      changeBarPercentage(element, x, width);
-    });
-  }
-
-  element.onmousedown = () =>
-  {
-    element.mouseDown = true;
-
-    update(event);
-  };
-
-  window.addEventListener('mouseup', () =>
-  {
-    if (element.mouseDown)
-      element.mouseDown = false;
-  });
-
-  window.addEventListener('mousemove', (event) =>
-  {
-    if (element.mouseDown)
-      update(event);
-  });
-}
-
-/** @param { HTMLDivElement } element
-* @param { number } current
-* @param { number } max
-*/
-function changeBarPercentage(element, current, max)
-{
-  const playedPercentage = current / max;
-  const remainingPercentage = 1 - playedPercentage;
-
-  element.querySelector('.played').style.width = `${playedPercentage * 100}%`;
-  element.querySelector('.remaining').style.width = `${remainingPercentage * 100}%`;
-}
-
 function initEvents()
 {
   // menu events
@@ -239,6 +192,13 @@ function initEvents()
   };
 
   optionsButton.onclick = () => changePage(optionsButton);
+
+  // controls events
+
+  playButton.onclick = playPause;
+  shuffleButton.onclick = shuffleMode;
+  repeatButton.onclick = repeatMode;
+  volumeButton.onclick = muteVolume;
 
   // sub-menu events
 
@@ -282,24 +242,32 @@ function initTippy()
     duration: [ 235, 200 ]
   });
 
-  playingSubMenuTooltip = tippy(playingButton, {
+  tippy(playingButton, {
     content: document.body.querySelector('.submenu.container.playing'),
     placement: 'bottom',
     interactive: true,
     arrow: true
   }).instances[0];
 
-  localSubMenuTooltip = tippy(localButton, {
+  tippy(localButton, {
     content: document.body.querySelector('.submenu.container.local'),
     placement: 'bottom',
     interactive: true,
     arrow: true
   }).instances[0];
 
-  optionsSubMenuTooltip = tippy(optionsButton, {
+  tippy(optionsButton, {
     content: document.body.querySelector('.submenu.container.options'),
     placement: 'bottom',
     interactive: true,
+    arrow: true
+  }).instances[0];
+
+  seekTooltip = tippy(seekBar, {
+    content: 0,
+    hideOnClick: false,
+    placement: 'top',
+    followCursor: 'horizontal',
     arrow: true
   }).instances[0];
 
@@ -310,6 +278,48 @@ function initTippy()
     content: volumeBar,
     interactive: true
   });
+}
+
+/** @param { HTMLDivElement } element
+ * @param { (highlightedPercentage: number) => void } mousemove
+* @param { (playedPercentage: number) => void } mousedown
+*/
+function initBar(element, mousemove, mousedown)
+{
+  /** @param { MouseEvent } event
+  */
+  function update(event)
+  {
+    const rect = element.getBoundingClientRect();
+
+    const width = Math.round(rect.width);
+    const left = Math.round(rect.left);
+
+    const x = Math.max(Math.min(event.clientX - left, width), 0);
+
+    if (mousemove)
+      mousemove(x / width);
+
+    if (element.mouseDown && mousedown)
+      mousedown(x / width);
+  }
+
+  element.onmousedown = () =>
+  {
+    element.mouseDown = true;
+
+    update(event);
+  };
+
+  element.onmouseup = element.onmouseleave = () =>
+  {
+    element.mouseDown = false;
+  };
+
+  element.onmousemove = (event) =>
+  {
+    update(event);
+  };
 }
 
 function init()
@@ -347,13 +357,130 @@ function onload()
 {
   initPages();
   
-  initBar(seekBar);
-  initBar(volumeBar);
+  seekControl(seekTime);
+  initBar(seekBar, seekShowTime, seekControl);
+
+  volumeControl(currentVolume);
+  initBar(volumeBar, undefined, volumeControl);
 
   resizeEnd();
   
   // set values
   changeRewindForwardTimings(rewindTime, forwardTime);
+}
+
+function playPause()
+{
+  // pause playback
+  if (playButton.classList.contains('playing'))
+  {
+    playButton.classList.remove('playing');
+    playButton.classList.add('paused');
+  }
+  // resume playback
+  else
+  {
+    playButton.classList.remove('paused');
+    playButton.classList.add('playing');
+  }
+}
+
+function shuffleMode()
+{
+  // turn off shuffling (play songs with their original indices)
+  if (shuffleButton.classList.contains('shuffled'))
+  {
+    shuffleButton.classList.remove('shuffled');
+    shuffleButton.classList.add('normal');
+  }
+  // turn on shuffling (play songs with shuffled indices)
+  else
+  {
+    shuffleButton.classList.remove('normal');
+    shuffleButton.classList.add('shuffled');
+  }
+}
+
+function repeatMode()
+{
+  // turn on repeating (the same track on loop)
+  if (repeatButton.classList.contains('looping'))
+  {
+    repeatButton.classList.remove('looping');
+    repeatButton.classList.add('repeating');
+  }
+  // turn off repeating (stop playing when the current track ends)
+  else if (repeatButton.classList.contains('repeating'))
+  {
+    repeatButton.classList.remove('repeating');
+    repeatButton.classList.add('once');
+  }
+  // turn on looping (loop the playlist) (goes to play track [0] when the last track ends)
+  else
+  {
+    repeatButton.classList.remove('once');
+    repeatButton.classList.add('looping');
+  }
+}
+
+/** @param { HTMLDivElement } element
+* @param { number } playedPercentage
+*/
+function updateBarPercentage(element, playedPercentage)
+{
+  const remainingPercentage = 1 - playedPercentage;
+
+  element.querySelector('.played').style.width = `${playedPercentage * 100}%`;
+  element.querySelector('.remaining').style.width = `${remainingPercentage * 100}%`;
+}
+
+function muteVolume()
+{
+  if (!volumeButton.classList.contains('muted'))
+    volumeControl(0);
+  else
+    volumeControl(lastRememberedVolume || 1);
+}
+
+/** @param { number } highlightedPercentage
+*/
+function seekShowTime(highlightedPercentage)
+{
+  seekTooltip.setContent(highlightedPercentage);
+}
+
+/** @param { number } playedPercentage
+*/
+function seekControl(playedPercentage)
+{
+  playedPercentage = playedPercentage || 0;
+
+  seekTime = playedPercentage;
+
+  updateBarPercentage(seekBar, playedPercentage);
+}
+
+/** @param { number } playedPercentage
+*/
+function volumeControl(playedPercentage)
+{
+  playedPercentage = playedPercentage || 0;
+
+  if (playedPercentage !== 0)
+  {
+    if (volumeButton.classList.contains('muted'))
+      volumeButton.classList.remove('muted');
+  }
+  else
+  {
+    if (!volumeButton.classList.contains('muted'))
+      volumeButton.classList.add('muted');
+  }
+
+  lastRememberedVolume = currentVolume;
+  currentVolume = playedPercentage;
+  
+  updateBarPercentage(volumeBar, currentVolume);
 }
 
 function onresize()

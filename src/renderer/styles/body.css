@@ -50,7 +50,7 @@ body
   height: 100%;
 }
 
-.icon > *
+.icon
 {
   fill: var(--color-4);
   stroke: var(--color-4);
@@ -115,6 +115,8 @@ body
   
   width: 100%;
   height: 100%;
+
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar

@@ -96,7 +96,10 @@ html(lang='en')
           .singular(data-tippy='Playing the queue once')
             +icon('singular')
         .volumeButton
-          +icon('volume')
+          .normal
+            +icon('volume')
+          .mute
+            +icon('mute')
       .queue.container
         .queue.playing.card
           .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')

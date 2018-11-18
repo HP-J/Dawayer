@@ -14,21 +14,21 @@
 
 .seekBar.played
 {
-  background-color: var(--color-6);
+  background-color: var(--color-4);
 
   user-select: none;
 
-  width: 0%;
+  width: 50%;
   height: 40%;
 }
 
 .seekBar.remaining
 {
-  background-color: var(--color-4);
+  background-color: var(--color-6);
 
   user-select: none;
 
-  width: 100%;
+  width: 50%;
   height: 40%;
 }
 
@@ -55,7 +55,7 @@
 
   user-select: none;
 
-  width: 0%;
+  width: 50%;
   height: 40%;
 }
 
@@ -65,7 +65,7 @@
 
   user-select: none;
 
-  width: 100%;
+  width: 50%;
   height: 40%;
 }
 
@@ -86,7 +86,7 @@
 
 .playButton:hover > * > .icon > *, .previousButton:hover > .icon > *, .nextButton:hover > .icon > *,
 .rewindButton:hover > .icon > *, .forwardButton:hover > .icon > *, .shuffleButton:hover > * >.icon > *,
-.repeatButton:hover > * > .icon > *, .volumeButton:hover > .icon > *,
+.repeatButton:hover > * > .icon > *, .volumeButton:hover > * .icon > *,
 .rewindButton:hover > .rewindTime, .forwardButton:hover > .forwardTime
 {
   fill: var(--color-7);
@@ -96,7 +96,7 @@
 
 .playButton:active > * > .icon, .nextButton:active > .icon,
 .forwardButton:active > .icon, .shuffleButton:active > * > .icon,
-.repeatButton:active > * > .icon,  .volumeButton:active > .icon,
+.repeatButton:active > * > .icon,  .volumeButton:active > * .icon,
 .rewindButton:active > .rewindTime, .forwardButton:active > .forwardTime
 {
   transition-property: transform;
@@ -168,7 +168,9 @@
 .shuffleButton > .linear,
 .repeatButton > .loop,
 .repeatButton > .repeat,
-.repeatButton > .singular
+.repeatButton > .singular,
+.volumeButton > .normal,
+.volumeButton > .mute
 {
   width: 100%;
   height: 100%;
@@ -205,6 +207,16 @@
 }
 
 .repeatButton.once > .repeat, .repeatButton.once > .loop
+{
+  display: none;
+}
+
+.volumeButton.muted > .normal
+{
+  display: none;
+}
+
+.volumeButton:not(.muted) > .mute
 {
   display: none;
 }
