@@ -9,6 +9,8 @@ import scroll from './scroll.js';
 
 let resizeEndTimeout;
 
+let menuIsCollapsed = false;
+
 let rewindTime = 10;
 let forwardTime = 30;
 
@@ -60,6 +62,10 @@ const localIconsContainer = localButton.children[0];
 /**  @type { HTMLDivElement }
 */
 const optionsButton = menu.querySelector('.menuItem.options');
+
+/**  @type { HTMLDivElement }
+*/
+const albumsWrapper = document.body.querySelector('.albums.wrapper');
 
 /**  @type { HTMLDivElement }
 */
@@ -130,8 +136,8 @@ function changePage(element, callback)
 
     // the index of the button is the same the the page
     selectedPage = pagesContainer.children.item(pageIndex);
-    
-    // scroll to page
+
+    // scroll to the page
     scroll(selectedPage, { callback: callback });
 
     return true;
@@ -157,6 +163,7 @@ function changeLocalSubPage(index)
   selectedLocalIcon = localIconsContainer.children.item(index);
   selectedLocalSubPage = localSubPagesContainer.children.item(index);
 
+  // smooth scroll to the sub-page and its icon
   scroll(selectedLocalIcon, { direction: 'vertical' });
   scroll(selectedLocalSubPage, { direction: 'vertical' });
 }
@@ -192,6 +199,21 @@ function initEvents()
   };
 
   optionsButton.onclick = () => changePage(optionsButton);
+
+  // menu collapsing events
+
+  menu.onmouseenter = () =>
+  {
+    expandMenu();
+  };
+
+  albumsWrapper.onscroll = (event) =>
+  {
+    if (event.srcElement.scrollTop >= 20)
+      collapseMenu();
+    else
+      expandMenu();
+  };
 
   // controls events
 
@@ -367,6 +389,33 @@ function onload()
   
   // set values
   changeRewindForwardTimings(rewindTime, forwardTime);
+}
+
+function collapseMenu()
+{
+  if (!menuIsCollapsed)
+  {
+    const height = menu.getBoundingClientRect().height;
+    const collapsedHeight = height * 0.65;
+
+    menu.style.top = `-${collapsedHeight}px`;
+    pagesContainer.style.top = `-${collapsedHeight}px`;
+    pagesContainer.style.height = `calc(100% + ${collapsedHeight}px)`;
+
+    setTimeout(() => menuIsCollapsed = true, 125);
+  }
+}
+
+function expandMenu()
+{
+  if (menuIsCollapsed)
+  {
+    menu.style.setProperty('top', '');
+    pagesContainer.style.setProperty('top', '');
+    pagesContainer.style.setProperty('height', '');
+
+    setTimeout(() => menuIsCollapsed = false, 125);
+  }
 }
 
 function playPause()
