@@ -88,9 +88,29 @@ body
   padding: 0 10%;
 }
 
+.playing.background
+{
+  z-index: -2;
+  position: absolute;
+
+  background-image: url(../../../test-materials/Dina1.jpeg);
+  background-position: center;
+  background-size: cover;
+
+  width: 100%;
+  height: 100%;
+  
+  filter: blur(5px);
+  transform: scale(1.05);
+
+  pointer-events: none;
+}
+
 .page.container.playing
 {
   grid-area: playing;
+
+  background-color: transparent;
 }
 
 .page.container.local

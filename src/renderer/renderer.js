@@ -134,6 +134,16 @@ function changePage(element, callback)
     // get the index of the button
     const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
 
+    if (pageIndex === 0)
+    {
+      controlBar.classList.add('extended');
+    }
+    else
+    {
+      if (controlBar.classList.contains('extended'))
+        controlBar.classList.remove('extended');
+    }
+
     // the index of the button is the same the the page
     selectedPage = pagesContainer.children.item(pageIndex);
 
@@ -399,8 +409,8 @@ function collapseMenu()
     const collapsedHeight = height * 0.65;
 
     menu.style.top = `-${collapsedHeight}px`;
-    pagesContainer.style.top = `-${collapsedHeight}px`;
-    pagesContainer.style.height = `calc(100% + ${collapsedHeight}px)`;
+    pagesContainer.style.top = `-${height}px`;
+    pagesContainer.style.height = `calc(100% + ${height}px)`;
 
     setTimeout(() => menuIsCollapsed = true, 125);
   }

@@ -23,6 +23,57 @@ html(lang='en')
     link(rel='stylesheet' href='./renderer/styles/tracks.css')
 
   body.fastforward
+
+    .controlBar.container
+      .controls.container
+        .seekBar.container
+          .seekBar.played
+          .seekBar.remaining
+        .playButton.paused
+          .pause(data-tippy='Pause')
+            +icon('pause')
+          .play(data-tippy='Pause')
+            +icon('play')
+        .previousButton(data-tippy='Previous Track')
+          +icon('next')
+        .nextButton(data-tippy='Next Track')
+          +icon('next')
+        .rewindButton
+          +icon('forward')
+          .rewindTime
+        .forwardButton
+          +icon('forward')
+          .forwardTime
+        .shuffleButton.shuffled
+          .shuffle(data-tippy='Shuffled queue')
+            +icon('shuffle')
+          .linear(data-tippy='Normal queue')
+            +icon('linear')
+        .repeatButton.looping
+          .loop(data-tippy='Looping the queue')
+            +icon('loop')
+          .repeat(data-tippy='Repeating the track')
+            +icon('repeat')
+          .singular(data-tippy='Playing the queue once')
+            +icon('singular')
+        .volumeButton
+          .normal
+            +icon('volume')
+          .mute
+            +icon('mute')
+      .queue.container
+        .queue.playing.card
+          .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
+          .queue.playing.artist Dina El-Wedidi
+          .queue.playing.title Dawayer (Circles) [ft. Mazaher]
+        .queue.text Up Next
+        .queue.tracks
+          .queueItem.container
+            .queueItem.index -1
+            .queueItem.artist Dina El-Wedidi
+            .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
+      .controlBar.background
+
     .menu.container
       .menuItem.wrapper.playing
         .menuItem.container
@@ -35,6 +86,9 @@ html(lang='en')
       .menuItem.wrapper.options
         .menuItem.container
           +icon('settings')
+      .menu.background
+
+    .playing.background
 
     .pages.container
       .page.container.playing
@@ -42,6 +96,14 @@ html(lang='en')
         .page.extended.local
           .albums.wrapper
             .albums.container
+              .album.wrapper.placeholder
+                .album.container
+                  .album.cover
+                  .album.card
+                    .album.background
+                    .album.title
+                    .album.text
+                    .album.artist
               .album.wrapper.placeholder
                 .album.container
                   .album.cover
@@ -117,56 +179,6 @@ html(lang='en')
           .tracks.wrapper
           .artists.wrapper
       .page.container.options
-
-    .controlBar.container
-      .controlBar.background
-      .controls.container
-        .seekBar.container
-          .seekBar.played
-          .seekBar.remaining
-        .playButton.paused
-          .pause(data-tippy='Pause')
-            +icon('pause')
-          .play(data-tippy='Pause')
-            +icon('play')
-        .previousButton(data-tippy='Previous Track')
-          +icon('next')
-        .nextButton(data-tippy='Next Track')
-          +icon('next')
-        .rewindButton
-          +icon('forward')
-          .rewindTime
-        .forwardButton
-          +icon('forward')
-          .forwardTime
-        .shuffleButton.shuffled
-          .shuffle(data-tippy='Shuffled queue')
-            +icon('shuffle')
-          .linear(data-tippy='Normal queue')
-            +icon('linear')
-        .repeatButton.looping
-          .loop(data-tippy='Looping the queue')
-            +icon('loop')
-          .repeat(data-tippy='Repeating the track')
-            +icon('repeat')
-          .singular(data-tippy='Playing the queue once')
-            +icon('singular')
-        .volumeButton
-          .normal
-            +icon('volume')
-          .mute
-            +icon('mute')
-      .queue.container
-        .queue.playing.card
-          .queue.playing.cover(style='background-image: url(../test-materials/Dina1.jpeg);')
-          .queue.playing.artist Dina El-Wedidi
-          .queue.playing.title Dawayer (Circles) [ft. Mazaher]
-        .queue.text Up Next
-        .queue.tracks
-          .queueItem.container
-            .queueItem.index -1
-            .queueItem.artist Dina El-Wedidi
-            .queueItem.title Yohadethoni El Shagar (Trees Adress Me)
 
     .submenu.container.playing
       .submenu.button.playing Playing Now

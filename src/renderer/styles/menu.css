@@ -16,16 +16,35 @@
   width: 100%;
   height: calc(6.85vh + 1.85vw);
 
-  outline: 1px solid black;
-  outline-offset: -1px;
-
   transition-property: top;
   transition-duration: 0.125s;
   transition-timing-function: ease-in;
 }
 
+.menu.background
+{
+  z-index: -1;
+  position: absolute;
+
+  background-color: palegoldenrod;
+
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  transition-property: top;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.controlBar.container.extended ~ .menu.container > .menu.background
+{
+  top: -100%;
+}
+
 .menuItem.wrapper
 {
+  z-index: 3;
   position: relative;
   
   cursor: pointer;
