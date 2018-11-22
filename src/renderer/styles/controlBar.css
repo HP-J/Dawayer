@@ -115,6 +115,7 @@
     position: absolute;
 
     max-width: 450px;
+    bottom: -180%;
     width: 75%;
   }
 }

@@ -3,6 +3,7 @@
 import tippy from 'tippy.js';
 
 import scroll from './scroll.js';
+import { appendCachedAudioFiles } from './storage.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
@@ -49,11 +50,11 @@ const localSubPagesContainer = document.body.querySelector('.page.extended.local
 
 /**  @type { HTMLDivElement }
 */
-const playingButton = menu.querySelector('.menuItem.playing');
+const playingButton = menu.children.item(0);
 
 /**  @type { HTMLDivElement }
 */
-const localButton = menu.querySelector('.menuItem.local');
+const localButton = menu.children.item(1);
 
 /**  @type { HTMLDivElement }
 */
@@ -61,7 +62,7 @@ const localIconsContainer = localButton.children[0];
 
 /**  @type { HTMLDivElement }
 */
-const optionsButton = menu.querySelector('.menuItem.options');
+const optionsButton = menu.children.item(2);
 
 /**  @type { HTMLDivElement }
 */
@@ -356,6 +357,7 @@ function initBar(element, mousemove, mousedown)
 
 function init()
 {
+  initOptions();
   initEvents();
 
   initTippy();
@@ -363,11 +365,16 @@ function init()
 
 function initPages()
 {
-  selectedPage = pagesContainer.children.item(1);
+  selectedPage = pagesContainer.children.item(2);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
   scroll(selectedPage, { duration: 0 });
+}
+
+function initOptions()
+{
+  
 }
 
 /** scroll coordinates break on resizing the containers and need to be reset every time
@@ -383,22 +390,6 @@ function resizeEnd()
 {
   // remove no-motion class
   document.body.classList.remove('fastforward');
-}
-
-function onload()
-{
-  initPages();
-  
-  seekControl(seekTime);
-  initBar(seekBar, seekShowTime, seekControl);
-
-  volumeControl(currentVolume);
-  initBar(volumeBar, undefined, volumeControl);
-
-  resizeEnd();
-  
-  // set values
-  changeRewindForwardTimings(rewindTime, forwardTime);
 }
 
 function collapseMenu()
@@ -540,6 +531,24 @@ function volumeControl(playedPercentage)
   currentVolume = playedPercentage;
   
   updateBarPercentage(volumeBar, currentVolume);
+}
+
+function onload()
+{
+  initPages();
+  
+  seekControl(seekTime);
+  initBar(seekBar, seekShowTime, seekControl);
+
+  volumeControl(currentVolume);
+  initBar(volumeBar, undefined, volumeControl);
+
+  resizeEnd();
+  
+  appendCachedAudioFiles();
+
+  // set values
+  changeRewindForwardTimings(rewindTime, forwardTime);
 }
 
 function onresize()
