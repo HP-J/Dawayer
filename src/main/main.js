@@ -3,7 +3,9 @@ import { BrowserWindow, app, screen, ipcMain, dialog, Menu } from 'electron';
 import path from 'path';
 import url from 'url';
 
-import { setWindow, setApp, focus } from './window.js';
+import * as settings from 'electron-json-config';
+
+import { setWindow, setApp, focus, isDebug } from './window.js';
 import { loadOptions } from './options.js';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -61,22 +63,27 @@ function createWindow()
   // set the electron window location
   // to the center of the screen
 
-  // let width = Math.round(screenSize.width * 0.7);
-  // let height = Math.round(screenSize.height * 0.82);
-
-  // TODO re-enable auto size
-
   const minWidth = 350;
   const minHeight = 510;
 
-  let width = 955;
-  let height = 607;
+  const savedSize = settings.get('size');
+
+  let width;
+  let height;
+
+  width = (!savedSize || isDebug()) ? Math.round(screenSize.width * 0.7) : savedSize[0];
+  height = (!savedSize || isDebug()) ? Math.round(screenSize.height * 0.82) : savedSize[1];
 
   if (minWidth > width)
     width = minWidth;
 
   if (minHeight > height)
     height = minHeight;
+
+  const savedPosition = settings.get('position');
+
+  const x = (!savedPosition || isDebug()) ? Math.round((screenSize.width - width) / 2) : savedPosition[0];
+  const y =  (!savedPosition || isDebug()) ? Math.round((screenSize.height - height) / 2) : savedPosition[1];
 
   // replace the default menu
   Menu.setApplicationMenu(menuTemplate);
@@ -92,8 +99,8 @@ function createWindow()
       height: height,
       minWidth: minWidth,
       minHeight: minHeight,
-      x: Math.round((screenSize.width - width) / 2),
-      y: Math.round((screenSize.height - height) / 2)
+      x: x,
+      y: y
     }
   );
 
@@ -111,6 +118,12 @@ function createWindow()
 
   // TODO disable dev tools
   mainWindow.webContents.openDevTools({ mode: 'detach' });
+
+  mainWindow.on('close', () =>
+  {
+    settings.set('size', mainWindow.getSize());
+    settings.set('position', mainWindow.getPosition());
+  });
 
   // emits when the window is closed
   mainWindow.on('closed', () =>

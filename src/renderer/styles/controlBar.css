@@ -118,4 +118,14 @@
     bottom: -180%;
     width: 75%;
   }
+
+  .controlBar.container.extended > .queue.container.queue.container
+  {
+    bottom: -180%;
+  }
+
+  .controlBar.container.extended > .queue.container.queue.container:hover
+  {
+    bottom: 0;
+  }
 }

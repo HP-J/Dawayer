@@ -65,14 +65,7 @@ function loadTrayIcon()
 
     trayIcon = new Tray(nativeImage.createFromPath(iconPath));
 
-    trayIcon._setContextMenu = trayIcon.setContextMenu;
-
-    trayIcon.setContextMenu = function(menu)
-    {
-      trayIcon._setContextMenu(menu);
-      
-      trayIcon.contextMenu = menu;
-    };
+    trayIcon.on('click', showHide);
 
     trayIcon.setContextMenu(trayMenu);
   }
