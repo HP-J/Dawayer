@@ -1,9 +1,7 @@
-// import { remote } from 'electron';
-
 import tippy from 'tippy.js';
 
 import scroll from './scroll.js';
-import { appendCachedAudioFiles } from './storage.js';
+import { initOptions, initOptionsEvents } from './options.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
@@ -261,6 +259,7 @@ function initEvents()
   };
 
   // window events
+
   window.onload = onload;
   window.onresize = onresize;
 }
@@ -358,7 +357,9 @@ function initBar(element, mousemove, mousedown)
 function init()
 {
   initOptions();
+
   initEvents();
+  initOptionsEvents();
 
   initTippy();
 }
@@ -370,11 +371,6 @@ function initPages()
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
   scroll(selectedPage, { duration: 0 });
-}
-
-function initOptions()
-{
-  
 }
 
 /** scroll coordinates break on resizing the containers and need to be reset every time
@@ -545,8 +541,6 @@ function onload()
 
   resizeEnd();
   
-  appendCachedAudioFiles();
-
   // set values
   changeRewindForwardTimings(rewindTime, forwardTime);
 }

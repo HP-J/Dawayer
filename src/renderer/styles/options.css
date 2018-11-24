@@ -52,46 +52,24 @@
 
 .option.local.directory
 {
+  user-select: text;
   word-break: break-all;
   font-weight: 500;
 }
 
-.option.local.remove
+.option.local.remove, .option.local.add
 {
   display: flex;
   align-items: center;
-
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.option.local.remove:after
-{
-  display: block;
-  content: "Remove";
-}
-
-.option.local.remove:hover:after
-{
-  color: var(--color-7);
-}
-
-.option.local.add
-{
-  display: flex;
   justify-content: center;
 
+  cursor: pointer;
+
   font-weight: 900;
   text-transform: uppercase;
 }
 
-.option.local.add:after
-{
-  display: block;
-  content: "Add";
-}
-
-.option.local.add:hover:after
+.option.local.remove:hover, .option.local.add:hover
 {
   color: var(--color-7);
 }

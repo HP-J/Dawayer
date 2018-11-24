@@ -79,12 +79,12 @@ html(lang='en')
       .menuItem.wrapper
         .menuItem.container
           +icon('playing')
-      .menuItem.wrapper.selected
+      .menuItem.wrapper
         .menuItem.container
           +icon('albums')
           +icon('music')
           +icon('artist')
-      .menuItem.wrapper
+      .menuItem.wrapper.selected
         .menuItem.container
           +icon('settings')
       .menu.background
@@ -119,12 +119,9 @@ html(lang='en')
       .page.options
         .options.wrapper
           .options.container
-            .optionsItem.container
+            .optionsItem.container.local
               .option.title Audio Directories
-              .option.local.container
-                .option.local.directory /home/ker0olos/Music
-                .option.local.remove
-              .option.local.add
+              .option.local.add Add
 
     .submenu.container.playing
       .submenu.button.playing Playing Now
