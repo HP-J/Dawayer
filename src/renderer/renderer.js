@@ -6,6 +6,8 @@ import { initOptions, initOptionsEvents } from './options.js';
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
 
+//#region Variables
+
 let resizeEndTimeout;
 
 let menuIsCollapsed = false;
@@ -118,6 +120,10 @@ let rewindTimeTooltip;
 */
 let forwardTimeTooltip;
 
+//#endregion
+
+//#region Page Transactions
+
 /** @param { HTMLDivElement } element
 * @param { () => void } callback
 */
@@ -177,22 +183,9 @@ function changeLocalSubPage(index)
   scroll(selectedLocalSubPage, { direction: 'vertical' });
 }
 
-/** @param { number } rewind
-* @param { number } forward
-*/
-function changeRewindForwardTimings(rewind, forward)
-{
-  rewindTime = rewind;
-  forwardTime = forward;
+//#endregion
 
-  // the icon text
-  rewindTimeText.innerText = rewindTime;
-  forwardTimeText.innerText = forwardTime;
-
-  // the tooltip text
-  rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
-  forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
-}
+//#region Init
 
 function initEvents()
 {
@@ -296,6 +289,7 @@ function initTippy()
   }).instances[0];
 
   seekTooltip = tippy(seekBar, {
+    duration: 0,
     content: 0,
     hideOnClick: false,
     placement: 'top',
@@ -366,27 +360,16 @@ function init()
 
 function initPages()
 {
-  selectedPage = pagesContainer.children.item(2);
+  selectedPage = pagesContainer.children.item(1);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
   scroll(selectedPage, { duration: 0 });
 }
 
-/** scroll coordinates break on resizing the containers and need to be reset every time
-*/
-function resetPagesScroll()
-{
-  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical', delay: 200 });
-  scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
-  scroll(selectedPage, { duration: 0 });
-}
+//#endregion
 
-function resizeEnd()
-{
-  // remove no-motion class
-  document.body.classList.remove('fastforward');
-}
+//#region Menu Collapsing
 
 function collapseMenu()
 {
@@ -414,6 +397,10 @@ function expandMenu()
     setTimeout(() => menuIsCollapsed = false, 125);
   }
 }
+
+//#endregion
+
+//#region Controls
 
 function playPause()
 {
@@ -506,6 +493,23 @@ function seekControl(playedPercentage)
   updateBarPercentage(seekBar, playedPercentage);
 }
 
+/** @param { number } rewind
+* @param { number } forward
+*/
+function changeRewindForwardTimings(rewind, forward)
+{
+  rewindTime = rewind;
+  forwardTime = forward;
+
+  // the icon text
+  rewindTimeText.innerText = rewindTime;
+  forwardTimeText.innerText = forwardTime;
+
+  // the tooltip text
+  rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
+  forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
+}
+
 /** @param { number } playedPercentage
 */
 function volumeControl(playedPercentage)
@@ -527,6 +531,25 @@ function volumeControl(playedPercentage)
   currentVolume = playedPercentage;
   
   updateBarPercentage(volumeBar, currentVolume);
+}
+
+//#endregion
+
+//#region Callbacks
+
+/** scroll coordinates break on resizing the containers and need to be reset every time
+*/
+function resetPagesScroll()
+{
+  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical', delay: 200 });
+  scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
+  scroll(selectedPage, { duration: 0 });
+}
+
+function resizeEnd()
+{
+  // remove no-motion class
+  document.body.classList.remove('fastforward');
 }
 
 function onload()
@@ -561,5 +584,25 @@ function onresize()
   // set a new resize-end timeout
   resizeEndTimeout = setTimeout(resizeEnd, 25);
 }
+
+//#endregion
+
+//#region API
+
+/** @param { string } classes
+*/
+export function createElement(classes)
+{
+  const element = document.createElement('div');
+
+  const classesArray = classes.split('.');
+  classesArray.shift();
+
+  element.classList.add(...classesArray);
+
+  return element;
+}
+
+//#endregion
 
 init();

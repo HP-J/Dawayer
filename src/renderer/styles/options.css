@@ -39,7 +39,7 @@
   font-weight: 700;
 }
 
-.option.local.container
+.option.directories.container
 {
   display: grid;
 
@@ -50,14 +50,14 @@
   margin: 2% 0%;
 }
 
-.option.local.directory
+.option.directories.directory
 {
   user-select: text;
   word-break: break-all;
   font-weight: 500;
 }
 
-.option.local.remove, .option.local.add
+.option.directories.remove, .option.directories.add
 {
   display: flex;
   align-items: center;
@@ -69,7 +69,7 @@
   text-transform: uppercase;
 }
 
-.option.local.remove:hover, .option.local.add:hover
+.option.directories.remove:hover, .option.directories.add:hover
 {
   color: var(--color-7);
 }

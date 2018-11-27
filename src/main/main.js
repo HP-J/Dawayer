@@ -116,9 +116,6 @@ function createWindow()
     slashes: true
   }));
 
-  // TODO disable dev tools
-  mainWindow.webContents.openDevTools({ mode: 'detach' });
-
   mainWindow.on('close', () =>
   {
     settings.set('size', mainWindow.getSize());

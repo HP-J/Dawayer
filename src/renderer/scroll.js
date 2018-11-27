@@ -1,8 +1,8 @@
 /** @typedef { Object } ScrollOptions
- * @property { number } delay ms
- * @property { number } duration ms
- * @property { 'horizontal' | 'vertical' } direction
- * @property { () => void } callback
+* @property { number } delay ms
+* @property { number } duration ms
+* @property { 'horizontal' | 'vertical' } direction
+* @property { () => void } callback
 */
 
 /** @param { HTMLElement } element

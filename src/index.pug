@@ -79,12 +79,12 @@ html(lang='en')
       .menuItem.wrapper
         .menuItem.container
           +icon('playing')
-      .menuItem.wrapper
+      .menuItem.wrapper.selected
         .menuItem.container
           +icon('albums')
           +icon('music')
           +icon('artist')
-      .menuItem.wrapper.selected
+      .menuItem.wrapper
         .menuItem.container
           +icon('settings')
       .menu.background
@@ -98,14 +98,6 @@ html(lang='en')
         .page.extended.local
           .albums.wrapper
             .albums.container
-              .album.wrapper.placeholder
-                .album.container
-                  .album.cover
-                  .album.card
-                    .album.background
-                    .album.title
-                    .album.text
-                    .album.artist
               //- .album.wrapper
                 .album.container
                   .album.cover(style='background-image: url(../test-materials/Dina2.png);')
@@ -119,9 +111,9 @@ html(lang='en')
       .page.options
         .options.wrapper
           .options.container
-            .optionsItem.container.local
-              .option.title Audio Directories
-              .option.local.add Add
+            .optionsItem.container.directories
+              .option.directories.title Audio Directories
+              .option.directories.add Add
 
     .submenu.container.playing
       .submenu.button.playing Playing Now
