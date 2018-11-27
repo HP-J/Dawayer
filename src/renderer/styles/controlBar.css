@@ -17,6 +17,15 @@
   height: auto;
 
   padding: 0px 2%;
+
+  transition-property: top;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+}
+
+.controlBar.container.hidden
+{
+  top: 30%;
 }
 
 .controlBar.background
@@ -84,7 +93,7 @@
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.queue.container:hover, .controlBar.container.extended > .queue.container
+.queue.container:hover, .controlBar.container.extended:not(.hidden) > .queue.container
 {
   bottom: 0;
 }
