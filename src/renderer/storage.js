@@ -1,12 +1,13 @@
-import { parseFile } from 'music-metadata';
-import * as settings from 'electron-json-config';
-
 import { readdirSync, existsSync, statSync } from 'fs';
 import { join, basename, extname } from 'path';
 import { homedir, platform } from 'os';
 
-import { createElement } from './renderer';
-import { appendDirectoryNode } from './options';
+import { parseFile } from 'music-metadata';
+import * as settings from 'electron-json-config';
+
+import { createElement } from './renderer.js';
+import { appendDirectoryNode } from './options.js';
+import { base64 as lqip } from './lqip.js';
 
 /** @typedef { Object } Storage
 * @property { Object<string, {  artist: string, tracks: string[] }> } albums
@@ -76,7 +77,7 @@ function getDefaultMusicDir()
 }
 
 /** @param { HTMLDivElement } placeholder
-* @param { { format: string, data: Buffer } } picture
+* @param { string } picture
 * @param { string } title
 * @param { string } artist
 */
@@ -85,8 +86,7 @@ function updateAlbumElement(placeholder, picture, title, artist)
   if (placeholder.classList.contains('placeholder'))
     placeholder.classList.remove('placeholder');
 
-  placeholder.children[0].children[0].style.backgroundImage =
-  `url(data:${picture.format};base64,${picture.data.toString('base64')})`;
+  placeholder.children[0].children[0].style.backgroundImage = `url(${picture})`;
 
   placeholder.children[0].children[1].children[1].innerText = title;
   placeholder.children[0].children[1].children[2].innerText = 'by ';
@@ -143,59 +143,82 @@ function scanCacheAudioFiles()
     
     const promises = [];
 
+    // loop through all files in the audio directories
     for (let i = 0; i < files.length; i++)
     {
       const file = files[i];
 
-      // see if the file matches any of those supported audio extensions
+      // if the file matches any of those supported audio extensions
       if (file.match(AUDIO_EXTENSIONS_REGEX))
       {
-        promises.push(parseFile(file).then((metadata) =>
-        {
-          const title = basename(file, extname(file));
+        promises.push(
+          // parse the file for the metadata
+          parseFile(file)
+            .then((metadata) =>
+            {
+              // then using the track's picture
+              // create a lqip version of it then return the metadata and
+              // the lqip picture to the next promise
 
-          // if the audio metadata belongs in an album
-          if (metadata.common.album)
-          {
-            if (storage.albums[metadata.common.album])
+              return new Promise((resolve) =>
+              {
+                lqip(metadata.common.picture[0]).then((res) =>
+                {
+                  resolve({ metadata: metadata, lqip: res });
+                });
+              });
+            })
+            .then(({ metadata, lqip }) =>
             {
-              storage.albums[metadata.common.album].tracks.push(title);
-            }
-            else
-            {
-              storage.albums[metadata.common.album] = {
-                artist: metadata.common.albumartist,
-                tracks: [ title ]
+              // using the metadata and the lqip picture fill
+              // the storage object and cache it to the
+              // hard disk
+
+              const title = basename(file, extname(file));
+
+              // if the audio metadata belongs in an album
+              if (metadata.common.album)
+              {
+                if (storage.albums[metadata.common.album])
+                {
+                  storage.albums[metadata.common.album].tracks.push(title);
+                }
+                else
+                {
+                  storage.albums[metadata.common.album] = {
+                    artist: metadata.common.albumartist,
+                    tracks: [ title ]
+                  };
+                }
+              }
+
+              // if the audio metadata has a known artist
+              if (metadata.common.artists)
+              {
+                const artists = metadata.common.artists;
+
+                for (let i = 0; i < artists.length; i++)
+                {
+                  if (storage.artists[artists[i]])
+                  {
+                    storage.artists[artists[i]].tracks.push(title);
+                  }
+                  else
+                  {
+                    storage.artists[artists[i]] = {
+                      tracks: [ title ]
+                    };
+                  }
+                }
+              }
+
+              // store the track important metadata
+              storage.tracks[title] = {
+                url: file,
+                lqip: lqip,
+                artists: metadata.common.artists
               };
-            }
-          }
-
-          // if the audio metadata has a known artist
-          if (metadata.common.artists)
-          {
-            const artists = metadata.common.artists;
-
-            for (let i = 0; i < artists.length; i++)
-            {
-              if (storage.artists[artists[i]])
-              {
-                storage.artists[artists[i]].tracks.push(title);
-              }
-              else
-              {
-                storage.artists[artists[i]] = {
-                  tracks: [ title ]
-                };
-              }
-            }
-          }
-      
-          // store the track important metadata
-          storage.tracks[title] = {
-            url: file,
-            artists: metadata.common.artists
-          };
-        }));
+            }));
       }
     }
 
@@ -204,15 +227,21 @@ function scanCacheAudioFiles()
   });
 }
 
-function appendAlbums()
+function appendItems()
 {
+  // remove all children from albums, tracks and artists pages
   // removeAllChildren(albumsContainer);
-  console.log(JSON.stringify(storage));
-}
 
-function appendLocalElements()
-{
-  appendAlbums();
+  const albums = Object.keys(storage.albums);
+
+  for (let i = 0; i < albums.length; i++)
+  {
+    Promise.resolve(appendAlbumPlaceholder())
+      .then((placeholder) =>
+      {
+        updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
+      });
+  }
 }
 
 /** @param { HTMLElement } element
@@ -234,7 +263,7 @@ export function initStorage()
   addNewDirectories([ getDefaultMusicDir() ]);
 
   // .ADD load the cached storage instead of scan every time
-  scanCacheAudioFiles().then(appendLocalElements);
+  scanCacheAudioFiles().then(appendItems);
 }
 
 /** adds the directories to the save file and the scan array,

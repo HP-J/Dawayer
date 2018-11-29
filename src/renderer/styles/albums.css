@@ -112,7 +112,7 @@
 
 .album.wrapper:not(.placeholder):hover > * > .album.cover:after
 {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.785);
 }
 
 .album.card
