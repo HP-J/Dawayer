@@ -1,7 +1,7 @@
 import { remote } from 'electron';
 
 import { createElement } from './renderer.js';
-import { initStorage, addNewDirectories, removeDirectory } from './storage.js';
+import { initStorage, addNewDirectories, removeDirectory, scanCacheAudioFiles } from './storage.js';
 
 /**  @type { HTMLDivElement }
 */
@@ -29,6 +29,12 @@ export function initOptionsEvents()
       },
       addNewDirectories
     );
+  };
+
+  document.body.querySelector('.option.directories.add').onclick = () =>
+  {
+    // .ADD rescan button functionality
+    // scanCacheAudioFiles();
   };
 }
 

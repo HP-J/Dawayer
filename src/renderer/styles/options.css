@@ -57,9 +57,18 @@
   font-weight: 500;
 }
 
-.option.directories.remove, .option.directories.add
+.option.container.buttons
 {
   display: flex;
+}
+
+.option.directories.remove,
+.option.directories.add,
+.option.directories.rescan
+{
+  display: flex;
+
+  flex-grow: 1;
   align-items: center;
   justify-content: center;
 
@@ -69,7 +78,9 @@
   text-transform: uppercase;
 }
 
-.option.directories.remove:hover, .option.directories.add:hover
+.option.directories.remove:hover,
+.option.directories.add:hover,
+.option.directories.rescan:hover
 {
   color: var(--color-7);
 }

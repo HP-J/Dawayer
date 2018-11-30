@@ -88,9 +88,16 @@ function updateAlbumElement(placeholder, picture, title, artist)
 
   placeholder.children[0].children[0].style.backgroundImage = `url(${picture})`;
 
-  placeholder.children[0].children[1].children[1].innerText = title;
-  placeholder.children[0].children[1].children[2].innerText = 'by ';
-  placeholder.children[0].children[1].children[3].innerText = artist;
+  placeholder.children[0].children[1].children[0].appendChild(createElement('.album.track'));
+  placeholder.children[0].children[1].children[0].appendChild(createElement('.album.track'));
+
+  placeholder.children[0].children[1].children[0].children[0].innerText = 'Dawayer (Circles) [ft. Mazaher]';
+  placeholder.children[0].children[1].children[0].children[1].innerText = 'Fi Belad El Agayeb (In Wonderland)';
+
+  placeholder.children[0].children[1].children[2].innerText = title;
+  placeholder.children[0].children[1].children[3].innerText = '41:25';
+  placeholder.children[0].children[1].children[4].innerText = 'by ';
+  placeholder.children[0].children[1].children[5].innerText = artist;
 }
 
 function appendAlbumPlaceholder()
@@ -102,8 +109,10 @@ function appendAlbumPlaceholder()
   const cover = createElement('.album.cover');
   const card = createElement('.album.card');
 
+  const tracks = createElement('.album.tracks');
   const background = createElement('.album.background');
   const title = createElement('.album.title');
+  const time = createElement('.album.time');
   const text = createElement('.album.text');
   const artist = createElement('.album.artist');
 
@@ -111,8 +120,10 @@ function appendAlbumPlaceholder()
   //   .album.container
   //     .album.cover(style=background-image)
   //     .album.card
+  //       .album.tracks
   //       .album.background
   //       .album.title
+  //       .album.time
   //       .album.text by
   //       .album.artist
 
@@ -121,8 +132,10 @@ function appendAlbumPlaceholder()
   container.appendChild(cover);
   container.appendChild(card);
 
+  card.appendChild(tracks);
   card.appendChild(background);
   card.appendChild(title);
+  card.appendChild(time);
   card.appendChild(text);
   card.appendChild(artist);
 
@@ -131,10 +144,22 @@ function appendAlbumPlaceholder()
   return placeholder;
 }
 
+/** initialize the cache system and loads local tracks, albums and artists, appending an element
+* for each of them
+*/
+export function initStorage()
+{
+  // .ADD load 'audioDirectories' from settings, if none exists load default music dir
+  addNewDirectories([ getDefaultMusicDir() ]);
+
+  // .ADD load the cached storage instead of scan every time
+  scanCacheAudioFiles().then(appendItems);
+}
+
 /** scan the audio directories for audio files then parses them for their metadata,
 * and adds the important data to the storage object
 */
-function scanCacheAudioFiles()
+export function scanCacheAudioFiles()
 {
   return new Promise((resolve) =>
   {
@@ -229,19 +254,28 @@ function scanCacheAudioFiles()
 
 function appendItems()
 {
-  // remove all children from albums, tracks and artists pages
-  // removeAllChildren(albumsContainer);
-
-  const albums = Object.keys(storage.albums);
-
-  for (let i = 0; i < albums.length; i++)
+  return new Promise((resolve) =>
   {
-    Promise.resolve(appendAlbumPlaceholder())
-      .then((placeholder) =>
-      {
-        updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
-      });
-  }
+    // remove all children from albums, tracks and artists pages
+    // removeAllChildren(albumsContainer);
+
+    const albums = Object.keys(storage.albums);
+
+    for (let i = 0; i < albums.length; i++)
+    {
+      const placeholder = appendAlbumPlaceholder();
+
+      updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
+
+      // Promise.resolve(appendAlbumPlaceholder())
+      //   .then((placeholder) =>
+      //   {
+      //     updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
+      //   });
+    }
+
+    resolve();
+  });
 }
 
 /** @param { HTMLElement } element
@@ -252,18 +286,6 @@ function removeAllChildren(element)
   {
     element.removeChild(element.lastChild);
   }
-}
-
-/** initialize the cache system and loads local tracks, albums and artists, appending an element
-* for each of them
-*/
-export function initStorage()
-{
-  // .ADD load 'audioDirectories' from settings, if none exists load default music dir
-  addNewDirectories([ getDefaultMusicDir() ]);
-
-  // .ADD load the cached storage instead of scan every time
-  scanCacheAudioFiles().then(appendItems);
 }
 
 /** adds the directories to the save file and the scan array,
