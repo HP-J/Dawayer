@@ -96,8 +96,7 @@ function updateAlbumElement(placeholder, picture, title, artist)
 
   placeholder.children[0].children[1].children[2].innerText = title;
   placeholder.children[0].children[1].children[3].innerText = '41:25';
-  placeholder.children[0].children[1].children[4].innerText = 'by ';
-  placeholder.children[0].children[1].children[5].innerText = artist;
+  placeholder.children[0].children[1].children[4].innerText = artist;
 }
 
 function appendAlbumPlaceholder()
@@ -113,7 +112,6 @@ function appendAlbumPlaceholder()
   const background = createElement('.album.background');
   const title = createElement('.album.title');
   const time = createElement('.album.time');
-  const text = createElement('.album.text');
   const artist = createElement('.album.artist');
 
   // .album.wrapper.placeholder
@@ -124,7 +122,6 @@ function appendAlbumPlaceholder()
   //       .album.background
   //       .album.title
   //       .album.time
-  //       .album.text by
   //       .album.artist
 
   placeholder.appendChild(container);
@@ -136,7 +133,6 @@ function appendAlbumPlaceholder()
   card.appendChild(background);
   card.appendChild(title);
   card.appendChild(time);
-  card.appendChild(text);
   card.appendChild(artist);
 
   albumsContainer.appendChild(placeholder);
