@@ -18,7 +18,7 @@ body
   grid-template-rows: auto 60vh 1fr;
   grid-template-columns: 100vw;
   grid-template-areas: "menu" "pages" "controlBar";
-  
+
   width: 100vw;
   height: 100vh;
 
@@ -35,7 +35,7 @@ body
 .design
 {
   position: absolute;
-  
+
   left: 0;
   top: 0;
 
@@ -60,12 +60,12 @@ body
 {
   grid-area: pages;
   position: relative;
-  
+
   display: grid;
   grid-template-rows: 100%;
   grid-template-columns: 100vw 100vw 100vw;
   grid-template-areas: "playing local options";
-  
+
   top: 0;
   width: 100%;
   height: 100%;
@@ -89,7 +89,7 @@ body
 
   transition-property: height;
   transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .playing.background
@@ -103,7 +103,7 @@ body
 
   width: 100%;
   height: 100%;
-  
+
   filter: blur(6px);
   transform: scale(1.05);
 
@@ -120,7 +120,7 @@ body
   left: 0;
   width: 100%;
   height: 100%;
-  
+
   pointer-events: none;
 
   transition-property: left;
@@ -160,11 +160,11 @@ body
 .page.extended.local
 {
   display: grid;
-  
+
   grid-template-rows: 100% 100% 100%;
   grid-template-columns: 100%;
   grid-template-areas: "." "." ".";
-  
+
   width: 100%;
   height: 100%;
 
@@ -174,7 +174,7 @@ body
 ::-webkit-scrollbar
 {
   background: transparent;
-  
+
   min-width: 8px;
   width: 0.5vw;
 }

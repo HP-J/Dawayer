@@ -1,8 +1,11 @@
 import { readdirSync, existsSync, statSync } from 'fs';
-import { join, basename, extname } from 'path';
+
+import { writeJson, readJSON } from 'fs-extra';
+
+import { join, dirname, basename, extname } from 'path';
 import { homedir, platform } from 'os';
 
-import { parseFile } from 'music-metadata';
+import { parseFile as getMetadata } from 'music-metadata';
 import * as settings from 'electron-json-config';
 
 import { createElement } from './renderer.js';
@@ -15,7 +18,14 @@ import { base64 as lqip } from './lqip.js';
 * @property { Object<string, { url: string, artists: string[] }> } tracks
 */
 
-const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.acc$|.m4a$|.flac$/;
+/** @typedef { Object } StorageInfo
+* @property { number } date
+* @property { number } albums
+* @property { number } artists
+* @property { number } tracks
+*/
+
+const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
 
 /**  @type { HTMLDivElement }
 */
@@ -25,13 +35,13 @@ const albumsContainer = document.body.querySelector('.albums.container');
 */
 const audioDirectories = [];
 
-/** @type { Storage }
+/** @type { string }
 */
-const storage = {
-  albums: {},
-  artists: {},
-  tracks: {}
-};
+let storageInfoConfig;
+
+/** @type { string }
+*/
+let storageConfig;
 
 /** @param { string[] } directories
 * @returns { string[] }
@@ -52,9 +62,9 @@ function walkSync(directories)
     list.forEach((file) =>
     {
       file = join(dir, file);
-      
+
       const stat = statSync(file);
-  
+
       if (stat && stat.isDirectory())
         // Recurs into a subdirectory
         results = results.concat(walkSync([ file ]));
@@ -145,11 +155,59 @@ function appendAlbumPlaceholder()
 */
 export function initStorage()
 {
-  // .ADD load 'audioDirectories' from settings, if none exists load default music dir
-  addNewDirectories([ getDefaultMusicDir() ]);
+  // ADD test changing the directory (from ~/Music to /mnt/k/Music Tester) during runtime
+  // and then re-scanning
 
-  // .ADD load the cached storage instead of scan every time
-  scanCacheAudioFiles().then(appendItems);
+  // the base directory for the app config files
+  const configDir = dirname(settings.file());
+
+  storageInfoConfig = join(configDir, '/storageInfo.json');
+  storageConfig = join(configDir, '/storage.json');
+
+  // loaded the saved audio directories
+
+  const savedAudioDirectories = settings.get('audioDirectories');
+
+  // if now audio directories are saved, then use the OS default directory for music
+  if (!savedAudioDirectories || !savedAudioDirectories.length <= 0)
+    addNewDirectories([ getDefaultMusicDir() ]);
+  else
+    addNewDirectories(savedAudioDirectories);
+
+  // if a cached storage object exists
+  if (existsSync(storageConfig))
+  {
+    let storageInfo;
+
+    readJSON(storageInfoConfig).then((data) =>
+    {
+      storageInfo = data;
+
+      return readJSON(storageConfig);
+    })
+      .then((storage) =>
+      {
+        appendItems(storageInfo, storage);
+
+        // ADD if the cache is too old create a new cache for the next time
+        // the app starts
+        // if (isStorageOld(storageInfo.date))
+        //   scanCacheAudioFiles().then((scan) =>
+        //   {
+        //     cacheStorage(scan.storageInfo, scan.storage);
+        //   });
+      });
+  }
+  // if not, then scan the audio directories for the audio files,
+  // load them and then create a new cache for them
+  else
+  {
+    scanCacheAudioFiles().then((scan) =>
+    {
+      appendItems(scan.storageInfo, scan.storage);
+      cacheStorage(scan.storageInfo, scan.storage);
+    });
+  }
 }
 
 /** scan the audio directories for audio files then parses them for their metadata,
@@ -157,11 +215,17 @@ export function initStorage()
 */
 export function scanCacheAudioFiles()
 {
+  const storage = {
+    albums: {},
+    artists: {},
+    tracks: {}
+  };
+
   return new Promise((resolve) =>
   {
     // walk through all the listed audio directories
     const files = walkSync(audioDirectories);
-    
+
     const promises = [];
 
     // loop through all files in the audio directories
@@ -174,7 +238,7 @@ export function scanCacheAudioFiles()
       {
         promises.push(
           // parse the file for the metadata
-          parseFile(file)
+          getMetadata(file)
             .then((metadata) =>
             {
               // then using the track's picture
@@ -243,32 +307,76 @@ export function scanCacheAudioFiles()
       }
     }
 
-    // when all files are parsed and added to the storage object resolve this promise
-    Promise.all(promises).then(resolve);
+    // when all files are parsed and added to the storage object
+    // fill the storage info, then cache them,
+    // then resolve this promise
+    Promise.all(promises).then(() =>
+    {
+      const storageInfo = {
+        date: Date.now(),
+        albums: Object.keys(storage.albums).length,
+        artists: Object.keys(storage.artists).length,
+        tracks: Object.keys(storage.tracks).length
+      };
+
+      resolve({ storageInfo, storage });
+    });
   });
 }
 
-function appendItems()
+/** @param  { StorageInfo } storageInfo
+* @param  { Storage } storage
+*/
+function cacheStorage(storageInfo, storage)
+{
+  writeJson(storageInfoConfig, storageInfo);
+  writeJson(storageConfig, storage);
+}
+
+/** @param  { number } time
+* @return { Boolean }
+*/
+function isStorageOld(time)
+{
+  const date = new Date(time);
+
+  // add 2 days
+  date.setDate(date.getDate() + 2);
+
+  const now = new Date();
+
+  return (now.getTime() >= date.getTime());
+}
+
+/**  @param  { StorageInfo } storageInfo
+* @param  { Storage } storage
+*/
+function appendItems(storageInfo, storage)
 {
   return new Promise((resolve) =>
   {
+    for (let i = 0; i < storageInfo.albums; i++)
+    {
+      appendAlbumPlaceholder();
+    }
+
     // remove all children from albums, tracks and artists pages
     // removeAllChildren(albumsContainer);
 
-    const albums = Object.keys(storage.albums);
-
-    for (let i = 0; i < albums.length; i++)
-    {
-      const placeholder = appendAlbumPlaceholder();
-
-      updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
-
-      // Promise.resolve(appendAlbumPlaceholder())
-      //   .then((placeholder) =>
-      //   {
-      //     updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
-      //   });
-    }
+    // const albums = Object.keys(storage.albums);
+    //
+    // for (let i = 0; i < albums.length; i++)
+    // {
+    //   const placeholder = appendAlbumPlaceholder();
+    //
+    //   updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
+    //
+    //   // Promise.resolve(appendAlbumPlaceholder())
+    //   //   .then((placeholder) =>
+    //   //   {
+    //   //     updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
+    //   //   });
+    // }
 
     resolve();
   });

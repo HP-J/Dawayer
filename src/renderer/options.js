@@ -33,7 +33,7 @@ export function initOptionsEvents()
 
   document.body.querySelector('.option.directories.add').onclick = () =>
   {
-    // .ADD rescan button functionality
+    // ADD re-scan button functionality
     // scanCacheAudioFiles();
   };
 }

@@ -161,7 +161,7 @@ function changePage(element, callback)
   {
     if (callback)
       callback();
-    
+
     return false;
   }
 }
@@ -174,7 +174,7 @@ function changeLocalSubPage(index)
     index = 0;
   else
     index = index + 1;
-  
+
   selectedLocalIcon = localIconsContainer.children.item(index);
   selectedLocalSubPage = localSubPagesContainer.children.item(index);
 
@@ -529,7 +529,7 @@ function volumeControl(playedPercentage)
 
   lastRememberedVolume = currentVolume;
   currentVolume = playedPercentage;
-  
+
   updateBarPercentage(volumeBar, currentVolume);
 }
 
@@ -555,7 +555,7 @@ function resizeEnd()
 function onload()
 {
   initPages();
-  
+
   seekControl(seekTime);
   initBar(seekBar, seekShowTime, seekControl);
 
@@ -563,7 +563,7 @@ function onload()
   initBar(volumeBar, undefined, volumeControl);
 
   resizeEnd();
-  
+
   // set values
   changeRewindForwardTimings(rewindTime, forwardTime);
 }

@@ -18,7 +18,6 @@ export default function(element, options)
   if (options.duration === undefined)
     options.duration = 85;
 
-
   if (options.delay)
   {
     setTimeout(() =>

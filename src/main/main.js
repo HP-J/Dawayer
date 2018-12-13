@@ -116,6 +116,8 @@ function createWindow()
     slashes: true
   }));
 
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
+
   mainWindow.on('close', () =>
   {
     settings.set('size', mainWindow.getSize());
@@ -153,7 +155,7 @@ else
   ipcMain.on('rendererError', (event, data) =>
   {
     dialog.showErrorBox('A Javascript error occurred in the renderer process', data);
-      
+
     app.quit();
   });
 

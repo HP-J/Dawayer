@@ -162,7 +162,7 @@
 .album.tracks
 {
   grid-area: tracks;
-  
+
   width: 100%;
   height: 100%;
 
@@ -201,7 +201,7 @@
 .album.title
 {
   grid-area: title;
-  
+
   z-index: 1;
 
   overflow: hidden;
@@ -282,14 +282,14 @@
 
 .placeholder > .container > .card > .album.title
 {
-  margin: 2.5% 0px;
-  margin-top: 135%;
+  margin: 5% 0%;
 }
 
 .placeholder > .container > .card > .album.artist
 {
-  margin-bottom: 5%;
-  margin-right: 30%;
+  margin-top: 3%;
+  margin-bottom: 0.5%;
+  margin-right: 45%;
 }
 
 @keyframes placeholder-animation
