@@ -1,6 +1,6 @@
-import { readdirSync, existsSync, statSync } from 'fs';
+import { existsSync, statSync } from 'fs';
 
-import { writeJson, readJSON } from 'fs-extra';
+import { writeJson, readJSON, readdir } from 'fs-extra';
 
 import { join, dirname, basename, extname } from 'path';
 import { homedir, platform } from 'os';
@@ -46,35 +46,38 @@ let storageConfig;
 /** @param { string[] } directories
 * @returns { string[] }
 */
-function walkSync(directories)
+function walk(directories)
 {
-  let results = [];
-
-  for (let i = 0; i < directories.length; i++)
+  return new Promise((resolve) =>
   {
-    const dir = directories[i];
+    const results = [];
+    const promises = [];
 
-    if (!existsSync(dir))
-      continue;
-
-    const list = readdirSync(dir);
-
-    list.forEach((file) =>
+    for (let i = 0; i < directories.length; i++)
     {
-      file = join(dir, file);
+      const dir = directories[i];
 
-      const stat = statSync(file);
+      if (!existsSync(dir))
+        continue;
 
-      if (stat && stat.isDirectory())
-        // Recurs into a subdirectory
-        results = results.concat(walkSync([ file ]));
-      else
-        // Is a file
-        results.push(file);
-    });
-  }
+      promises.push(readdir(dir).then((list) =>
+      {
+        list.forEach((file) =>
+        {
+          file = join(dir, file);
 
-  return results;
+          const stat = statSync(file);
+
+          if (stat && stat.isDirectory())
+            promises.push(walk([ file ].then((files) => results.push(...files))));
+          else
+            results.push(file);
+        });
+      }));
+    }
+
+    Promise.all(promises).then(() => resolve(results));
+  });
 }
 
 function getDefaultMusicDir()
@@ -224,102 +227,103 @@ export function scanCacheAudioFiles()
   return new Promise((resolve) =>
   {
     // walk through all the listed audio directories
-    const files = walkSync(audioDirectories);
-
-    const promises = [];
-
-    // loop through all files in the audio directories
-    for (let i = 0; i < files.length; i++)
+    walk(audioDirectories).then((files) =>
     {
-      const file = files[i];
+      const promises = [];
 
-      // if the file matches any of those supported audio extensions
-      if (file.match(AUDIO_EXTENSIONS_REGEX))
+      // loop through all files in the audio directories
+      for (let i = 0; i < files.length; i++)
       {
-        promises.push(
-          // parse the file for the metadata
-          getMetadata(file)
-            .then((metadata) =>
-            {
-              // then using the track's picture
-              // create a lqip version of it then return the metadata and
-              // the lqip picture to the next promise
+        const file = files[i];
 
-              return new Promise((resolve) =>
+        // if the file matches any of those supported audio extensions
+        if (file.match(AUDIO_EXTENSIONS_REGEX))
+        {
+          promises.push(
+            // parse the file for the metadata
+            getMetadata(file)
+              .then((metadata) =>
               {
-                lqip(metadata.common.picture[0]).then((res) =>
-                {
-                  resolve({ metadata: metadata, lqip: res });
-                });
-              });
-            })
-            .then(({ metadata, lqip }) =>
-            {
-              // using the metadata and the lqip picture fill
-              // the storage object and cache it to the
-              // hard disk
+                // then using the track's picture
+                // create a lqip version of it then return the metadata and
+                // the lqip picture to the next promise
 
-              const title = basename(file, extname(file));
-
-              // if the audio metadata belongs in an album
-              if (metadata.common.album)
-              {
-                if (storage.albums[metadata.common.album])
+                return new Promise((resolve) =>
                 {
-                  storage.albums[metadata.common.album].tracks.push(title);
-                }
-                else
-                {
-                  storage.albums[metadata.common.album] = {
-                    artist: metadata.common.albumartist,
-                    tracks: [ title ]
-                  };
-                }
-              }
-
-              // if the audio metadata has a known artist
-              if (metadata.common.artists)
-              {
-                const artists = metadata.common.artists;
-
-                for (let i = 0; i < artists.length; i++)
-                {
-                  if (storage.artists[artists[i]])
+                  lqip(metadata.common.picture[0]).then((res) =>
                   {
-                    storage.artists[artists[i]].tracks.push(title);
+                    resolve({ metadata: metadata, lqip: res });
+                  });
+                });
+              })
+              .then(({ metadata, lqip }) =>
+              {
+                // using the metadata and the lqip picture fill
+                // the storage object and cache it to the
+                // hard disk
+
+                const title = basename(file, extname(file));
+
+                // if the audio metadata belongs in an album
+                if (metadata.common.album)
+                {
+                  if (storage.albums[metadata.common.album])
+                  {
+                    storage.albums[metadata.common.album].tracks.push(title);
                   }
                   else
                   {
-                    storage.artists[artists[i]] = {
+                    storage.albums[metadata.common.album] = {
+                      artist: metadata.common.albumartist,
                       tracks: [ title ]
                     };
                   }
                 }
-              }
 
-              // store the track important metadata
-              storage.tracks[title] = {
-                url: file,
-                lqip: lqip,
-                artists: metadata.common.artists
-              };
-            }));
+                // if the audio metadata has a known artist
+                if (metadata.common.artists)
+                {
+                  const artists = metadata.common.artists;
+
+                  for (let i = 0; i < artists.length; i++)
+                  {
+                    if (storage.artists[artists[i]])
+                    {
+                      storage.artists[artists[i]].tracks.push(title);
+                    }
+                    else
+                    {
+                      storage.artists[artists[i]] = {
+                        tracks: [ title ]
+                      };
+                    }
+                  }
+                }
+
+                // store the track important metadata
+                storage.tracks[title] = {
+                  url: file,
+                  lqip: lqip,
+                  artists: metadata.common.artists
+                };
+              }));
+        }
       }
-    }
 
-    // when all files are parsed and added to the storage object
-    // fill the storage info, then cache them,
-    // then resolve this promise
-    Promise.all(promises).then(() =>
-    {
-      const storageInfo = {
-        date: Date.now(),
-        albums: Object.keys(storage.albums).length,
-        artists: Object.keys(storage.artists).length,
-        tracks: Object.keys(storage.tracks).length
-      };
+      // when all files are parsed and added to the storage object
+      // fill the storage info, then cache them,
+      // then resolve this promise
+      Promise.all(promises).then(() =>
+      {
+        const storageInfo = {
+          date: Date.now(),
+          albums: Object.keys(storage.albums).length,
+          artists: Object.keys(storage.artists).length,
+          tracks: Object.keys(storage.tracks).length
+        };
 
-      resolve({ storageInfo, storage });
+        resolve({ storageInfo, storage });
+      });
     });
   });
 }
