@@ -93,9 +93,9 @@
     "electron-json-config": "^1.5.3",
     "fs-extra": "^7.0.1",
     "howler": "^2.0.15",
-    "jimp": "^0.6.0",
     "music-metadata": "^3.2.4",
     "node-vibrant": "^3.0.0",
+    "sharp": "^0.21.1",
     "tippy.js": "^3.3.0"
   },
   "devDependencies": {
@@ -106,6 +106,7 @@
     "create-svg-sprite": "^1.0.4",
     "electron": "^3.0.11",
     "electron-builder": "^20.38.2",
+    "electron-rebuild": "^1.8.2",
     "eslint": "^5.10.0",
     "pug": "^2.0.3",
     "pug-cli": "^1.0.0-alpha6",

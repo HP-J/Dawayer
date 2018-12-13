@@ -1,6 +1,6 @@
 // Originally written by (Zouhir Chahoud)[https://zouhir.org/] under MIT License
 
-import jimp from 'jimp';
+import sharp from 'sharp';
 import Vibrant from 'node-vibrant';
 import { sortBy } from 'lodash';
 
@@ -53,28 +53,12 @@ export function base64(picture)
 {
   return new Promise((resolve, reject) =>
   {
-    return jimp
-      .read(picture.data)
-      .then(image => image.resize(24, jimp.AUTO))
-      .then(image => image.blur(2))
-      .then(image =>
-        image.getBuffer(picture.format, (err, data) =>
-        {
-          if (err)
-            return reject(err);
+    sharp(picture.data).resize({ width: 24 }).blur(2).toBuffer().then(data =>
+    {
+      picture.data = data;
 
-          if (data)
-          {
-            picture.data = data;
-
-            // valid image Base64 string, ready to go as src or CSS background
-            return resolve(toBase64(picture));
-          }
-
-          return reject(new Error('Unhandled promise rejection in base64 promise'));
-        })
-      )
-      .catch(err => reject(err));
+      resolve(toBase64(picture))
+    }).catch(err => reject(err));
   });
 }
 
@@ -95,7 +79,7 @@ export function palette(picture)
       {
         if (palette)
           return resolve(toPalette(palette));
-        
+
         return reject(new Error('Unhandled promise rejection in colorPalette', palette));
       })
       .catch(err => reject(err));

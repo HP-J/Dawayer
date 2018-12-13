@@ -1,6 +1,4 @@
-import { existsSync, statSync } from 'fs';
-
-import { writeJson, readJSON, readdir } from 'fs-extra';
+import { existsSync, exists, stat, writeJson, readJSON, readdir } from 'fs-extra';
 
 import { join, dirname, basename, extname } from 'path';
 import { homedir, platform } from 'os';
@@ -12,10 +10,7 @@ import { createElement } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
 import { base64 as lqip } from './lqip.js';
 
-/** @typedef { Object } Storage
-* @property { Object<string, {  artist: string, tracks: string[] }> } albums
-* @property { Object<string, { tracks: string[] }> } artists
-* @property { Object<string, { url: string, artists: string[] }> } tracks
+/** @typedef { import('music-metadata').IAudioMetadata } Metadata
 */
 
 /** @typedef { Object } StorageInfo
@@ -23,6 +18,12 @@ import { base64 as lqip } from './lqip.js';
 * @property { number } albums
 * @property { number } artists
 * @property { number } tracks
+*/
+
+/** @typedef { Object } Storage
+* @property { Object<string, {  artist: string, tracks: string[] }> } albums
+* @property { Object<string, { tracks: string[] }> } artists
+* @property { Object<string, { url: string, artists: string[] }> } tracks
 */
 
 const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
@@ -57,32 +58,37 @@ function walk(directories)
     {
       const dir = directories[i];
 
-      if (!existsSync(dir))
-        continue;
-
-      promises.push(readdir(dir).then((list) =>
+      exists(dir).then((existsValue) =>
       {
-        list.forEach((file) =>
+        if (!existsValue)
+          return;
+
+        readdir(dir).then((list) =>
         {
-          file = join(dir, file);
+          list.forEach((file, index) =>
+          {
+            file = join(dir, file);
 
-          const stat = statSync(file);
+            stat(file).then((statValue) =>
+            {
+              if (statValue && statValue.isDirectory())
+                promises.push(walk([ file ]).then((files) => results.push(...files)));
+              else
+                results.push(file);
 
-          if (stat && stat.isDirectory())
-            promises.push(walk([ file ].then((files) => results.push(...files))));
-          else
-            results.push(file);
+              if (i === directories.length - 1 && index === list.length - 1)
+                Promise.all(promises).then(() => resolve(results));
+            });
+          });
         });
-      }));
+      });
     }
-
-    Promise.all(promises).then(() => resolve(results));
   });
 }
 
 function getDefaultMusicDir()
 {
-  // .ADD test on windows
+  // TEST the default music dir on windows
   const currentPlatform = platform();
 
   if (currentPlatform === 'linux' || currentPlatform === 'win32')
@@ -127,16 +133,6 @@ function appendAlbumPlaceholder()
   const time = createElement('.album.time');
   const artist = createElement('.album.artist');
 
-  // .album.wrapper.placeholder
-  //   .album.container
-  //     .album.cover(style=background-image)
-  //     .album.card
-  //       .album.tracks
-  //       .album.background
-  //       .album.title
-  //       .album.time
-  //       .album.artist
-
   placeholder.appendChild(container);
 
   container.appendChild(cover);
@@ -158,7 +154,7 @@ function appendAlbumPlaceholder()
 */
 export function initStorage()
 {
-  // ADD test changing the directory (from ~/Music to /mnt/k/Music Tester) during runtime
+  // TEST changing the directory (from ~/Music to /mnt/k/Music Tester) during runtime
   // and then re-scanning
 
   // the base directory for the app config files
@@ -192,7 +188,7 @@ export function initStorage()
       {
         appendItems(storageInfo, storage);
 
-        // ADD if the cache is too old create a new cache for the next time
+        // TODO if the cache is too old create a new cache for the next time
         // the app starts
         // if (isStorageOld(storageInfo.date))
         //   scanCacheAudioFiles().then((scan) =>
@@ -239,24 +235,23 @@ export function scanCacheAudioFiles()
         // if the file matches any of those supported audio extensions
         if (file.match(AUDIO_EXTENSIONS_REGEX))
         {
+          /** @type { Metadata }
+          */
+          let metadata;
+
           promises.push(
             // parse the file for the metadata
             getMetadata(file)
-              .then((metadata) =>
+              .then((meta) =>
               {
+                metadata = meta;
                 // then using the track's picture
                 // create a lqip version of it then return the metadata and
                 // the lqip picture to the next promise
 
-                return new Promise((resolve) =>
-                {
-                  lqip(metadata.common.picture[0]).then((res) =>
-                  {
-                    resolve({ metadata: metadata, lqip: res });
-                  });
-                });
+                return lqip(metadata.common.picture[0]);
               })
-              .then(({ metadata, lqip }) =>
+              .then((lqip) =>
               {
                 // using the metadata and the lqip picture fill
                 // the storage object and cache it to the
@@ -359,13 +354,15 @@ function appendItems(storageInfo, storage)
 {
   return new Promise((resolve) =>
   {
+    // ADD the background image loading (via metadata and via DOM)
+
+    // remove all children from albums, tracks and artists pages
+    removeAllChildren(albumsContainer);
+
     for (let i = 0; i < storageInfo.albums; i++)
     {
       appendAlbumPlaceholder();
     }
-
-    // remove all children from albums, tracks and artists pages
-    // removeAllChildren(albumsContainer);
 
     // const albums = Object.keys(storage.albums);
     //
