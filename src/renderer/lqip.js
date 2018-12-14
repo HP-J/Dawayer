@@ -48,12 +48,13 @@ function toPalette(swatch)
 }
 
 /** @param { { format: string, data: Buffer } } picture
+* @returns { Promise<string> }
 */
 export function base64(picture)
 {
   return new Promise((resolve, reject) =>
   {
-    sharp(picture.data).resize({ width: 24 }).blur(2).toBuffer().then(data =>
+    sharp(picture.data).resize({ width: 24 }).blur(1.85).toBuffer().then(data =>
     {
       picture.data = data;
 

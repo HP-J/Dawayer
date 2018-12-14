@@ -117,8 +117,8 @@
 
   grid-template-areas:
   "tracks tracks"
-  "artist time"
-  "title time";
+  "artist duration"
+  "title duration";
 
   position: relative;
   white-space: pre-line;
@@ -227,9 +227,9 @@
   text-decoration: underline;
 }
 
-.album.time
+.album.duration
 {
-  grid-area: time;
+  grid-area: duration;
 
   z-index: 1;
   opacity: 0;
@@ -249,7 +249,7 @@
   transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
 }
 
-.album.wrapper:not(.placeholder):hover > * > .album.card > .album.time
+.album.wrapper:not(.placeholder):hover > * > .album.card > .album.duration
 {
   opacity: 1;
 }
@@ -310,7 +310,7 @@
   font-size: calc(3px + 0.35vw + 0.3vh);
 }
 
-.album.time, .album.track, .album.title
+.album.duration, .album.track, .album.title
 {
  font-size: calc(5px + 0.45vw + 0.4vh);
 }
@@ -322,7 +322,7 @@
     font-size: 7px;
   }
 
-  .album.time, .album.track, .album.title
+  .album.duration, .album.track, .album.title
   {
     font-size: 10px;
   }
@@ -335,7 +335,7 @@
     font-size: 8px;
   }
 
-  .album.time, .album.track, .album.title
+  .album.duration, .album.track, .album.title
   {
     font-size: 12px;
   }

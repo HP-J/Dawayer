@@ -1,3 +1,5 @@
+import { remote } from 'electron';
+
 import { existsSync, exists, stat, writeJson, readJSON, readdir } from 'fs-extra';
 
 import { join, dirname, basename, extname } from 'path';
@@ -10,20 +12,19 @@ import { createElement } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
 import { base64 as lqip } from './lqip.js';
 
+const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
+
 /** @typedef { import('music-metadata').IAudioMetadata } Metadata
 */
 
 /** @typedef { Object } StorageInfo
 * @property { number } date
-* @property { number } albums
-* @property { number } artists
-* @property { number } tracks
 */
 
 /** @typedef { Object } Storage
-* @property { Object<string, {  artist: string, tracks: string[] }> } albums
-* @property { Object<string, { tracks: string[] }> } artists
-* @property { Object<string, { url: string, artists: string[] }> } tracks
+* @property { Object<string, {  artist: string, tracks: string[], duration: number }> } albums
+* @property { Object<string, { tracks: string[], duration: number }> } artists
+* @property { Object<string, { url: string, lqip: string, artists: string[], duration: number }> } tracks
 */
 
 const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
@@ -96,26 +97,34 @@ function getDefaultMusicDir()
 }
 
 /** @param { HTMLDivElement } placeholder
-* @param { string } picture
-* @param { string } title
-* @param { string } artist
+* @param { { picture: string, title: string, artist: string, tracks: string[], duration: string } } options
 */
-function updateAlbumElement(placeholder, picture, title, artist)
+function updateAlbumElement(placeholder, options)
 {
   if (placeholder.classList.contains('placeholder'))
     placeholder.classList.remove('placeholder');
 
-  placeholder.children[0].children[0].style.backgroundImage = `url(${picture})`;
+  if (options.picture)
+    placeholder.children[0].children[0].style.backgroundImage = `url(${options.picture})`;
 
-  placeholder.children[0].children[1].children[0].appendChild(createElement('.album.track'));
-  placeholder.children[0].children[1].children[0].appendChild(createElement('.album.track'));
+  if (options.title)
+    placeholder.children[0].children[1].children[2].innerText = options.title;
 
-  placeholder.children[0].children[1].children[0].children[0].innerText = 'Dawayer (Circles) [ft. Mazaher]';
-  placeholder.children[0].children[1].children[0].children[1].innerText = 'Fi Belad El Agayeb (In Wonderland)';
+  if (options.duration)
+    placeholder.children[0].children[1].children[3].innerText = options.duration;
 
-  placeholder.children[0].children[1].children[2].innerText = title;
-  placeholder.children[0].children[1].children[3].innerText = '41:25';
-  placeholder.children[0].children[1].children[4].innerText = artist;
+  if (options.artist)
+    placeholder.children[0].children[1].children[4].innerText = options.artist;
+
+  if (options.tracks)
+  {
+    for (let i = 0; i < options.tracks.length; i++)
+    {
+      placeholder.children[0].children[1].children[0]
+        .appendChild(createElement('.album.track'))
+        .innerText = options.tracks[i];
+    }
+  }
 }
 
 function appendAlbumPlaceholder()
@@ -130,7 +139,7 @@ function appendAlbumPlaceholder()
   const tracks = createElement('.album.tracks');
   const background = createElement('.album.background');
   const title = createElement('.album.title');
-  const time = createElement('.album.time');
+  const duration = createElement('.album.duration');
   const artist = createElement('.album.artist');
 
   placeholder.appendChild(container);
@@ -141,7 +150,7 @@ function appendAlbumPlaceholder()
   card.appendChild(tracks);
   card.appendChild(background);
   card.appendChild(title);
-  card.appendChild(time);
+  card.appendChild(duration);
   card.appendChild(artist);
 
   albumsContainer.appendChild(placeholder);
@@ -174,19 +183,19 @@ export function initStorage()
     addNewDirectories(savedAudioDirectories);
 
   // if a cached storage object exists
-  if (existsSync(storageConfig))
+  if (existsSync(storageConfig) && !isDebug())
   {
-    let storageInfo;
+    // let storageInfo;
 
     readJSON(storageInfoConfig).then((data) =>
     {
-      storageInfo = data;
+      // storageInfo = data;
 
       return readJSON(storageConfig);
     })
       .then((storage) =>
       {
-        appendItems(storageInfo, storage);
+        appendItems(storage);
 
         // TODO if the cache is too old create a new cache for the next time
         // the app starts
@@ -203,7 +212,7 @@ export function initStorage()
   {
     scanCacheAudioFiles().then((scan) =>
     {
-      appendItems(scan.storageInfo, scan.storage);
+      appendItems(scan.storage);
       cacheStorage(scan.storageInfo, scan.storage);
     });
   }
@@ -214,6 +223,8 @@ export function initStorage()
 */
 export function scanCacheAudioFiles()
 {
+  /** @type { Storage }
+  */
   const storage = {
     albums: {},
     artists: {},
@@ -241,14 +252,13 @@ export function scanCacheAudioFiles()
 
           promises.push(
             // parse the file for the metadata
-            getMetadata(file)
+            getMetadata(file, { duration: true })
               .then((meta) =>
               {
                 metadata = meta;
-                // then using the track's picture
-                // create a lqip version of it then return the metadata and
-                // the lqip picture to the next promise
 
+                // then using the track's picture
+                // create a lqip version of it then return it
                 return lqip(metadata.common.picture[0]);
               })
               .then((lqip) =>
@@ -265,12 +275,17 @@ export function scanCacheAudioFiles()
                   if (storage.albums[metadata.common.album])
                   {
                     storage.albums[metadata.common.album].tracks.push(title);
+
+                    storage.albums[metadata.common.album].duration =
+                      storage.albums[metadata.common.album].duration +
+                      metadata.format.duration;
                   }
                   else
                   {
                     storage.albums[metadata.common.album] = {
                       artist: metadata.common.albumartist,
-                      tracks: [ title ]
+                      tracks: [ title ],
+                      duration: metadata.format.duration
                     };
                   }
                 }
@@ -285,11 +300,16 @@ export function scanCacheAudioFiles()
                     if (storage.artists[artists[i]])
                     {
                       storage.artists[artists[i]].tracks.push(title);
+
+                      storage.artists[artists[i]].duration =
+                        storage.artists[artists[i]].duration +
+                        metadata.format.duration;
                     }
                     else
                     {
                       storage.artists[artists[i]] = {
-                        tracks: [ title ]
+                        tracks: [ title ],
+                        duration: metadata.format.duration
                       };
                     }
                   }
@@ -299,7 +319,8 @@ export function scanCacheAudioFiles()
                 storage.tracks[title] = {
                   url: file,
                   lqip: lqip,
-                  artists: metadata.common.artists
+                  artists: metadata.common.artists,
+                  duration: metadata.format.duration
                 };
               }));
         }
@@ -311,10 +332,7 @@ export function scanCacheAudioFiles()
       Promise.all(promises).then(() =>
       {
         const storageInfo = {
-          date: Date.now(),
-          albums: Object.keys(storage.albums).length,
-          artists: Object.keys(storage.artists).length,
-          tracks: Object.keys(storage.tracks).length
+          date: Date.now()
         };
 
         resolve({ storageInfo, storage });
@@ -332,12 +350,12 @@ function cacheStorage(storageInfo, storage)
   writeJson(storageConfig, storage);
 }
 
-/** @param  { number } time
+/** @param  { number } date
 * @return { Boolean }
 */
-function isStorageOld(time)
+function isStorageOld(date)
 {
-  const date = new Date(time);
+  date = new Date(date);
 
   // add 2 days
   date.setDate(date.getDate() + 2);
@@ -347,40 +365,42 @@ function isStorageOld(time)
   return (now.getTime() >= date.getTime());
 }
 
-/**  @param  { StorageInfo } storageInfo
-* @param  { Storage } storage
+/** @param  { Storage } storage
 */
-function appendItems(storageInfo, storage)
+function appendItems(storage)
 {
-  return new Promise((resolve) =>
+  // ADD the background image loading (via metadata and via DOM)
+
+  // remove all children from albums, tracks and artists pages
+  removeAllChildren(albumsContainer);
+
+  const albums = Object.keys(storage.albums);
+
+  for (let i = 0; i < albums.length; i++)
   {
-    // ADD the background image loading (via metadata and via DOM)
+    const placeholder = appendAlbumPlaceholder();
 
-    // remove all children from albums, tracks and artists pages
-    removeAllChildren(albumsContainer);
+    const track = storage.tracks[storage.albums[albums[i]].tracks[0]];
 
-    for (let i = 0; i < storageInfo.albums; i++)
+    const albumPicture = track.lqip;
+    const albumArtist = storage.albums[albums[i]].artist;
+    const albumTracks = storage.albums[albums[i]].tracks;
+
+    const img = new Image();
+
+    img.src = albumPicture;
+
+    img.onload = () =>
     {
-      appendAlbumPlaceholder();
-    }
-
-    // const albums = Object.keys(storage.albums);
-    //
-    // for (let i = 0; i < albums.length; i++)
-    // {
-    //   const placeholder = appendAlbumPlaceholder();
-    //
-    //   updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
-    //
-    //   // Promise.resolve(appendAlbumPlaceholder())
-    //   //   .then((placeholder) =>
-    //   //   {
-    //   //     updateAlbumElement(placeholder, storage.tracks[storage.albums[albums[i]].tracks[0]].lqip, albums[i], storage.albums[albums[i]].artist);
-    //   //   });
-    // }
-
-    resolve();
-  });
+      updateAlbumElement(placeholder, {
+        picture: albumPicture,
+        title: albums[i],
+        artist: albumArtist,
+        tracks: albumTracks,
+        duration: secondsToDuration(storage.albums[albums[i]].duration)
+      });
+    };
+  }
 }
 
 /** @param { HTMLElement } element
@@ -422,4 +442,20 @@ export function removeDirectory(directory)
 
   // remove the directory from the save file
   settings.set('audioDirectories', audioDirectories);
+}
+
+/**@param { number } seconds
+*/
+function secondsToDuration(seconds)
+{
+  const minutes = Math.floor(seconds / 60);
+
+  seconds = Math.floor(seconds - minutes * 60).toString();
+
+  if (seconds.length > 2)
+    seconds.substring(0, 2);
+  else if (seconds.length === 1)
+    seconds = `0${seconds}`;
+
+  return `${minutes}:${seconds}`;
 }
