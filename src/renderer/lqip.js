@@ -58,7 +58,7 @@ export function base64(picture)
     {
       picture.data = data;
 
-      resolve(toBase64(picture))
+      resolve(toBase64(picture));
     }).catch(err => reject(err));
   });
 }

@@ -10,7 +10,7 @@ import * as settings from 'electron-json-config';
 
 import { createElement } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
-import { base64 as lqip } from './lqip.js';
+import { base64 as lqip, toBase64 } from './lqip.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -118,11 +118,20 @@ function updateAlbumElement(placeholder, options)
 
   if (options.tracks)
   {
+    const tracksContainer = placeholder.children[0].children[1].children[0];
+
     for (let i = 0; i < options.tracks.length; i++)
     {
-      placeholder.children[0].children[1].children[0]
-        .appendChild(createElement('.album.track'))
-        .innerText = options.tracks[i];
+      if (tracksContainer.children.length - 1 >= i)
+      {
+        tracksContainer.children[i].innerText = options.tracks[i];
+      }
+      else
+      {
+        tracksContainer
+          .appendChild(createElement('.album.track'))
+          .innerText = options.tracks[i];
+      }
     }
   }
 }
@@ -183,13 +192,13 @@ export function initStorage()
     addNewDirectories(savedAudioDirectories);
 
   // if a cached storage object exists
-  if (existsSync(storageConfig) && !isDebug())
+  if (!isDebug() && existsSync(storageConfig))
   {
-    // let storageInfo;
+    let storageInfo;
 
     readJSON(storageInfoConfig).then((data) =>
     {
-      // storageInfo = data;
+      storageInfo = data;
 
       return readJSON(storageConfig);
     })
@@ -197,13 +206,15 @@ export function initStorage()
       {
         appendItems(storage);
 
-        // TODO if the cache is too old create a new cache for the next time
-        // the app starts
-        // if (isStorageOld(storageInfo.date))
-        //   scanCacheAudioFiles().then((scan) =>
-        //   {
-        //     cacheStorage(scan.storageInfo, scan.storage);
-        //   });
+        // update the cache if it's older than 2 days
+        // take effect when the app is re-opened
+        if (isStorageOld(storageInfo.date))
+        {
+          scanCacheAudioFiles().then((scan) =>
+          {
+            cacheStorage(scan.storageInfo, scan.storage);
+          });
+        }
       });
   }
   // if not, then scan the audio directories for the audio files,
@@ -357,11 +368,15 @@ function isStorageOld(date)
 {
   date = new Date(date);
 
-  // add 2 days
+  // add two days
   date.setDate(date.getDate() + 2);
 
   const now = new Date();
 
+  // compares the current time with the cache time
+  // if the cache time + two days < the current time
+  // then that means it's been more than two days since the last time
+  // storage been cached
   return (now.getTime() >= date.getTime());
 }
 
@@ -382,7 +397,8 @@ function appendItems(storage)
 
     const track = storage.tracks[storage.albums[albums[i]].tracks[0]];
 
-    const albumPicture = track.lqip;
+    let albumPicture = track.lqip;
+
     const albumArtist = storage.albums[albums[i]].artist;
     const albumTracks = storage.albums[albums[i]].tracks;
 
@@ -400,6 +416,13 @@ function appendItems(storage)
         duration: secondsToDuration(storage.albums[albums[i]].duration)
       });
     };
+
+    // updates the lqip after parsing the metadata of the first track
+    getMetadata(track.url)
+      .then(metadata =>
+      {
+        img.src = albumPicture = toBase64(metadata.common.picture[0]);
+      });
   }
 }
 
