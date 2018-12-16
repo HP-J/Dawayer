@@ -11,3 +11,78 @@
 {
   overflow-y: overlay;
 }
+
+.artist.container
+{
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  width: 97%;
+  height: calc(7vh + 1vw);
+
+  overflow: hidden;
+  margin: 1.5%;
+}
+
+.artist.container:before
+{
+  position: absolute;
+
+  content: "";
+  display: block;
+
+  width: 100%;
+  height: 100%;
+}
+
+.artist.cover
+{
+  width: 15%;
+  height: 100%;
+}
+
+.artist.title
+{
+  width: 81%;
+  height: 100%;
+
+  margin: 0% 2%;
+}
+
+/* Content Placeholders */
+
+.artist.placeholder
+{
+  background-color: var(--color-4);
+}
+
+.artist.placeholder > .cover,
+.artist.placeholder > .title
+{
+  background-color: var(--color-9);
+}
+
+.artist.placeholder > .title
+{
+  height: 60%
+}
+
+.artist.placeholder:after
+{
+  z-index: 2;
+
+  content: "";
+  display: block;
+
+  position: absolute;
+
+  background: var(--gradient-1);
+
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  animation: placeholder-animation 1s linear infinite;
+}

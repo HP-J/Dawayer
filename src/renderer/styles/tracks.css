@@ -11,3 +11,14 @@
 {
   overflow-y: overlay;
 }
+
+.tracks.container
+{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  min-height: 100%;
+  width: 100%;
+  height: auto;
+}

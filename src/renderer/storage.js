@@ -33,6 +33,10 @@ const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.fla
 */
 const albumsContainer = document.body.querySelector('.albums.container');
 
+/**  @type { HTMLDivElement }
+*/
+const artistsContainer = document.body.querySelector('.artists.container');
+
 /** @type { string[] }
 */
 const audioDirectories = [];
@@ -94,77 +98,6 @@ function getDefaultMusicDir()
 
   if (currentPlatform === 'linux' || currentPlatform === 'win32')
     return join(homedir(), '/Music');
-}
-
-/** @param { HTMLDivElement } placeholder
-* @param { { picture: string, title: string, artist: string, tracks: string[], duration: string } } options
-*/
-function updateAlbumElement(placeholder, options)
-{
-  if (placeholder.classList.contains('placeholder'))
-    placeholder.classList.remove('placeholder');
-
-  if (options.picture)
-    placeholder.children[0].children[0].style.backgroundImage = `url(${options.picture})`;
-
-  if (options.title)
-    placeholder.children[0].children[1].children[2].innerText = options.title;
-
-  if (options.duration)
-    placeholder.children[0].children[1].children[3].innerText = options.duration;
-
-  if (options.artist)
-    placeholder.children[0].children[1].children[4].innerText = options.artist;
-
-  if (options.tracks)
-  {
-    const tracksContainer = placeholder.children[0].children[1].children[0];
-
-    for (let i = 0; i < options.tracks.length; i++)
-    {
-      if (tracksContainer.children.length - 1 >= i)
-      {
-        tracksContainer.children[i].innerText = options.tracks[i];
-      }
-      else
-      {
-        tracksContainer
-          .appendChild(createElement('.album.track'))
-          .innerText = options.tracks[i];
-      }
-    }
-  }
-}
-
-function appendAlbumPlaceholder()
-{
-  const placeholder = createElement('.album.wrapper.placeholder');
-
-  const container = createElement('.album.container');
-
-  const cover = createElement('.album.cover');
-  const card = createElement('.album.card');
-
-  const tracks = createElement('.album.tracks');
-  const background = createElement('.album.background');
-  const title = createElement('.album.title');
-  const duration = createElement('.album.duration');
-  const artist = createElement('.album.artist');
-
-  placeholder.appendChild(container);
-
-  container.appendChild(cover);
-  container.appendChild(card);
-
-  card.appendChild(tracks);
-  card.appendChild(background);
-  card.appendChild(title);
-  card.appendChild(duration);
-  card.appendChild(artist);
-
-  albumsContainer.appendChild(placeholder);
-
-  return placeholder;
 }
 
 /** initialize the cache system and loads local tracks, albums and artists, appending an element
@@ -380,13 +313,97 @@ function isStorageOld(date)
   return (now.getTime() >= date.getTime());
 }
 
+function appendAlbumPlaceholder()
+{
+  const placeholder = createElement('.album.wrapper.placeholder');
+
+  const container = createElement('.album.container');
+
+  const cover = createElement('.album.cover');
+  const card = createElement('.album.card');
+
+  const tracks = createElement('.album.tracks');
+  const background = createElement('.album.background');
+  const title = createElement('.album.title');
+  const duration = createElement('.album.duration');
+  const artist = createElement('.album.artist');
+
+  placeholder.appendChild(container);
+
+  container.appendChild(cover);
+  container.appendChild(card);
+
+  card.appendChild(tracks);
+  card.appendChild(background);
+  card.appendChild(title);
+  card.appendChild(duration);
+  card.appendChild(artist);
+
+  albumsContainer.appendChild(placeholder);
+
+  return placeholder;
+}
+
+/** @param { HTMLDivElement } placeholder
+* @param { { picture: string, title: string, artist: string, tracks: string[], duration: string } } options
+*/
+function updateAlbumElement(placeholder, options)
+{
+  if (placeholder.classList.contains('placeholder'))
+    placeholder.classList.remove('placeholder');
+
+  if (options.picture)
+    placeholder.children[0].children[0].style.backgroundImage = `url(${options.picture})`;
+
+  if (options.title)
+    placeholder.children[0].children[1].children[2].innerText = options.title;
+
+  if (options.duration)
+    placeholder.children[0].children[1].children[3].innerText = options.duration;
+
+  if (options.artist)
+    placeholder.children[0].children[1].children[4].innerText = options.artist;
+
+  if (options.tracks)
+  {
+    const tracksContainer = placeholder.children[0].children[1].children[0];
+
+    for (let i = 0; i < options.tracks.length; i++)
+    {
+      if (tracksContainer.children.length - 1 >= i)
+      {
+        tracksContainer.children[i].innerText = options.tracks[i];
+      }
+      else
+      {
+        tracksContainer
+          .appendChild(createElement('.album.track'))
+          .innerText = options.tracks[i];
+      }
+    }
+  }
+}
+
+function appendArtistPlaceholder()
+{
+  const placeholder = createElement('.artist.container.placeholder');
+
+  const cover = createElement('.artist.cover');
+  const title = createElement('.artist.title');
+
+  placeholder.appendChild(cover);
+  placeholder.appendChild(title);
+
+  artistsContainer.appendChild(placeholder);
+
+  return placeholder;
+}
+
 /** @param  { Storage } storage
 */
-function appendItems(storage)
+function appendAlbumsPageItems(storage)
 {
-  // ADD the background image loading (via metadata and via DOM)
-
-  // remove all children from albums, tracks and artists pages
+  // remove all children from albums page
   removeAllChildren(albumsContainer);
 
   const albums = Object.keys(storage.albums);
@@ -424,6 +441,29 @@ function appendItems(storage)
         img.src = albumPicture = toBase64(metadata.common.picture[0]);
       });
   }
+}
+
+/** @param  { Storage } storage
+*/
+function appendArtistsPageItems(storage)
+{
+  // remove all children from artists pages
+  removeAllChildren(artistsContainer);
+
+  const artists = Object.keys(storage.artists);
+
+  for (let i = 0; i < artists.length; i++)
+  {
+    const placeholder = appendArtistPlaceholder();
+  }
+}
+
+/** @param  { Storage } storage
+*/
+function appendItems(storage)
+{
+  appendAlbumsPageItems(storage);
+  appendArtistsPageItems(storage);
 }
 
 /** @param { HTMLElement } element

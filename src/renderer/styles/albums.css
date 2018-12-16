@@ -37,10 +37,6 @@
 
   overflow: hidden;
   margin: 1.5%;
-
-  transition-property: margin, width;
-  transition-duration: 0.35s;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .album.wrapper:before
@@ -99,12 +95,12 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.album.wrapper:not(.placeholder):hover > * > .album.cover
+.album.wrapper:not(.placeholder):hover > * > .cover
 {
   height: 100%;
 }
 
-.album.wrapper:not(.placeholder):hover > * > .album.cover:after
+.album.wrapper:not(.placeholder):hover > * > .cover:after
 {
   background-color: rgba(255, 255, 255, 0.825);
 }
@@ -132,7 +128,7 @@
   font-family: Lato, sans-serif;
   font-weight: 400;
 
-  transition-property: background-color, top;
+  transition-property: background-color;
   transition-duration: 0.5s;
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -154,7 +150,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.album.wrapper:not(.placeholder):hover > * > .album.card > .album.background
+.album.wrapper:not(.placeholder):hover > * > .card > .background
 {
   bottom: -21%;
 }
@@ -193,7 +189,7 @@
   text-decoration: underline;
 }
 
-.album.wrapper:not(.placeholder):hover > * > .album.card > .album.tracks > .album.track
+.album.wrapper:not(.placeholder):hover > * > .card > .tracks > .track
 {
   opacity: 1;
 }
@@ -249,21 +245,21 @@
   transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
 }
 
-.album.wrapper:not(.placeholder):hover > * > .album.card > .album.duration
+.album.wrapper:not(.placeholder):hover > * > .card > .duration
 {
   opacity: 1;
 }
 
 /* Content Placeholders */
 
-.placeholder > .container > .album.cover,
-.placeholder > .container > .card > .album.title,
-.placeholder > .container > .card > .album.artist
+.album.placeholder > .container > .cover,
+.album.placeholder > .container > .card > .title,
+.album.placeholder > .container > .card > .artist
 {
-  background-color: #E6E6E6;
+  background-color: var(--color-9);
 }
 
-.placeholder > .container:after
+.album.placeholder > .container:after
 {
   z-index: 2;
 
@@ -271,21 +267,21 @@
   display: block;
 
   position: absolute;
-  background: linear-gradient(to left, rgba(15,15,15,0) 0%, rgba(189, 189, 189, 0.4) 50%, rgba(255,255,255,0) 100%);
+  background: var(--gradient-1);
 
   top: 0;
   width: 100%;
   height: 100%;
 
-  animation: placeholder-animation 1s linear infinite;
+  animation: album-placeholder-animation 1s linear infinite;
 }
 
-.placeholder > .container > .card > .album.title
+.album.placeholder > .container > .card > .title
 {
   margin: 5% 0%;
 }
 
-.placeholder > .container > .card > .album.artist
+.album.placeholder > .container > .card > .artist
 {
   margin-top: 3%;
   margin-bottom: 0.5%;
