@@ -10,7 +10,6 @@ import * as settings from 'electron-json-config';
 
 import { createElement } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
-import { base64 as lqip, toBase64 } from './lqip.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -22,9 +21,9 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 */
 
 /** @typedef { Object } Storage
-* @property { Object<string, {  artist: string, tracks: string[], duration: number }> } albums
-* @property { Object<string, { tracks: string[], duration: number }> } artists
-* @property { Object<string, { url: string, lqip: string, artists: string[], duration: number }> } tracks
+* @property { Object<string, {  artist: string, tracks: string[], duration: number, element: HTMLDivElement }> } albums
+* @property { Object<string, { tracks: string[], duration: number, element: HTMLDivElement }> } artists
+* @property { Object<string, { url: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
 
 const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
@@ -190,24 +189,12 @@ export function scanCacheAudioFiles()
         // if the file matches any of those supported audio extensions
         if (file.match(AUDIO_EXTENSIONS_REGEX))
         {
-          /** @type { Metadata }
-          */
-          let metadata;
-
           promises.push(
             // parse the file for the metadata
             getMetadata(file, { duration: true })
-              .then((meta) =>
+              .then((metadata) =>
               {
-                metadata = meta;
-
-                // then using the track's picture
-                // create a lqip version of it then return it
-                return lqip(metadata.common.picture[0]);
-              })
-              .then((lqip) =>
-              {
-                // using the metadata and the lqip picture fill
+                // using the metadata fill
                 // the storage object and cache it to the
                 // hard disk
 
@@ -262,7 +249,6 @@ export function scanCacheAudioFiles()
                 // store the track important metadata
                 storage.tracks[title] = {
                   url: file,
-                  lqip: lqip,
                   artists: metadata.common.artists,
                   duration: metadata.format.duration
                 };
@@ -399,6 +385,21 @@ function appendArtistPlaceholder()
   return placeholder;
 }
 
+/** @param { HTMLDivElement } placeholder
+* @param { { picture: string, title: string, description: string, albums: string[], tracks: string[] } } options
+*/
+function updateArtistElement(placeholder, options)
+{
+  if (placeholder.classList.contains('placeholder'))
+    placeholder.classList.remove('placeholder');
+
+  if (options.picture)
+    placeholder.children[0].style.backgroundImage = `url(${options.picture})`;
+
+  if (options.title)
+    placeholder.children[1].innerText = options.title;
+}
+
 /** @param  { Storage } storage
 */
 function appendAlbumsPageItems(storage)
@@ -412,21 +413,19 @@ function appendAlbumsPageItems(storage)
   {
     const placeholder = appendAlbumPlaceholder();
 
-    const track = storage.tracks[storage.albums[albums[i]].tracks[0]];
-
-    let albumPicture = track.lqip;
+    storage.albums[albums[i]].element = placeholder;
 
     const albumArtist = storage.albums[albums[i]].artist;
     const albumTracks = storage.albums[albums[i]].tracks;
 
-    const img = new Image();
+    const track = storage.tracks[storage.albums[albums[i]].tracks[0]];
 
-    img.src = albumPicture;
+    const img = new Image();
 
     img.onload = () =>
     {
       updateAlbumElement(placeholder, {
-        picture: albumPicture,
+        picture: img.src,
         title: albums[i],
         artist: albumArtist,
         tracks: albumTracks,
@@ -434,11 +433,10 @@ function appendAlbumsPageItems(storage)
       });
     };
 
-    // updates the lqip after parsing the metadata of the first track
     getMetadata(track.url)
       .then(metadata =>
       {
-        img.src = albumPicture = toBase64(metadata.common.picture[0]);
+        img.src = toBase64(metadata.common.picture[0]);
       });
   }
 }
@@ -455,6 +453,24 @@ function appendArtistsPageItems(storage)
   for (let i = 0; i < artists.length; i++)
   {
     const placeholder = appendArtistPlaceholder();
+
+    const img = new Image();
+
+    const track = storage.tracks[storage.artists[artists[i]].tracks[0]];
+
+    img.onload = () =>
+    {
+      updateArtistElement(placeholder, {
+        picture: img.src,
+        title: artists[i]
+      });
+    };
+
+    getMetadata(track.url)
+      .then(metadata =>
+      {
+        img.src = toBase64(metadata.common.picture[0]);
+      });
   }
 }
 
@@ -505,6 +521,13 @@ export function removeDirectory(directory)
 
   // remove the directory from the save file
   settings.set('audioDirectories', audioDirectories);
+}
+
+/** @param { { format: string, data: Buffer } } picture
+*/
+function toBase64(picture)
+{
+  return `data:${picture.format};base64,${picture.data.toString('base64')}`;
 }
 
 /**@param { number } seconds
