@@ -70,6 +70,14 @@ const albumsWrapper = document.body.querySelector('.albums.wrapper');
 
 /**  @type { HTMLDivElement }
 */
+const tracksWrapper = document.body.querySelector('.tracks.wrapper');
+
+/**  @type { HTMLDivElement }
+*/
+const artistsWrapper = document.body.querySelector('.artists.wrapper');
+
+/**  @type { HTMLDivElement }
+*/
 const seekBar = controlBar.querySelector('.seekBar.container');
 
 /**  @type { HTMLDivElement }
@@ -203,6 +211,8 @@ function initEvents()
   optionsButton.onclick = () => changePage(optionsButton);
 
   // menu collapsing events
+
+  // Add the new sub-pages collapsing events
 
   menu.onmouseenter = () =>
   {
@@ -360,16 +370,21 @@ function init()
 
 function initPages()
 {
+  // TODO change default sub-page back to albums
   selectedPage = pagesContainer.children.item(1);
-  selectedLocalIcon = localIconsContainer.children.item(0);
-  selectedLocalSubPage = localSubPagesContainer.children.item(0);
+  selectedLocalIcon = localIconsContainer.children.item(2);
+  selectedLocalSubPage = localSubPagesContainer.children.item(2);
 
   scroll(selectedPage, { duration: 0 });
+  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical' });
+  scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
 }
 
 //#endregion
 
 //#region Menu Collapsing
+
+// TODO add menu collapsing for all 3 sub-pages
 
 function collapseMenu()
 {
@@ -505,7 +520,7 @@ function changeRewindForwardTimings(rewind, forward)
   rewindTimeText.innerText = rewindTime;
   forwardTimeText.innerText = forwardTime;
 
-  // the tooltip text
+  // the tool-tip text
   rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
   forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
 }
@@ -601,6 +616,28 @@ export function createElement(classes)
   element.classList.add(...classesArray);
 
   return element;
+}
+
+/**@param { string } name
+* @param { string } classes
+* @return {SVGSVGElement}
+*/
+export function createIcon(name, classes)
+{
+  const classesArray = classes.split('.');
+  classesArray.shift();
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+
+  svg.classList.add('icon');
+  svg.classList.add(...classesArray);
+
+  use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `./icons.svg#${name}`);
+
+  svg.appendChild(use);
+
+  return svg;
 }
 
 //#endregion

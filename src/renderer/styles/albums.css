@@ -19,8 +19,10 @@
   justify-content: center;
 
   min-height: 100%;
-  width: 100%;
+  width: 90%;
   height: auto;
+
+  margin: 0% 5%;
 }
 
 .album.wrapper
@@ -48,18 +50,20 @@
   padding-bottom: 150%;
 }
 
+.album.wrapper:not(.placeholder)
+{
+  cursor: pointer;
+}
+
 .album.container
 {
   position: absolute;
 
+  user-select: none;
+
   top: 0;
   height: 100%;
   width: 100%;
-}
-
-.album.wrapper:not(.placeholder)
-{
-  cursor: pointer;
 }
 
 .album.cover
@@ -69,8 +73,6 @@
   top: 0;
   width: 100%;
   height: 80%;
-
-  user-select: none;
 
   background-size: cover;
   background-position: center;
@@ -85,47 +87,47 @@
   content: "";
   display: block;
 
-  background-color: rgba(255, 255, 255, 0);
+  background-color: var(--color-4);
 
   width: 100%;
   height: 100%;
 
-  transition-property: background-color;
+  opacity: 0;
+
+  transition-property: opacity;
   transition-duration: 0.5s;
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.album.wrapper:not(.placeholder):hover > * > .cover
+.album.wrapper:not(.placeholder):hover > .container > .cover
 {
   height: 100%;
 }
 
-.album.wrapper:not(.placeholder):hover > * > .cover:after
+.album.wrapper:not(.placeholder):hover > .container > .cover:after
 {
-  background-color: rgba(255, 255, 255, 0.825);
+  opacity: 0.825;
 }
 
 .album.card
 {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: 80% 8% 12%;
+  grid-template-rows: 80% 11% 9%;
 
   grid-template-areas:
   "tracks tracks"
-  "artist duration"
-  "title duration";
+  "title duration"
+  "artist duration";
 
   position: relative;
-  white-space: pre-line;
-  user-select: none;
 
   top: 0;
   width: 90%;
   height: 100%;
   padding: 0% 5%;
 
-  font-family: Lato, sans-serif;
+  font-family: Montserrat, sans-serif;
   font-weight: 400;
 
   transition-property: background-color;
@@ -150,7 +152,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.album.wrapper:not(.placeholder):hover > * > .card > .background
+.album.wrapper:not(.placeholder):hover > .container > .card > .background
 {
   bottom: -21%;
 }
@@ -174,6 +176,7 @@
   opacity: 0;
   overflow: hidden;
 
+  white-space: pre-line;
   word-break: break-word;
   font-weight: 700;
 
@@ -189,36 +192,48 @@
   text-decoration: underline;
 }
 
-.album.wrapper:not(.placeholder):hover > * > .card > .tracks > .track
+.album.wrapper:not(.placeholder):hover > .container > .card > .tracks > .track
 {
   opacity: 1;
 }
 
 .album.title
 {
+  z-index: 1;
   grid-area: title;
 
-  z-index: 1;
+  display: flex;
+  align-items: flex-end;
 
+  color: var(--color-5);
+
+  white-space: pre-line;
   overflow: hidden;
+
   font-weight: 700;
 }
 
 .album.artist
 {
+  z-index: 1;
   grid-area: artist;
 
-  z-index: 1;
+  margin-top: 1px;
+  margin-left: 1px;
 
-  display: flex;
-  align-items: flex-end;
-
-  color: var(--color-3);
-
+  white-space: pre;
   overflow: hidden;
 }
 
-.album.artist:hover
+.album.artistLink
+{
+  color: var(--color-3);
+
+  white-space: pre-line;
+  text-decoration: none;
+}
+
+.album.artistLink:hover
 {
   text-decoration: underline;
 }
@@ -238,6 +253,7 @@
   height: 100%;
 
   overflow: hidden;
+
   font-weight: 900;
 
   transition-property: opacity;
@@ -245,7 +261,7 @@
   transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
 }
 
-.album.wrapper:not(.placeholder):hover > * > .card > .duration
+.album.wrapper:not(.placeholder):hover > .container > .card > .duration
 {
   opacity: 1;
 }
@@ -301,14 +317,18 @@
   }
 }
 
+/* Font Sizes */
+
 .album.card
 {
-  font-size: calc(3px + 0.35vw + 0.3vh);
+  font-size: calc(3px + 0.3vw + 0.3vh);
 }
 
-.album.duration, .album.track, .album.title
+.album.duration,
+.album.track,
+.album.title
 {
- font-size: calc(5px + 0.45vw + 0.4vh);
+ font-size: calc(5px + 0.4vw + 0.3vh);
 }
 
 @media screen and (max-width: 600px)
@@ -318,9 +338,11 @@
     font-size: 7px;
   }
 
-  .album.duration, .album.track, .album.title
+  .album.duration,
+  .album.track,
+  .album.title
   {
-    font-size: 10px;
+    font-size: 9px;
   }
 }
 
@@ -331,8 +353,10 @@
     font-size: 8px;
   }
 
-  .album.duration, .album.track, .album.title
+  .album.duration,
+  .album.track,
+  .album.title
   {
-    font-size: 12px;
+    font-size: 11px;
   }
 }

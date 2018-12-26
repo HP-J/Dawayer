@@ -8,7 +8,7 @@ import { homedir, platform } from 'os';
 import { parseFile as getMetadata } from 'music-metadata';
 import * as settings from 'electron-json-config';
 
-import { createElement } from './renderer.js';
+import { createElement, createIcon } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
@@ -22,11 +22,15 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 /** @typedef { Object } Storage
 * @property { Object<string, {  artist: string, tracks: string[], duration: number, element: HTMLDivElement }> } albums
-* @property { Object<string, { tracks: string[], duration: number, element: HTMLDivElement }> } artists
+* @property { Object<string, { tracks: string[], albums: string[], element: HTMLDivElement }> } artists
 * @property { Object<string, { url: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
 
 const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
+
+/**  @type { string }
+*/
+let missingPicture;
 
 /**  @type { HTMLDivElement }
 */
@@ -107,6 +111,8 @@ export function initStorage()
   // TEST changing the directory (from ~/Music to /mnt/k/Music Tester) during runtime
   // and then re-scanning
 
+  missingPicture = join(__dirname, '../../missing.png');
+
   // the base directory for the app config files
   const configDir = dirname(settings.file());
 
@@ -122,6 +128,8 @@ export function initStorage()
     addNewDirectories([ getDefaultMusicDir() ]);
   else
     addNewDirectories(savedAudioDirectories);
+
+  window.onbeforeunload = storageNavigation;
 
   // if a cached storage object exists
   if (!isDebug() && existsSync(storageConfig))
@@ -200,19 +208,23 @@ export function scanCacheAudioFiles()
 
                 const title = basename(file, extname(file));
 
-                // if the audio metadata belongs in an album
+                // if the track belongs in an album
                 if (metadata.common.album)
                 {
+                  // if the track's album is in the storage object already
                   if (storage.albums[metadata.common.album])
                   {
+                    // push the new track to the album's list
                     storage.albums[metadata.common.album].tracks.push(title);
 
+                    // add the track's duration to the overall album duration
                     storage.albums[metadata.common.album].duration =
                       storage.albums[metadata.common.album].duration +
                       metadata.format.duration;
                   }
                   else
                   {
+                    // add the album to the storage object
                     storage.albums[metadata.common.album] = {
                       artist: metadata.common.albumartist,
                       tracks: [ title ],
@@ -221,28 +233,33 @@ export function scanCacheAudioFiles()
                   }
                 }
 
-                // if the audio metadata has a known artist
+                // if the track has a known artist
                 if (metadata.common.artists)
                 {
                   const artists = metadata.common.artists;
 
                   for (let i = 0; i < artists.length; i++)
                   {
-                    if (storage.artists[artists[i]])
-                    {
-                      storage.artists[artists[i]].tracks.push(title);
-
-                      storage.artists[artists[i]].duration =
-                        storage.artists[artists[i]].duration +
-                        metadata.format.duration;
-                    }
-                    else
+                    // if the artist isn't in the storage object yet
+                    // add them
+                    if (!storage.artists[artists[i]])
                     {
                       storage.artists[artists[i]] = {
-                        tracks: [ title ],
-                        duration: metadata.format.duration
+                        tracks: [],
+                        albums: []
                       };
                     }
+
+                    // if the track does belong in an album and
+                    // the album isn't added to the artist yet, and
+                    // the album's artist is the same as the track's artist
+                    if (metadata.common.album &&
+                      !storage.artists[artists[i]].albums[title] &&
+                      metadata.common.albumartist === artists[i]
+                    )
+                      storage.artists[artists[i]].albums.push(title);
+                    else
+                      storage.artists[artists[i]].tracks.push(title);
                   }
                 }
 
@@ -301,9 +318,9 @@ function isStorageOld(date)
 
 function appendAlbumPlaceholder()
 {
-  const placeholder = createElement('.album.wrapper.placeholder');
+  const placeholderWrapper = createElement('.album.wrapper.placeholder');
 
-  const container = createElement('.album.container');
+  const albumContainer = createElement('.album.container');
 
   const cover = createElement('.album.cover');
   const card = createElement('.album.card');
@@ -314,10 +331,10 @@ function appendAlbumPlaceholder()
   const duration = createElement('.album.duration');
   const artist = createElement('.album.artist');
 
-  placeholder.appendChild(container);
+  placeholderWrapper.appendChild(albumContainer);
 
-  container.appendChild(cover);
-  container.appendChild(card);
+  albumContainer.appendChild(cover);
+  albumContainer.appendChild(card);
 
   card.appendChild(tracks);
   card.appendChild(background);
@@ -325,9 +342,9 @@ function appendAlbumPlaceholder()
   card.appendChild(duration);
   card.appendChild(artist);
 
-  albumsContainer.appendChild(placeholder);
+  albumsContainer.appendChild(placeholderWrapper);
 
-  return placeholder;
+  return placeholderWrapper;
 }
 
 /** @param { HTMLDivElement } placeholder
@@ -339,20 +356,21 @@ function updateAlbumElement(placeholder, options)
     placeholder.classList.remove('placeholder');
 
   if (options.picture)
-    placeholder.children[0].children[0].style.backgroundImage = `url(${options.picture})`;
+    placeholder.querySelector('.album.cover').style.backgroundImage = `url(${options.picture})`;
 
   if (options.title)
-    placeholder.children[0].children[1].children[2].innerText = options.title;
+    placeholder.querySelector('.album.title').innerText = options.title;
 
   if (options.duration)
-    placeholder.children[0].children[1].children[3].innerText = options.duration;
+    placeholder.querySelector('.album.duration').innerText = options.duration;
 
   if (options.artist)
-    placeholder.children[0].children[1].children[4].innerText = options.artist;
+    placeholder.querySelector('.album.artist').innerHTML =
+    `by <a href='artists:${options.artist}' class='album artistLink'>${options.artist}</a>`;
 
   if (options.tracks)
   {
-    const tracksContainer = placeholder.children[0].children[1].children[0];
+    const tracksContainer = placeholder.querySelector('.album.tracks');
 
     for (let i = 0; i < options.tracks.length; i++)
     {
@@ -368,36 +386,6 @@ function updateAlbumElement(placeholder, options)
       }
     }
   }
-}
-
-function appendArtistPlaceholder()
-{
-  const placeholder = createElement('.artist.container.placeholder');
-
-  const cover = createElement('.artist.cover');
-  const title = createElement('.artist.title');
-
-  placeholder.appendChild(cover);
-  placeholder.appendChild(title);
-
-  artistsContainer.appendChild(placeholder);
-
-  return placeholder;
-}
-
-/** @param { HTMLDivElement } placeholder
-* @param { { picture: string, title: string, description: string, albums: string[], tracks: string[] } } options
-*/
-function updateArtistElement(placeholder, options)
-{
-  if (placeholder.classList.contains('placeholder'))
-    placeholder.classList.remove('placeholder');
-
-  if (options.picture)
-    placeholder.children[0].style.backgroundImage = `url(${options.picture})`;
-
-  if (options.title)
-    placeholder.children[1].innerText = options.title;
 }
 
 /** @param  { Storage } storage
@@ -418,9 +406,9 @@ function appendAlbumsPageItems(storage)
     const albumArtist = storage.albums[albums[i]].artist;
     const albumTracks = storage.albums[albums[i]].tracks;
 
-    const track = storage.tracks[storage.albums[albums[i]].tracks[0]];
-
     const img = new Image();
+
+    img.src = missingPicture;
 
     img.onload = () =>
     {
@@ -433,11 +421,118 @@ function appendAlbumsPageItems(storage)
       });
     };
 
+    const track = storage.tracks[storage.albums[albums[i]].tracks[0]];
+
     getMetadata(track.url)
       .then(metadata =>
       {
         img.src = toBase64(metadata.common.picture[0]);
       });
+  }
+}
+
+function appendArtistPlaceholder()
+{
+  const placeholderWrapper = createElement('.artist.wrapper.placeholder');
+  const placeholderContainer = createElement('.artist.container');
+
+  const cover = createElement('.artist.cover');
+  const card = createElement('.artist.card');
+
+  const title = createElement('.artist.title');
+  const stats = createElement('.artist.stats');
+
+  const overlayWrapper = createElement('.artistOverlay.wrapper');
+  const overlayBackground = createElement('.artistOverlay.background');
+  const overlayContainer = createElement('.artistOverlay.container');
+
+  const overlayCard = createElement('.artistOverlay.card');
+
+  const overlayCover = createElement('.artistOverlay.cover');
+  const overlayHide = createElement('.artistOverlay.hide');
+  const overlayDownward = createIcon('downward', '.artistOverlay.downward');
+  const overlayTitle = createElement('.artistOverlay.title');
+  const overlayButton = createElement('.artistOverlay.button');
+
+  const overlayBio = createElement('.artistOverlay.bio');
+
+  placeholderWrapper.appendChild(placeholderContainer);
+  placeholderWrapper.appendChild(overlayBackground);
+  placeholderWrapper.appendChild(overlayWrapper);
+
+  overlayWrapper.appendChild(overlayContainer);
+
+  placeholderContainer.appendChild(cover);
+  placeholderContainer.appendChild(card);
+
+  card.appendChild(title);
+  card.appendChild(stats);
+
+  overlayContainer.appendChild(overlayCard);
+
+  overlayCard.appendChild(overlayCover);
+  overlayCard.appendChild(overlayHide);
+  overlayHide.appendChild(overlayDownward);
+  overlayCard.appendChild(overlayTitle);
+  overlayCard.appendChild(overlayButton);
+
+  overlayContainer.appendChild(overlayBio);
+
+  artistsContainer.appendChild(placeholderWrapper);
+
+  return placeholderWrapper;
+}
+
+/** @param { HTMLDivElement } placeholder
+* @param { { picture: string, title: string, bio: string, albums: string[], tracks: string[] } } options
+*/
+function updateArtistElement(placeholder, options)
+{
+  if (placeholder.classList.contains('placeholder'))
+  {
+    placeholder.classList.remove('placeholder');
+
+    placeholder.querySelector('.artist.container').onclick =
+    placeholder.querySelector('.artistOverlay.hide').onclick =
+    () => placeholder.classList.toggle('activeOverlay');
+  }
+
+  if (options.picture)
+    placeholder.querySelector('.artist.cover').style.backgroundImage =
+    placeholder.querySelector('.artistOverlay.cover').style.backgroundImage = `url(${options.picture})`;
+
+  if (options.title)
+  {
+    placeholder.querySelector('.artist.title').innerText =
+    placeholder.querySelector('.artistOverlay.title').innerText = options.title;
+
+    placeholder.querySelector('.artistOverlay.button').innerHTML =
+    `<a href='play-artist:${options.title}' class='artistOverlay button'> Play</a>`;
+  }
+
+  if (options.bio)
+    placeholder.querySelector('.artistOverlay.bio').innerText = options.bio;
+
+  if (options.albums.length > 0 || options.tracks.length > 0)
+  {
+    const stats = placeholder.querySelector('.artist.stats');
+
+    stats.innerText = '';
+
+    if (options.albums.length > 0)
+    {
+      stats.innerText =
+      `${options.albums.length} Album${(options.albums.length > 1) ? 's' : ''}`;
+    }
+
+    if (options.tracks.length > 0)
+    {
+      if (stats.innerText.length > 0)
+        stats.innerText = stats.innerText + ' | ';
+
+      stats.innerText = stats.innerText +
+      `${options.tracks.length} Track${(options.tracks.length > 1) ? 's' : ''}`;
+    }
   }
 }
 
@@ -456,21 +551,36 @@ function appendArtistsPageItems(storage)
 
     const img = new Image();
 
-    const track = storage.tracks[storage.artists[artists[i]].tracks[0]];
+    // TODO using wiki.js pull artist picture and short bio
+    img.src = missingPicture;
+
+    let loadArtistImage = false;
 
     img.onload = () =>
     {
       updateArtistElement(placeholder, {
         picture: img.src,
-        title: artists[i]
+        title: artists[i],
+        bio: 'Dina El Wedidi (Arabic: دينا الوديدي‎, born 1 October 1987), is an Egyptian singer, composer, guitarist, Daf player, actress, and storyteller.[1] Dina has been known as the lead performer of an ensemble of musicians who have performed extensively in the past 2 years, fusing local and global styles of music.',
+        albums: storage.artists[artists[i]].albums,
+        tracks: storage.artists[artists[i]].tracks
       });
+
+      if (!loadArtistImage)
+      {
+        loadArtistImage = true;
+
+        img.src = join(__dirname, '../../test-materials/Dina.jpg');
+      }
     };
 
-    getMetadata(track.url)
-      .then(metadata =>
-      {
-        img.src = toBase64(metadata.common.picture[0]);
-      });
+    // const track = storage.tracks[storage.artists[artists[i]].tracks[0]] || storage.tracks[storage.artists[artists[i]].albums[0]];
+
+    // getMetadata(track.url)
+    //   .then(metadata =>
+    //   {
+    //     img.src = toBase64(metadata.common.picture[0]);
+    //   });
   }
 }
 
@@ -490,6 +600,15 @@ function removeAllChildren(element)
   {
     element.removeChild(element.lastChild);
   }
+}
+
+function storageNavigation()
+{
+  // storage key
+  // console.log(document.activeElement.href.match(/.+:/)[0].slice(0, -1));
+
+  // storage value
+  // console.log(document.activeElement.href.match(/:.+/)[0].substring(1));
 }
 
 /** adds the directories to the save file and the scan array,

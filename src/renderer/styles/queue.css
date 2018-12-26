@@ -11,17 +11,20 @@
 
   background-color: purple;
 
+  user-select: none;
   overflow: hidden;
 
   width: 100%;
   height: 9vh;
+
+  font-family: Montserrat, sans-serif;
+  font-weight: 400;
 }
 
 .queue.playing.cover
 {
   grid-area: cover;
 
-  background-color: red;
   background-size: cover;
   background-position: center;
 
@@ -29,20 +32,18 @@
   height: 100%;
 }
 
-.queue.playing.artist, .queue.playing.title
+.queue.playing.artist,
+.queue.playing.title
 {
   color: var(--color-4);
 
   white-space: pre-line;
-  user-select: none;
   overflow: hidden;
 
   width: 97%;
   height: 100%;
 
   padding: 0px 1.5%;
-
-  font-family: Montserrat, sans-serif;
 }
 
 .queue.playing.artist
@@ -51,9 +52,6 @@
 
   display: flex;
   align-items: flex-end;
-
-  font-size: calc(4px + 0.35vw + 0.2vh);
-  font-weight: 400;
 }
 
 .queue.playing.title
@@ -61,7 +59,6 @@
   grid-area: title;
   top: 50%;
 
-  font-size: calc(5px + 0.35vw + 0.4vh);
   font-weight: 700;
 }
 
@@ -72,15 +69,9 @@
   display: flex;
   align-items: flex-end;
 
-  white-space: pre-line;
-  user-select: none;
-  overflow: hidden;
-
   color: var(--color-4);
-  height: 100%;
 
   font-family: Montserrat, sans-serif;
-  font-size: calc(5px + 0.35vw + 0.2vh);
   font-weight: 900;
 }
 
@@ -97,19 +88,17 @@
   grid-template-rows: 1fr 1fr;
   grid-template-areas: "index artist" "index title";
 
-  white-space: pre-line;
+  background-color: red;
+
+  overflow: hidden;
   user-select: none;
-  overflow: hidden;
-
-  background-color: rgba(#ff0000, 0.45);
-
-  overflow: hidden;
 
   width: 100%;
   height: 13%;
   margin: 1% 0px;
 
   font-family: Montserrat, sans-serif;
+  font-weight: 400;
 }
 
 .queueItem.index
@@ -120,7 +109,7 @@
   align-items: center;
 
   color: var(--color-4);
-  font-size: calc(5px + 0.65vw + 0.3vh);
+
   font-weight: 700;
 }
 
@@ -131,30 +120,57 @@
   display: flex;
   align-items: flex-end;
 
+  white-space: pre-line;
+
   color: var(--color-4);
-  font-size: calc(4px + 0.35vw + 0.2vh);
-  font-weight: 400;
 }
 
 .queueItem.title
 {
   grid-area: title;
 
+  white-space: pre-line;
+
   color: var(--color-4);
-  font-size: calc(5px + 0.35vw + 0.4vh);
   font-weight: 900;
+}
+
+/* Font Sizes */
+
+.queueItem.artist,
+.queue.playing.artist
+{
+  font-size: calc(4px + 0.4vw + 0.2vh);
+}
+
+.queueItem.title,
+.queue.playing.title
+{
+  font-size: calc(5px + 0.35vw + 0.4vh);
+}
+
+.queue.text
+{
+  font-size: calc(5px + 0.4vw + 0.2vh);
+}
+
+.queueItem.index
+{
+  font-size: calc(5px + 0.65vw + 0.3vh);
 }
 
 @media screen and (max-width: 800px)
 {
-  .queue.playing.artist, .queueItem.artist
+  .queueItem.artist,
+  .queue.playing.artist
   {
-    font-size: calc(5px + 0.55vw + 0.2vh);
+    font-size: calc(5px + 0.6vw + 0.2vh);
   }
 
-  .queue.playing.title, .queueItem.title
+  .queueItem.title,
+  .queue.playing.title
   {
-    font-size: calc(5px + 0.75vw + 0.4vh);
+    font-size: calc(5px + 0.6vw + 0.4vh);
   }
 
   .queue.text
@@ -165,5 +181,55 @@
   .queueItem.index
   {
     font-size: calc(5px + 0.85vw + 0.7vh);
+  }
+}
+
+@media screen and (max-width: 600px)
+{
+  .queueItem.artist,
+  .queue.playing.artist
+  {
+    font-size: 9px;
+  }
+
+  .queueItem.title,
+  .queue.playing.title
+  {
+    font-size: 9px;
+  }
+
+  .queue.text
+  {
+    font-size: 9px;
+  }
+
+  .queueItem.index
+  {
+    font-size: 13px;
+  }
+}
+
+@media screen and (min-width: 1020px)
+{
+  .queueItem.artist,
+  .queue.playing.artist
+  {
+    font-size: 11px;
+  }
+
+  .queueItem.title,
+  .queue.playing.title
+  {
+    font-size: 12px;
+  }
+
+  .queue.text
+  {
+    font-size: 11px;
+  }
+
+  .queueItem.index
+  {
+    font-size: 15px;
   }
 }

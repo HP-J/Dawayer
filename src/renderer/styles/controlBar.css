@@ -1,6 +1,6 @@
 .controlBar.container
 {
-  z-index: 3;
+  z-index: 4;
   position: relative;
 
   grid-area: controlBar;
@@ -11,7 +11,7 @@
 
   top: 0;
   left: 0;
-  
+
   min-height: 125px;
   width: 96%;
   height: auto;
@@ -20,7 +20,7 @@
 
   transition-property: top;
   transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .controlBar.container.hidden
@@ -32,7 +32,7 @@
 {
   z-index: -1;
   position: absolute;
-  
+
   background-color: var(--color-2);
 
   top: 0;
@@ -106,7 +106,7 @@
     justify-content: center;
 
     padding-top: 2vh;
-  } 
+  }
 
   .controls.container
   {

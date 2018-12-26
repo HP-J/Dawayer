@@ -11,6 +11,8 @@ html
   --color-8: #929493;
 
   --color-9: #E6E6E6;
+  
+  --holder-1: rgba(0, 0, 0, 0.5);
 
   --gradient-1 : linear-gradient(to left, rgba(15,15,15,0) 0%, rgba(189, 189, 189, 0.4) 50%, rgba(255,255,255,0) 100%);
 }
@@ -101,6 +103,7 @@ body
   z-index: -2;
   position: absolute;
 
+  background-color: var(--color-1);
   background-image: url(../../../test-materials/Dina1.jpeg);
   background-position: center;
   background-size: cover;

@@ -12,61 +12,423 @@
   overflow-y: overlay;
 }
 
-.artist.container
+.artists.container
+{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  min-height: 100%;
+  width: 90%;
+  height: auto;
+
+  margin: 0% 5%;
+}
+
+.artist.wrapper
 {
   position: relative;
 
-  display: flex;
-  align-items: center;
+  width: auto;
+  height: fit-content;
 
-  width: 97%;
-  height: calc(7vh + 1vw);
-
-  overflow: hidden;
-  margin: 1.5%;
+  margin: 1%;
 }
 
-.artist.container:before
+.artist.wrapper:not(.placeholder)
 {
-  position: absolute;
+  cursor: pointer;
+}
 
-  content: "";
-  display: block;
+.artist.container
+{
+  width: 250px;
+  height: fit-content;
 
-  width: 100%;
-  height: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+
+  box-shadow: 0px 0px 0px 0px var(--color-5);
+
+  transition-property: box-shadow;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.artist.wrapper:not(.placeholder) > .container:hover
+{
+  box-shadow: 0px 0px 12px 0px var(--color-5);
 }
 
 .artist.cover
 {
-  width: 15%;
-  height: 100%;
+  background-size: cover;
+  background-position: center;
+
+  width: 100%;
+  height: 0;
 }
 
-.artist.title
+.artist.wrapper:not(.placeholder) > .container > .artist.cover:after
 {
-  width: 81%;
+  content: "";
+
+  display: block;
+
+  background-color: var(--color-5);
+
+  top: 0;
+  width: 100%;
+  height: 0;
+
+  opacity: 0.2;
+}
+
+.artist.cover,
+.artist.wrapper:not(.placeholder) > .container > .artist.cover:after
+{
+  padding-bottom: 65%;
+}
+
+.artist.card
+{
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+
+  top: 0;
+  width: 100%;
   height: 100%;
 
-  margin: 0% 2%;
+  user-select: none;
+
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+}
+
+.artist.title,
+.artist.stats
+{
+  position: relative;
+  color: var(--color-4);
+
+  width: 94%;
+  height: fit-content;
+
+  white-space: pre-line;
+
+  margin-left: 3%;
+  margin-top: 3%;
+}
+
+.artist.stats
+{
+  align-self: flex-end;
+
+  margin-top: 0%;
+  margin-bottom: 3%;
+}
+
+/* Artist Overlay */
+
+.artistOverlay.wrapper
+{
+  z-index: 5;
+  position: fixed;
+  display: flex;
+
+  justify-content: center;
+
+  background-color: transparent;
+
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 94%;
+
+  padding: 3% 0;
+
+  pointer-events: none;
+  overflow-x: hidden;
+  overflow-y: overlay;
+
+  /* transition-property: top;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); */
+}
+
+.artist.wrapper.activeOverlay > .artistOverlay.wrapper
+{
+  top: 0;
+}
+
+.artistOverlay.container
+{
+  display: flex;
+  flex-wrap: wrap;
+
+  cursor: default;
+
+  background-color: var(--color-4);
+
+  width: calc(85vw - 6%);
+  height: fit-content;
+
+  pointer-events: all;
+  overflow: hidden;
+  padding: 3%;
+
+  font-family: Montserrat, sans-serif;
+  font-weight: 400;
+}
+
+.artistOverlay.background
+{
+  z-index: 5;
+  position: fixed;
+
+  background-color: transparent;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+
+  /* transition-property: background-color;
+  transition-duration: 0.25s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); */
+}
+
+.artist.wrapper.activeOverlay > .artistOverlay.background
+{
+  background-color: var(--holder-1);
+  pointer-events: all;
+}
+
+.artistOverlay.container,
+.artistOverlay.cover,
+.artistOverlay.cover:after
+{
+  border-radius: 6px;
+}
+
+.artistOverlay.card
+{
+  display: grid;
+
+  grid-template-areas:
+  "cover title hide"
+  "cover button button";
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 50% 50%;
+
+  width: 100%;
+  height: fit-content;
+
+  column-gap: 3%;
+  margin-bottom: 3%;
+
+  overflow: hidden;
+}
+
+.artistOverlay.cover
+{
+  grid-area: cover;
+
+  background-size: cover;
+  background-position: center;
+
+  max-width: 175px;
+  width: calc(25vw + 2vh);
+  height: fit-content;
+
+  user-select: none;
+}
+
+.artistOverlay.cover:after
+{
+  content: "";
+  display: block;
+
+  width: 100%;
+  height: 0;
+
+  padding-bottom: 100%;
+}
+
+.artistOverlay.title
+{
+  grid-area: title;
+
+  display: flex;
+  align-items: flex-end;
+
+  font-weight: 700;
+}
+
+.artistOverlay.hide
+{
+  position: relative;
+  grid-area: hide;
+
+  min-width: 35px;
+  max-width: 50px;
+  width: 5%;
+  height: fit-content;
+
+  cursor: pointer;
+}
+
+.artistOverlay.hide:after
+{
+  content: "";
+  display: block;
+
+  width: 100%;
+  height: 0;
+
+  padding-bottom: 100%;
+}
+
+.artistOverlay.hide:hover > .icon
+{
+  fill: var(--color-7);
+  stroke: var(--color-7);
+}
+
+.artistOverlay.downward
+{
+  position: absolute;
+}
+
+.artistOverlay.button
+{
+  grid-area: button;
+
+  user-select: none;
+
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.artistOverlay.button > a:hover
+{
+  text-decoration: underline;
+}
+
+.artistOverlay.bio
+{
+  width: 100%;
+  height: fit-content;
+}
+
+.artistOverlay.title,
+.artistOverlay.bio,
+.artistOverlay.button,
+.artistOverlay.icon
+{
+  color: var(--color-5);
+  fill: var(--color-5);
+  stroke: var(--color-5);
+
+  white-space: pre-line;
+}
+
+@media screen and (max-width: 480px)
+{
+  .artistOverlay.card
+  {
+    grid-template-areas: "cover cover" "title hide" "button button";
+    grid-template-columns: 1fr auto;
+    grid-template-rows:
+    calc(25vh + 10vw)
+    calc((25vh + 10vw) / 2)
+    calc((25vh + 10vw)/2);
+
+    width: 100%;
+    height: calc(25vh + 10vw);
+  }
+
+  .artistOverlay.cover
+  {
+    max-width: unset;
+    width: 100%;
+    height: 100%;
+  }
+
+  .artistOverlay.cover:after
+  {
+    background-color: var(--color-5);
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0.2;
+
+    padding-bottom: 0;
+  }
+
+  .artistOverlay.title
+  {
+    position: relative;
+    top: calc(-25vh - 10vw);
+
+    margin-left: 3%;
+  }
+
+  .artistOverlay.hide
+  {
+    position: relative;
+    top: calc(-25vh - 10vw);
+
+    margin-right: 10%;
+  }
+
+  .artistOverlay.button
+  {
+    position: relative;
+    top: calc(-25vh - 10vw);
+
+    margin-left: 3%;
+  }
+
+  .artistOverlay.button a
+  {
+    top: 0;
+    margin-left: 0;
+  }
+
+  .artistOverlay.title,
+  .artistOverlay.button,
+  .artistOverlay.icon
+  {
+    color: var(--color-4);
+    fill: var(--color-4);
+    stroke: var(--color-4);
+  }
 }
 
 /* Content Placeholders */
 
-.artist.placeholder
+.artist.placeholder > .container
 {
   background-color: var(--color-4);
 }
 
-.artist.placeholder > .cover,
-.artist.placeholder > .title
+.artist.placeholder > .container > .card > .title,
+.artist.placeholder > .container > .card > .stats
 {
   background-color: var(--color-9);
+
+  padding: 2.5% 0%;
+  width: 40%;
 }
 
-.artist.placeholder > .title
+.artist.placeholder > .container > .card > .stats
 {
-  height: 60%
+  width: 70%;
 }
 
 .artist.placeholder:after
@@ -85,4 +447,60 @@
   height: 100%;
 
   animation: placeholder-animation 1s linear infinite;
+}
+
+/* Font Sizes */
+
+.artist.title,
+.artist.stats
+{
+ font-size: calc(5px + 0.45vw + 0.3vh);
+}
+
+.artistOverlay.container
+{
+ font-size: calc(7px + 0.55vw + 0.4vh);
+}
+
+.artistOverlay.card
+{
+ font-size: calc(6px + 0.65vw + 0.4vh);
+}
+
+@media screen and (max-width: 600px)
+{
+  .artist.title,
+  .artist.stats
+  {
+   font-size: 10px;
+  }
+
+  .artistOverlay.container
+  {
+   font-size: 12px;
+  }
+
+  .artistOverlay.card
+  {
+   font-size: 12px;
+  }
+}
+
+@media screen and (min-width: 1020px)
+{
+  .artist.title,
+  .artist.stats
+  {
+   font-size: 12px;
+  }
+
+  .artistOverlay.container
+  {
+   font-size: 15px;
+  }
+
+  .artistOverlay.card
+  {
+   font-size: 16px;
+  }
 }
