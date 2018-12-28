@@ -18,7 +18,6 @@
   flex-wrap: wrap;
   justify-content: center;
 
-  min-height: 100%;
   width: 90%;
   height: auto;
 
@@ -59,6 +58,7 @@
 {
   position: absolute;
 
+  overflow: hidden;
   user-select: none;
 
   top: 0;
@@ -128,7 +128,6 @@
   padding: 0% 5%;
 
   font-family: Montserrat, sans-serif;
-  font-weight: 400;
 
   transition-property: background-color;
   transition-duration: 0.5s;
@@ -230,6 +229,8 @@
   color: var(--color-3);
 
   white-space: pre-line;
+  overflow: hidden;
+
   text-decoration: none;
 }
 
@@ -252,6 +253,7 @@
   width: 100%;
   height: 100%;
 
+  white-space: pre-line;
   overflow: hidden;
 
   font-weight: 900;
@@ -275,23 +277,6 @@
   background-color: var(--color-9);
 }
 
-.album.placeholder > .container:after
-{
-  z-index: 2;
-
-  content: "";
-  display: block;
-
-  position: absolute;
-  background: var(--gradient-1);
-
-  top: 0;
-  width: 100%;
-  height: 100%;
-
-  animation: album-placeholder-animation 1s linear infinite;
-}
-
 .album.placeholder > .container > .card > .title
 {
   margin: 5% 0%;
@@ -300,8 +285,26 @@
 .album.placeholder > .container > .card > .artist
 {
   margin-top: 3%;
-  margin-bottom: 0.5%;
+  margin-bottom: 3.5%;
   margin-right: 45%;
+}
+
+.album.placeholder > .container:after
+{
+  z-index: 2;
+
+  content: "";
+  display: block;
+
+  position: absolute;
+
+  background: var(--gradient-1);
+
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  animation: placeholder-animation 1s linear infinite;
 }
 
 @keyframes placeholder-animation

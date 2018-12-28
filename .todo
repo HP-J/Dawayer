@@ -1,5 +1,6 @@
 main:
-  ☐ caching storage data depends on what is needed to be loaded for a faster start-up time and what can be read using lazy-loading later
+  ☐ about tab that also doubles as a the auto-update visuals
+  ☐ option tab to change the tray color from dark to light and vice-versa
 
 graphics:
 
@@ -11,5 +12,5 @@ playback:
 
   ☐ next button always skips to next song
   ☐ previous button goes back only if playback time is less than 5 seconds else resets the playback to the start of the audio file
-  
+
   ☐ queue sorts audio files (if same album sort by track number) then sort by title then sort by filename

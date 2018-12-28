@@ -16,7 +16,7 @@ export default function(element, options)
   options.direction = options.direction || 'horizontal';
 
   if (options.duration === undefined)
-    options.duration = 85;
+    options.duration = 50;
 
   if (options.delay)
   {

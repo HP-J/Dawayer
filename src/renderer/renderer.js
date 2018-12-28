@@ -372,12 +372,12 @@ function initPages()
 {
   // TODO change default sub-page back to albums
   selectedPage = pagesContainer.children.item(1);
-  selectedLocalIcon = localIconsContainer.children.item(2);
-  selectedLocalSubPage = localSubPagesContainer.children.item(2);
+  selectedLocalIcon = localIconsContainer.children.item(0);
+  selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
   scroll(selectedPage, { duration: 0 });
-  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical' });
-  scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
+  // scroll(selectedLocalIcon, { duration: 0, direction: 'vertical' });
+  // scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
 }
 
 //#endregion

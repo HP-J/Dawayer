@@ -40,6 +40,10 @@ const albumsContainer = document.body.querySelector('.albums.container');
 */
 const artistsContainer = document.body.querySelector('.artists.container');
 
+/**  @type { HTMLDivElement }
+*/
+const tracksContainer = document.body.querySelector('.tracks.container');
+
 /** @type { string[] }
 */
 const audioDirectories = [];
@@ -584,12 +588,95 @@ function appendArtistsPageItems(storage)
   }
 }
 
+function appendTracksPlaceholder()
+{
+  const placeholderWrapper = createElement('.track.wrapper.placeholder');
+  const placeholderContainer = createElement('.track.container');
+
+  const cover = createElement('.track.cover');
+  const artist = createElement('.track.artist');
+  const title = createElement('.track.title');
+  const duration = createElement('.track.duration');
+
+  placeholderWrapper.appendChild(placeholderContainer);
+
+  placeholderContainer.appendChild(cover);
+  placeholderContainer.appendChild(artist);
+  placeholderContainer.appendChild(title);
+  placeholderContainer.appendChild(duration);
+
+  tracksContainer.appendChild(placeholderWrapper);
+
+  return placeholderWrapper;
+}
+
+/** @param { HTMLDivElement } placeholder
+* @param { { picture: string, artist: string, title: string, duration: string } } options
+*/
+function updateTracksElement(placeholder, options)
+{
+  if (placeholder.classList.contains('placeholder'))
+    placeholder.classList.remove('placeholder');
+
+  if (options.picture)
+    placeholder.querySelector('.track.cover').style.backgroundImage = `url(${options.picture})`;
+
+  if (options.artist)
+    placeholder.querySelector('.track.artist').innerHTML =
+    `<a href='artists:${options.artist}' class='track artistLink'>${options.artist}</a>`;
+
+  if (options.title)
+    placeholder.querySelector('.track.title').innerText = options.title;
+
+  if (options.duration)
+    placeholder.querySelector('.track.duration').innerText = options.duration;
+}
+
+/** @param  { Storage } storage
+*/
+function appendTracksPageItems(storage)
+{
+  // remove all children from tracks pages
+  removeAllChildren(tracksContainer);
+
+  const tracks = Object.keys(storage.tracks);
+
+  for (let i = 0; i < tracks.length; i++)
+  {
+    const placeholder = appendTracksPlaceholder();
+
+    storage.tracks[tracks[i]].element = placeholder;
+
+    const track = storage.tracks[tracks[i]];
+    const img = new Image();
+
+    img.src = missingPicture;
+
+    img.onload = () =>
+    {
+      updateTracksElement(placeholder, {
+        picture: img.src,
+        artist: track.artists.join(', '),
+        title: tracks[i],
+        duration: secondsToDuration(track.duration)
+      });
+    };
+
+    getMetadata(track.url)
+      .then(metadata =>
+      {
+        img.src = toBase64(metadata.common.picture[0]);
+      });
+  }
+}
+
 /** @param  { Storage } storage
 */
 function appendItems(storage)
 {
   appendAlbumsPageItems(storage);
   appendArtistsPageItems(storage);
+  appendTracksPageItems(storage);
 }
 
 /** @param { HTMLElement } element

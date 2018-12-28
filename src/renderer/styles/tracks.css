@@ -18,7 +18,202 @@
   flex-wrap: wrap;
   justify-content: center;
 
-  min-height: 100%;
-  width: 100%;
   height: auto;
+
+  margin: 0% 5%;
+}
+
+.track.wrapper
+{
+  position: relative;
+
+  max-width: 800px;
+  width: 85%;
+  height: 9vh;
+
+  overflow: hidden;
+  margin: 1%;
+}
+
+.track.container
+{
+  display: grid;
+
+  grid-template-columns: 20% 1fr auto;
+  grid-template-rows: 50% 50%;
+  grid-template-areas: "cover artist duration" "cover title duration";
+
+  grid-column-gap: 1.5%;
+
+  background-color: var(--color-4);
+
+  user-select: none;
+  cursor: pointer;
+
+  width: 98.5%;
+  height: 100%;
+
+  padding-right: 1.5%;
+}
+
+.track.cover
+{
+  grid-area: cover;
+
+  background-size: cover;
+  background-position: center;
+}
+
+.track.artist,
+.track.artistLink,
+.track.title,
+.track.duration
+{
+  color: var(--color-5);
+
+  white-space: pre-line;
+  overflow: hidden;
+
+  font-family: Montserrat, sans-serif;
+}
+
+.track.artist
+{
+  grid-area: artist;
+
+  display: flex;
+  align-items: flex-end;
+}
+
+.track.title
+{
+  grid-area: title;
+
+  font-weight: 700;
+}
+
+.track.duration
+{
+  grid-area: duration;
+
+  display: flex;
+  align-items: center;
+
+  font-weight: 700;
+}
+
+.track.artistLink
+{
+  color: var(--color-3);
+
+  text-decoration: none;
+}
+
+.track.artistLink:hover
+{
+  text-decoration: underline;
+}
+
+/* Content Placeholders */
+
+.track.placeholder > .container > .cover,
+.track.placeholder > .container > .artist,
+.track.placeholder > .container > .title,
+.track.placeholder > .container > .duration
+{
+  background-color: var(--color-9);
+}
+
+.track.placeholder > .container
+{
+  grid-template-columns: 20% 67% 10%;
+
+  width: 100%;
+  padding-right: 0;
+}
+
+.track.placeholder > .container > .artist,
+.track.placeholder > .container > .title,
+.track.placeholder > .container > .duration
+{
+  position: relative;
+
+  top: 10%;
+  width: 45%;
+  height: 60%;
+
+  padding: 0;
+  margin: 0;
+}
+
+.track.placeholder > .container > .title
+{
+  top: 5%;
+  width: 70%;
+}
+
+.track.placeholder > .container > .duration
+{
+  top: 30%;
+  width: 75%;
+  height: 40%;
+}
+
+.track.placeholder > .container:after
+{
+  z-index: 2;
+
+  content: "";
+  display: block;
+
+  position: absolute;
+
+  background: var(--gradient-1);
+
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  animation: placeholder-animation 1s linear infinite;
+}
+
+/* Font Sizes */
+
+.track.artist
+{
+  font-size: calc(4px + 0.4vw + 0.2vh);
+}
+
+.track.title,
+.track.duration
+{
+  font-size: calc(5px + 0.35vw + 0.4vh);
+}
+
+@media screen and (max-width: 600px)
+{
+  .track.artist
+  {
+    font-size: 9px;
+  }
+
+  .track.title,
+  .track.duration
+  {
+    font-size: 9px;
+  }
+}
+
+@media screen and (min-width: 1020px)
+{
+  .track.artist
+  {
+    font-size: 11px;
+  }
+
+  .track.title,
+  .track.duration
+  {
+    font-size: 12px;
+  }
 }

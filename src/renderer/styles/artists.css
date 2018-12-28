@@ -18,7 +18,6 @@
   flex-wrap: wrap;
   justify-content: center;
 
-  min-height: 100%;
   width: 90%;
   height: auto;
 
@@ -32,18 +31,16 @@
   width: auto;
   height: fit-content;
 
+  overflow: hidden;
   margin: 1%;
-}
-
-.artist.wrapper:not(.placeholder)
-{
-  cursor: pointer;
 }
 
 .artist.container
 {
   width: 250px;
   height: fit-content;
+
+  cursor: pointer;
 
   border-radius: 6px;
   overflow: hidden;
@@ -116,6 +113,7 @@
   height: fit-content;
 
   white-space: pre-line;
+  overflow: hidden;
 
   margin-left: 3%;
   margin-top: 3%;
@@ -152,9 +150,9 @@
   overflow-x: hidden;
   overflow-y: overlay;
 
-  /* transition-property: top;
+  transition-property: top;
   transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); */
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .artist.wrapper.activeOverlay > .artistOverlay.wrapper
@@ -176,10 +174,10 @@
 
   pointer-events: all;
   overflow: hidden;
+  user-select: none;
   padding: 3%;
 
   font-family: Montserrat, sans-serif;
-  font-weight: 400;
 }
 
 .artistOverlay.background
@@ -196,9 +194,9 @@
 
   pointer-events: none;
 
-  /* transition-property: background-color;
+  transition-property: background-color;
   transition-duration: 0.25s;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); */
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .artist.wrapper.activeOverlay > .artistOverlay.background
@@ -243,8 +241,6 @@
   max-width: 175px;
   width: calc(25vw + 2vh);
   height: fit-content;
-
-  user-select: none;
 }
 
 .artistOverlay.cover:after
@@ -307,9 +303,6 @@
 {
   grid-area: button;
 
-  user-select: none;
-
-  font-weight: 400;
   text-decoration: none;
 }
 
@@ -334,6 +327,7 @@
   stroke: var(--color-5);
 
   white-space: pre-line;
+  overflow: hidden;
 }
 
 @media screen and (max-width: 480px)
@@ -431,7 +425,7 @@
   width: 70%;
 }
 
-.artist.placeholder:after
+.artist.placeholder > .container:after
 {
   z-index: 2;
 
