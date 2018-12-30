@@ -31,8 +31,16 @@
   width: 85%;
   height: 9vh;
 
-  overflow: hidden;
   margin: 1%;
+
+  transition-property: height;
+  transition-duration: 0.25s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.track.wrapper:not(.placeholder):hover
+{
+  height: 14vh;
 }
 
 .track.container
@@ -47,13 +55,24 @@
 
   background-color: var(--color-4);
 
-  user-select: none;
   cursor: pointer;
+  overflow: hidden;
+  user-select: none;
 
   width: 98.5%;
   height: 100%;
 
+  box-shadow: 0px 0px 0px 0px var(--color-5);
   padding-right: 1.5%;
+
+  transition-property: box-shadow;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.track.wrapper:not(.placeholder) > .container:hover
+{
+  box-shadow: 0px 0px 20px 0px var(--color-5);
 }
 
 .track.cover
@@ -124,14 +143,6 @@
   background-color: var(--color-9);
 }
 
-.track.placeholder > .container
-{
-  grid-template-columns: 20% 67% 10%;
-
-  width: 100%;
-  padding-right: 0;
-}
-
 .track.placeholder > .container > .artist,
 .track.placeholder > .container > .title,
 .track.placeholder > .container > .duration
@@ -159,6 +170,16 @@
   height: 40%;
 }
 
+.track.placeholder > .container
+{
+  grid-template-columns: 20% 67% 10%;
+
+  width: 100%;
+  padding-right: 0;
+
+  cursor: default;
+}
+
 .track.placeholder > .container:after
 {
   z-index: 2;
@@ -173,8 +194,6 @@
   top: 0;
   width: 100%;
   height: 100%;
-
-  animation: placeholder-animation 1s linear infinite;
 }
 
 /* Font Sizes */

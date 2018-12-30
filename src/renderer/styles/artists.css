@@ -31,7 +31,6 @@
   width: auto;
   height: fit-content;
 
-  overflow: hidden;
   margin: 1%;
 }
 
@@ -40,10 +39,10 @@
   width: 250px;
   height: fit-content;
 
-  cursor: pointer;
-
   border-radius: 6px;
+  cursor: pointer;
   overflow: hidden;
+  user-select: none;
 
   box-shadow: 0px 0px 0px 0px var(--color-5);
 
@@ -54,7 +53,7 @@
 
 .artist.wrapper:not(.placeholder) > .container:hover
 {
-  box-shadow: 0px 0px 12px 0px var(--color-5);
+  box-shadow: 0px 0px 20px 0px var(--color-5);
 }
 
 .artist.cover
@@ -79,6 +78,16 @@
   height: 0;
 
   opacity: 0.2;
+
+  transition-property: background-color, opacity;
+  transition-duration: 0.25s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.artist.wrapper:not(.placeholder) > .container:hover > .artist.cover:after
+{
+  background-color: var(--color-2);
+  opacity: 0.35;
 }
 
 .artist.cover,
@@ -96,8 +105,6 @@
   top: 0;
   width: 100%;
   height: 100%;
-
-  user-select: none;
 
   font-family: Montserrat, sans-serif;
   font-weight: 700;
@@ -151,7 +158,7 @@
   overflow-y: overlay;
 
   transition-property: top;
-  transition-duration: 0.5s;
+  transition-duration: 0.35s;
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
@@ -175,6 +182,7 @@
   pointer-events: all;
   overflow: hidden;
   user-select: none;
+
   padding: 3%;
 
   font-family: Montserrat, sans-serif;
@@ -409,6 +417,7 @@
 .artist.placeholder > .container
 {
   background-color: var(--color-4);
+  cursor: default;
 }
 
 .artist.placeholder > .container > .card > .title,
@@ -427,8 +436,6 @@
 
 .artist.placeholder > .container:after
 {
-  z-index: 2;
-
   content: "";
   display: block;
 
@@ -439,8 +446,6 @@
   top: 0;
   width: 100%;
   height: 100%;
-
-  animation: placeholder-animation 1s linear infinite;
 }
 
 /* Font Sizes */
