@@ -11,6 +11,7 @@ html
   --color-8: #929493;
 
   --color-9: #E6E6E6;
+  --color-10: palevioletred;
 
   --holder-1: rgba(0, 0, 0, 0.5);
 
@@ -122,7 +123,7 @@ body
   z-index: -2;
   position: absolute;
 
-  background-color: palevioletred;
+  background-color: var(--color-10);
 
   left: 0;
   width: 100%;

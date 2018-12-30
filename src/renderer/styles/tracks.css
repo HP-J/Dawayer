@@ -18,6 +18,7 @@
   flex-wrap: wrap;
   justify-content: center;
 
+  width: 90%;
   height: auto;
 
   margin: 0% 5%;
@@ -194,6 +195,19 @@
   top: 0;
   width: 100%;
   height: 100%;
+}
+
+/* Styles Inside Artist Overlay */
+
+.artistOverlay.container > .tracks.container
+{
+  width: 100%;
+  margin: 0;
+}
+
+.artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder)
+{
+  box-shadow: 0px 0px 40px -8px var(--color-5);
 }
 
 /* Font Sizes */

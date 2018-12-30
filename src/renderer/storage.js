@@ -261,7 +261,7 @@ export function scanCacheAudioFiles()
                       !storage.artists[artists[i]].albums[title] &&
                       metadata.common.albumartist === artists[i]
                     )
-                      storage.artists[artists[i]].albums.push(title);
+                      storage.artists[artists[i]].albums.push(metadata.common.album);
                     else
                       storage.artists[artists[i]].tracks.push(title);
                   }
@@ -360,7 +360,9 @@ function updateAlbumElement(placeholder, options)
     placeholder.classList.remove('placeholder');
 
   if (options.picture)
+  {
     placeholder.querySelector('.album.cover').style.backgroundImage = `url(${options.picture})`;
+  }
 
   if (options.title)
     placeholder.querySelector('.album.title').innerText = options.title;
@@ -390,6 +392,8 @@ function updateAlbumElement(placeholder, options)
       }
     }
   }
+
+  placeholder.dispatchEvent(new Event('albumItemUpdate'));
 }
 
 /** @param  { Storage } storage
@@ -460,6 +464,12 @@ function appendArtistPlaceholder()
 
   const overlayBio = createElement('.artistOverlay.bio');
 
+  const albumsText = createElement('.artistOverlay.text.albums')
+  const albumsContainer = createElement('.albums.container');
+
+  const tracksText = createElement('.artistOverlay.text.tracks')
+  const tracksContainer = createElement('.tracks.container');
+
   placeholderWrapper.appendChild(placeholderContainer);
   placeholderWrapper.appendChild(overlayBackground);
   placeholderWrapper.appendChild(overlayWrapper);
@@ -482,13 +492,19 @@ function appendArtistPlaceholder()
 
   overlayContainer.appendChild(overlayBio);
 
+  overlayContainer.appendChild(albumsText);
+  overlayContainer.appendChild(albumsContainer);
+
+  overlayContainer.appendChild(tracksText);
+  overlayContainer.appendChild(tracksContainer);
+
   artistsContainer.appendChild(placeholderWrapper);
 
   return placeholderWrapper;
 }
 
 /** @param { HTMLDivElement } placeholder
-* @param { { picture: string, title: string, bio: string, albums: string[], tracks: string[] } } options
+* @param { { picture: string, title: string, bio: string, albums: string[], tracks: string[], storage: Storage } } options
 */
 function updateArtistElement(placeholder, options)
 {
@@ -521,21 +537,72 @@ function updateArtistElement(placeholder, options)
   {
     const stats = placeholder.querySelector('.artist.stats');
 
+    const albumsText = placeholder.querySelector('.text.albums');
+    const albumsContainer = placeholder.querySelector('.albums.container');
+
+    const tracksText = placeholder.querySelector('.text.tracks');
+    const tracksContainer = placeholder.querySelector('.tracks.container');
+
     stats.innerText = '';
+
+    albumsText.innerText = '';
+    tracksText.innerText = '';
 
     if (options.albums.length > 0)
     {
+      removeAllChildren(albumsContainer);
+
       stats.innerText =
       `${options.albums.length} Album${(options.albums.length > 1) ? 's' : ''}`;
+
+      albumsText.innerText = 'Albums';
+
+      for (let i = 0; i < options.albums.length; i++)
+      {
+        const album = options.storage.albums[options.albums[i]];
+        let clone = album.element.cloneNode(true);
+
+        album.element.addEventListener('albumItemUpdate', () =>
+        {
+          const newClone = album.element.cloneNode(true);
+
+          albumsContainer.replaceChild(newClone, clone);
+
+          clone = newClone;
+        });
+
+        albumsContainer.appendChild(clone);
+      }
     }
 
     if (options.tracks.length > 0)
     {
+      removeAllChildren(tracksContainer);
+
       if (stats.innerText.length > 0)
         stats.innerText = stats.innerText + ' | ';
 
       stats.innerText = stats.innerText +
       `${options.tracks.length} Track${(options.tracks.length > 1) ? 's' : ''}`;
+
+      tracksText.innerText = 'Tracks';
+
+      for (let i = 0; i < options.tracks.length; i++)
+      {
+        const track = options.storage.tracks[options.tracks[i]];
+        let clone = track.element.cloneNode(true);
+
+        track.element.addEventListener('trackItemUpdate', () =>
+        {
+          const newClone = track.element.cloneNode(true);
+
+          tracksContainer.replaceChild(newClone, clone);
+
+          clone = newClone;
+        });
+
+        tracksContainer.appendChild(clone);
+      }
     }
   }
 }
@@ -567,7 +634,8 @@ function appendArtistsPageItems(storage)
         title: artists[i],
         bio: 'Dina El Wedidi (Arabic: دينا الوديدي‎, born 1 October 1987), is an Egyptian singer, composer, guitarist, Daf player, actress, and storyteller.[1] Dina has been known as the lead performer of an ensemble of musicians who have performed extensively in the past 2 years, fusing local and global styles of music.',
         albums: storage.artists[artists[i]].albums,
-        tracks: storage.artists[artists[i]].tracks
+        tracks: storage.artists[artists[i]].tracks,
+        storage: storage
       });
 
       if (!loadArtistImage)
@@ -630,6 +698,8 @@ function updateTracksElement(placeholder, options)
 
   if (options.duration)
     placeholder.querySelector('.track.duration').innerText = options.duration;
+
+  placeholder.dispatchEvent(new Event('trackItemUpdate'));
 }
 
 /** @param  { Storage } storage
@@ -675,8 +745,8 @@ function appendTracksPageItems(storage)
 function appendItems(storage)
 {
   appendAlbumsPageItems(storage);
-  appendArtistsPageItems(storage);
   appendTracksPageItems(storage);
+  appendArtistsPageItems(storage);
 }
 
 /** @param { HTMLElement } element
