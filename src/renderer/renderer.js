@@ -483,8 +483,10 @@ function muteVolume()
 {
   if (!volumeButton.classList.contains('muted'))
     volumeControl(0);
+  else if (lastRememberedVolume === 0 || 0.15 >= lastRememberedVolume)
+    volumeControl(0.15);
   else
-    volumeControl(lastRememberedVolume || 1);
+    volumeControl(lastRememberedVolume);
 }
 
 /** @param { number } highlightedPercentage

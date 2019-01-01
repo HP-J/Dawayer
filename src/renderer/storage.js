@@ -464,10 +464,10 @@ function appendArtistPlaceholder()
 
   const overlayBio = createElement('.artistOverlay.bio');
 
-  const albumsText = createElement('.artistOverlay.text.albums')
+  const albumsText = createElement('.artistOverlay.text.albums');
   const albumsContainer = createElement('.albums.container');
 
-  const tracksText = createElement('.artistOverlay.text.tracks')
+  const tracksText = createElement('.artistOverlay.text.tracks');
   const tracksContainer = createElement('.tracks.container');
 
   placeholderWrapper.appendChild(placeholderContainer);

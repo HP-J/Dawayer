@@ -77,11 +77,24 @@
 
   position: relative;
   align-self: center;
-  
-  background-color: black;
+
+  background-color: transparent;
 
   width: calc(3.5vw + 5vh);
   height: 70%;
+
+  filter: drop-shadow(0px 0px 0px var(--holder-3));
+
+  transition-property: filter;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.playButton:hover, .previousButton:hover, .nextButton:hover,
+.rewindButton:hover, .forwardButton:hover, .shuffleButton:hover,
+.repeatButton:hover, .volumeButton:hover
+{
+  filter: drop-shadow(0px 0px 12px var(--holder-3));
 }
 
 .playButton:hover > * > .icon > *, .previousButton:hover > .icon > *, .nextButton:hover > .icon > *,
@@ -156,7 +169,7 @@
   height: 25%;
 
   user-select: none;
-  
+
   font-family: Montserrat, sans-serif;
   font-size: calc(4px + 0.35vw + 0.5vh);
   font-weight: 700;

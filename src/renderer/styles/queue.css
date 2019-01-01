@@ -8,14 +8,18 @@
   grid-template-columns: 20% 1fr;
   grid-template-rows: 1fr 1fr;
   grid-template-areas: "cover artist" "cover title";
+  grid-column-gap: 3%;
 
-  background-color: purple;
+  background-color: var(--color-8);
 
   user-select: none;
   overflow: hidden;
 
-  width: 100%;
+  max-height: 42px;
+  width: 97%;
   height: 9vh;
+
+  padding-right: 3%;
 
   font-family: Montserrat, sans-serif;
   font-weight: 400;
@@ -36,8 +40,6 @@
 
   white-space: pre-line;
   overflow: hidden;
-
-  padding: 0px 1.5%;
 }
 
 .queue.playing.artist
@@ -72,6 +74,14 @@
 .queue.tracks
 {
   grid-area: tracks;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.queue.tracks:hover
+{
+  overflow-y: overlay;
 }
 
 .queueItem.container
@@ -82,7 +92,7 @@
   grid-template-rows: 50% 50%;
   grid-template-areas: "index artist" "index title";
 
-  background-color: red;
+  background-color: transparent;
 
   overflow: hidden;
   user-select: none;
@@ -101,8 +111,6 @@
   display: flex;
   align-items: center;
 
-  color: var(--color-4);
-
   font-weight: 700;
 }
 
@@ -112,20 +120,27 @@
 
   display: flex;
   align-items: flex-end;
-
-  white-space: pre-line;
-
-  color: var(--color-4);
 }
 
 .queueItem.title
 {
   grid-area: title;
 
+  font-weight: 900;
+}
+
+.queueItem.index,
+.queueItem.artist,
+.queueItem.title
+{
   white-space: pre-line;
 
   color: var(--color-4);
-  font-weight: 900;
+}
+
+.queueItem.container.played
+{
+  color: var(--holder-2);
 }
 
 /* Font Sizes */
@@ -207,13 +222,13 @@
   .queueItem.artist,
   .queue.playing.artist
   {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .queueItem.title,
   .queue.playing.title
   {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .queue.text

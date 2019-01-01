@@ -8,12 +8,16 @@ html
   --color-5: black;
   --color-6: #806969;
   --color-7: #7fffd4;
-  --color-8: #929493;
+  --color-8: #964141;
 
   --color-9: #E6E6E6;
   --color-10: palevioletred;
+  --color-11: #5d4037;
+  --color-12: #4C3731;
 
   --holder-1: rgba(0, 0, 0, 0.5);
+  --holder-2: rgba(255, 255, 255, 0.5);
+  --holder-3: #336947;
 
   --gradient-1 : linear-gradient(to left, transparent 0%, rgba(204, 202, 202, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
 }
@@ -86,8 +90,6 @@ body
 
 .page.container
 {
-  background-color: green;
-
   min-width: 0;
   min-height: 0;
   width: 80%;
@@ -149,8 +151,6 @@ body
 .page.playing
 {
   grid-area: playing;
-
-  background-color: transparent;
 }
 
 .page.local
@@ -161,8 +161,6 @@ body
 .page.options
 {
   grid-area: options;
-
-  background-color: darkorange;
 }
 
 .page.extended.local

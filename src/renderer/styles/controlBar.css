@@ -59,7 +59,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
 
-  background-color: gold;
+  background-color: transparent;
 
   max-width: 660px;
   width: 58.5%;
@@ -75,10 +75,11 @@
   grid-template-columns: 1fr;
   grid-template-rows: auto 5% 1fr;
   grid-template-areas: "playing playing" "text text" "tracks tracks";
+  grid-row-gap: 1%;
 
   align-self: flex-end;
 
-  background-color: rgba(255, 217, 0, 0.308);
+  background-color: var(--color-1);
 
   bottom: -153%;
 
@@ -112,8 +113,6 @@
   {
     align-self: flex-start;
 
-    background-color: yellow;
-
     max-width: 595px;
     width: 100%;
     height: 60%;
@@ -124,7 +123,7 @@
     position: absolute;
 
     max-width: 450px;
-    bottom: -180%;
+    bottom: -185%;
     width: 75%;
   }
 

@@ -44,7 +44,7 @@
   overflow: hidden;
   user-select: none;
 
-  box-shadow: 0px 0px 0px 0px var(--color-5);
+  box-shadow: 0px 0px 0px 0px var(--color-2);
 
   transition-property: box-shadow;
   transition-duration: 0.5s;
@@ -53,7 +53,7 @@
 
 .artist.wrapper:not(.placeholder) > .container:hover
 {
-  box-shadow: 0px 0px 20px 0px var(--color-5);
+  box-shadow: 0px 0px 20px 0px var(--color-2);
 }
 
 .artist.cover
