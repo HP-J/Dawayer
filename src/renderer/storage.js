@@ -1,15 +1,21 @@
 import { remote } from 'electron';
 
-import { existsSync, exists, stat, writeJson, readJSON, readdir } from 'fs-extra';
+import { existsSync, exists, stat, move, writeJson, readJSON, readdir } from 'fs-extra';
 
 import { join, dirname, basename, extname } from 'path';
-import { homedir, platform } from 'os';
+import { homedir, tmpdir, platform } from 'os';
 
-import { parseFile as getMetadata } from 'music-metadata';
 import * as settings from 'electron-json-config';
 
+/** @type {{ download: (win: Electron.BrowserWindow, url: string, options: { saveAs: boolean, directory: string, filename: string, openFolderWhenDone: boolean, showBadge: boolean, onStarted: (item: Electron.DownloadItem) => void, onProgress: (percentage: number) => void, onCancel: () => void }) => Promise<Electron.DownloadItem> }}
+*/
+const { download: dl  } = remote.require('electron-dl');
+
+import { parseFile as getMetadata } from 'music-metadata';
+import getWiki from 'wikijs';
+
 import { createElement, createIcon } from './renderer.js';
-import { appendDirectoryNode } from './options.js';
+import { mainWindow, appendDirectoryNode } from './options.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -22,15 +28,21 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 /** @typedef { Object } Storage
 * @property { Object<string, {  artist: string, tracks: string[], duration: number, element: HTMLDivElement }> } albums
-* @property { Object<string, { tracks: string[], albums: string[], element: HTMLDivElement }> } artists
+* @property { Object<string, { tracks: string[], albums: string[], bio: string, pictureUrl: string, element: HTMLDivElement }> } artists
 * @property { Object<string, { url: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
 
 const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
 
+/* the base directory for the app config files
+*/
+const configDir = dirname(settings.file());
+
 /**  @type { string }
 */
 let missingPicture;
+
+const wiki = getWiki();
 
 /**  @type { HTMLDivElement }
 */
@@ -116,9 +128,6 @@ export function initStorage()
   // and then re-scanning
 
   missingPicture = join(__dirname, '../../missing.png');
-
-  // the base directory for the app config files
-  const configDir = dirname(settings.file());
 
   storageInfoConfig = join(configDir, '/storageInfo.json');
   storageConfig = join(configDir, '/storage.json');
@@ -212,6 +221,13 @@ export function scanCacheAudioFiles()
 
                 const title = basename(file, extname(file));
 
+                // store the track important metadata
+                storage.tracks[title] = {
+                  url: file,
+                  artists: metadata.common.artists,
+                  duration: metadata.format.duration
+                };
+
                 // if the track belongs in an album
                 if (metadata.common.album)
                 {
@@ -267,12 +283,26 @@ export function scanCacheAudioFiles()
                   }
                 }
 
-                // store the track important metadata
-                storage.tracks[title] = {
-                  url: file,
-                  artists: metadata.common.artists,
-                  duration: metadata.format.duration
-                };
+                if (metadata.common.artists.length > 0)
+                  return metadata.common.artists;
+              })
+              // cache and store info like pictures, bio about the artists form Wikipedia
+              .then(artists =>
+              {
+                if (!artists)
+                  return;
+
+                return new Promise((resolve) =>
+                {
+                  const promises = [];
+
+                  for (let i = 0; i < artists.length; i++)
+                  {
+                    promises.push(cacheArtist(artists[i], storage));
+                  }
+
+                  Promise.all(promises).then(resolve);
+                });
               }));
         }
       }
@@ -318,6 +348,33 @@ function isStorageOld(date)
   // then that means it's been more than two days since the last time
   // storage been cached
   return (now.getTime() >= date.getTime());
+}
+
+/** @param { string } artist
+* @param { Storage } storage
+*/
+function cacheArtist(artist, storage)
+{
+  return new Promise((resolve) =>
+  {
+    const promises = [];
+
+    wiki.search(artist, 1)
+      .then(search =>
+      {
+        if (search.results.length <= 0)
+          return;
+
+        return wiki.page(search.results[0]);
+      })
+      .then(page =>
+      {
+        promises.push(page.summary().then(summary => storage.artists[artist].bio = summary));
+        promises.push(page.mainImage().then(imageUrl => storage.artists[artist].pictureUrl = imageUrl));
+
+        Promise.all(promises).then(resolve);
+      });
+  });
 }
 
 function appendAlbumPlaceholder()
@@ -618,41 +675,45 @@ function appendArtistsPageItems(storage)
 
   for (let i = 0; i < artists.length; i++)
   {
+    const artistPicture = join(configDir, artists[i]);
     const placeholder = appendArtistPlaceholder();
 
     const img = new Image();
 
-    // TODO using wiki.js pull artist picture and short bio
     img.src = missingPicture;
-
-    let loadArtistImage = false;
 
     img.onload = () =>
     {
       updateArtistElement(placeholder, {
         picture: img.src,
         title: artists[i],
-        bio: 'Dina El Wedidi (Arabic: دينا الوديدي‎, born 1 October 1987), is an Egyptian singer, composer, guitarist, Daf player, actress, and storyteller.[1] Dina has been known as the lead performer of an ensemble of musicians who have performed extensively in the past 2 years, fusing local and global styles of music.',
+        bio: storage.artists[artists[i]].bio,
         albums: storage.artists[artists[i]].albums,
         tracks: storage.artists[artists[i]].tracks,
         storage: storage
       });
-
-      if (!loadArtistImage)
-      {
-        loadArtistImage = true;
-
-        img.src = join(__dirname, '../../test-materials/Dina.jpg');
-      }
     };
 
-    // const track = storage.tracks[storage.artists[artists[i]].tracks[0]] || storage.tracks[storage.artists[artists[i]].albums[0]];
-
-    // getMetadata(track.url)
-    //   .then(metadata =>
-    //   {
-    //     img.src = toBase64(metadata.common.picture[0]);
-    //   });
+    // if image for the artist exists
+    exists(artistPicture).then((exists) =>
+    {
+      // if it does load it
+      if (exists)
+      {
+        img.src = artistPicture;
+      }
+      // else download/cache one form Wikipedia then load it
+      else if (storage.artists[artists[i]].pictureUrl)
+      {
+        dl(mainWindow, storage.artists[artists[i]].pictureUrl, {
+          directory: tmpdir(),
+          filename: artists[i],
+          showBadge: false
+        })
+          .then(() => move(join(tmpdir(), artists[i]), join(configDir, artists[i])))
+          .then(() => img.src = artistPicture);
+      }
+    });
   }
 }
 
