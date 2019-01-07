@@ -64,7 +64,7 @@ function scrollTo(element, options)
 
   if (options.direction === 'horizontal')
   {
-    scrollLocation = element.scrollWidth * index;
+    scrollLocation = Math.round(element.getBoundingClientRect().width) * index;
     scrollStartPosition = element.parentElement.scrollLeft;
 
     // the location of the element - the current scroll position
@@ -74,7 +74,7 @@ function scrollTo(element, options)
   }
   else
   {
-    scrollLocation = element.scrollHeight * index;
+    scrollLocation = Math.round(element.getBoundingClientRect().height) * index;
     scrollStartPosition = element.parentElement.scrollTop;
 
     // the location of the element - the current scroll position

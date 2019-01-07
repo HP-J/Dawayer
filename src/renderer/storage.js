@@ -1,6 +1,6 @@
 import { remote } from 'electron';
 
-import { existsSync, exists, stat, move, writeJson, readJSON, readdir } from 'fs-extra';
+import { existsSync, exists, stat, move, remove, writeJson, readJSON, readdir } from 'fs-extra';
 
 import { join, dirname, basename, extname } from 'path';
 import { homedir, tmpdir, platform } from 'os';
@@ -197,67 +197,41 @@ export function scanCacheAudioFiles()
 
   return new Promise((resolve) =>
   {
-    // walk through all the listed audio directories
-    walk(audioDirectories).then((files) =>
+    remove(join(configDir, 'cache')).then(() =>
     {
-      const promises = [];
-
-      // loop through all files in the audio directories
-      for (let i = 0; i < files.length; i++)
+      // walk through all the listed audio directories
+      walk(audioDirectories).then((files) =>
       {
-        const file = files[i];
+        const promises = [];
 
-        // if the file matches any of those supported audio extensions
-        if (file.match(AUDIO_EXTENSIONS_REGEX))
+        // loop through all files in the audio directories
+        for (let i = 0; i < files.length; i++)
         {
-          promises.push(
-            // parse the file for the metadata
-            getMetadata(file, { duration: true })
-              .then((metadata) =>
-              {
-                // using the metadata fill
-                // the storage object and cache it to the
-                // hard disk
+          const file = files[i];
 
-                const title = basename(file, extname(file));
-
-                // store the track important metadata
-                storage.tracks[title] = {
-                  url: file,
-                  artists: metadata.common.artists,
-                  duration: metadata.format.duration
-                };
-
-                // if the track belongs in an album
-                if (metadata.common.album)
+          // if the file matches any of those supported audio extensions
+          if (file.match(AUDIO_EXTENSIONS_REGEX))
+          {
+            promises.push(
+              // parse the file for the metadata
+              getMetadata(file, { duration: true })
+                .then((metadata) =>
                 {
-                  // if the track's album is in the storage object already
-                  if (storage.albums[metadata.common.album])
-                  {
-                    // push the new track to the album's list
-                    storage.albums[metadata.common.album].tracks.push(title);
+                  // using the metadata fill
+                  // the storage object and cache it to the
+                  // hard disk
 
-                    // add the track's duration to the overall album duration
-                    storage.albums[metadata.common.album].duration =
-                      storage.albums[metadata.common.album].duration +
-                      metadata.format.duration;
-                  }
-                  else
-                  {
-                    // add the album to the storage object
-                    storage.albums[metadata.common.album] = {
-                      artist: metadata.common.albumartist,
-                      tracks: [ title ],
-                      duration: metadata.format.duration
-                    };
-                  }
-                }
+                  const title = metadata.common.title || basename(file, extname(file));
+                  const artists = metadata.common.artists || [ 'Unknown Artist' ];
 
-                // if the track has a known artist
-                if (metadata.common.artists)
-                {
-                  const artists = metadata.common.artists;
+                  // store the track important metadata
+                  storage.tracks[title] = {
+                    url: file,
+                    artists: artists,
+                    duration: metadata.format.duration
+                  };
 
+                  // store the artist
                   for (let i = 0; i < artists.length; i++)
                   {
                     // if the artist isn't in the storage object yet
@@ -273,50 +247,82 @@ export function scanCacheAudioFiles()
                     // if the track does belong in an album and
                     // the album isn't added to the artist yet, and
                     // the album's artist is the same as the track's artist
-                    if (metadata.common.album &&
-                      !storage.artists[artists[i]].albums[title] &&
-                      metadata.common.albumartist === artists[i]
-                    )
-                      storage.artists[artists[i]].albums.push(metadata.common.album);
-                    else
+                    if (metadata.common.album && metadata.common.albumartist === artists[i])
+                    {
+                      if (!storage.artists[artists[i]].albums.includes(metadata.common.album))
+                        storage.artists[artists[i]].albums.push(metadata.common.album);
+                    }
+                    else if (!storage.artists[artists[i]].tracks.includes(title))
                       storage.artists[artists[i]].tracks.push(title);
                   }
-                }
 
-                if (metadata.common.artists.length > 0)
-                  return metadata.common.artists;
-              })
-              // cache and store info like pictures, bio about the artists form Wikipedia
-              .then(artists =>
-              {
-                if (!artists)
-                  return;
-
-                return new Promise((resolve) =>
-                {
-                  const promises = [];
-
-                  for (let i = 0; i < artists.length; i++)
+                  // if the track belongs in an album, store the album
+                  if (metadata.common.album)
                   {
-                    promises.push(cacheArtist(artists[i], storage));
+                    const album = metadata.common.album;
+
+                    // if the track's album is in the storage object already
+                    if (storage.albums[album])
+                    {
+                      // push the new track to the album's list
+                      storage.albums[album].tracks.push(title);
+
+                      // add the track's duration to the overall album duration
+                      storage.albums[album].duration =
+                        storage.albums[album].duration +
+                        metadata.format.duration;
+                    }
+                    else
+                    {
+                      // add the album to the storage object
+                      storage.albums[album] = {
+                        artist: metadata.common.albumartist || 'Unknown Artist',
+                        tracks: [ title ],
+                        duration: metadata.format.duration
+                      };
+                    }
                   }
 
-                  Promise.all(promises).then(resolve);
-                });
-              }));
+                  // if there's a known artist, then get and store som information about them
+                  // from Wikipeida
+                  if (metadata.common.artists && metadata.common.artists.length > 0)
+                  {
+                    return metadata.common.artists;
+                  }
+                })
+                // cache and store info like pictures, bio about the artists form Wikipedia
+                .then(artists =>
+                {
+                  if (!artists)
+                    return;
+
+                  return new Promise((resolve) =>
+                  {
+                    const promises = [];
+
+                    for (let i = 0; i < artists.length; i++)
+                    {
+                      if (!storage.artists[artists[i]].cachedWikiInfo)
+                        promises.push(cacheArtist(artists[i], storage));
+                    }
+
+                    Promise.all(promises).then(resolve);
+                  });
+                }));
+          }
         }
-      }
 
-      // when all files are parsed and added to the storage object
-      // fill the storage info, then cache them,
-      // then resolve this promise
-      Promise.all(promises).then(() =>
-      {
-        const storageInfo = {
-          date: Date.now()
-        };
+        // when all files are parsed and added to the storage object
+        // fill the storage info, then cache them,
+        // then resolve this promise
+        Promise.all(promises).then(() =>
+        {
+          const storageInfo = {
+            date: Date.now()
+          };
 
-        resolve({ storageInfo, storage });
+          resolve({ storageInfo, storage });
+        });
       });
     });
   });
@@ -350,27 +356,35 @@ function isStorageOld(date)
   return (now.getTime() >= date.getTime());
 }
 
-/** @param { string } artist
+/** adds a summary and a picture url for an artist to the storage object
+* @param { string } artist
 * @param { Storage } storage
 */
 function cacheArtist(artist, storage)
 {
+  // set a boolean to stop caching for every track from the same artist
+  storage.artists[artist].cachedWikiInfo = true;
+
   return new Promise((resolve) =>
   {
     const promises = [];
 
-    wiki.search(artist, 1)
+    wiki.search(artist)
       .then(search =>
       {
-        if (search.results.length <= 0)
-          return;
-
-        return wiki.page(search.results[0]);
+        for (let i = 0; i < search.results.length; i++)
+        {
+          if (search.results[i].indexOf(artist) > -1)
+            return wiki.page(search.results[i]);
+        }
       })
       .then(page =>
       {
-        promises.push(page.summary().then(summary => storage.artists[artist].bio = summary));
-        promises.push(page.mainImage().then(imageUrl => storage.artists[artist].pictureUrl = imageUrl));
+        if (page)
+        {
+          promises.push(page.summary().then(summary => storage.artists[artist].bio = summary));
+          promises.push(page.mainImage().then(imageUrl => storage.artists[artist].pictureUrl = imageUrl));
+        }
 
         Promise.all(promises).then(resolve);
       });
@@ -453,7 +467,7 @@ function updateAlbumElement(placeholder, options)
   placeholder.dispatchEvent(new Event('albumItemUpdate'));
 }
 
-/** @param  { Storage } storage
+/** @param { Storage } storage
 */
 function appendAlbumsPageItems(storage)
 {
@@ -491,7 +505,8 @@ function appendAlbumsPageItems(storage)
     getMetadata(track.url)
       .then(metadata =>
       {
-        img.src = toBase64(metadata.common.picture[0]);
+        if (metadata.common.picture && metadata.common.picture.length > 0)
+          img.src = toBase64(metadata.common.picture[0]);
       });
   }
 }
@@ -617,18 +632,14 @@ function updateArtistElement(placeholder, options)
       for (let i = 0; i < options.albums.length; i++)
       {
         const album = options.storage.albums[options.albums[i]];
-        let clone = album.element.cloneNode(true);
+        const clone = album.element.cloneNode(true);
+
+        albumsContainer.appendChild(clone);
 
         album.element.addEventListener('albumItemUpdate', () =>
         {
-          const newClone = album.element.cloneNode(true);
-
-          albumsContainer.replaceChild(newClone, clone);
-
-          clone = newClone;
+          clone.innerHTML = album.element.innerHTML;
         });
-
-        albumsContainer.appendChild(clone);
       }
     }
 
@@ -647,18 +658,14 @@ function updateArtistElement(placeholder, options)
       for (let i = 0; i < options.tracks.length; i++)
       {
         const track = options.storage.tracks[options.tracks[i]];
-        let clone = track.element.cloneNode(true);
+        const clone = track.element.cloneNode(true);
+
+        tracksContainer.appendChild(clone);
 
         track.element.addEventListener('trackItemUpdate', () =>
         {
-          const newClone = track.element.cloneNode(true);
-
-          tracksContainer.replaceChild(newClone, clone);
-
-          clone = newClone;
+          clone.innerHTML = track.element.innerHTML;
         });
-
-        tracksContainer.appendChild(clone);
       }
     }
   }
@@ -675,7 +682,7 @@ function appendArtistsPageItems(storage)
 
   for (let i = 0; i < artists.length; i++)
   {
-    const artistPicture = join(configDir, artists[i]);
+    const artistPicture = join(configDir, 'cache', artists[i]);
     const placeholder = appendArtistPlaceholder();
 
     const img = new Image();
@@ -710,7 +717,7 @@ function appendArtistsPageItems(storage)
           filename: artists[i],
           showBadge: false
         })
-          .then(() => move(join(tmpdir(), artists[i]), join(configDir, artists[i])))
+          .then(() => move(join(tmpdir(), artists[i]), artistPicture))
           .then(() => img.src = artistPicture);
       }
     });
@@ -796,7 +803,8 @@ function appendTracksPageItems(storage)
     getMetadata(track.url)
       .then(metadata =>
       {
-        img.src = toBase64(metadata.common.picture[0]);
+        if (metadata.common.picture && metadata.common.picture.length > 0)
+          img.src = toBase64(metadata.common.picture[0]);
       });
   }
 }

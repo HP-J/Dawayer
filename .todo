@@ -1,9 +1,9 @@
 main:
   ☐ check different tracks with different metadata to find issues with the cache code
 
+  ☐ playback options section to change rewind and forward timings
   ☐ about tab that also doubles as a the auto-update visuals
   ☐ theme options section to change the tray color and the application colors
-  ☐ playback options section to change rewind and forward timings
 
 graphics:
 

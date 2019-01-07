@@ -14,6 +14,7 @@ html
   --color-10: palevioletred;
   --color-11: #5d4037;
   --color-12: #4C3731;
+  --color-13: #101010;
 
   --holder-1: rgba(0, 0, 0, 0.5);
   --holder-2: rgba(255, 255, 255, 0.5);
@@ -106,15 +107,15 @@ body
   z-index: -2;
   position: absolute;
 
-  background-color: var(--color-1);
-  background-image: url(../../../test-materials/Dina1.jpeg);
+  background-color: var(--color-13);
+  background-image: url(../../../missing.png);
   background-position: center;
   background-size: cover;
 
   width: 100%;
   height: 100%;
 
-  filter: blur(6px);
+  filter: blur(5px);
   transform: scale(1.05);
 
   pointer-events: none;

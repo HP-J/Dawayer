@@ -29,6 +29,7 @@
 {
   grid-area: cover;
 
+  background-image: url(../../../missing.png);
   background-size: cover;
   background-position: center;
 }
@@ -138,7 +139,9 @@
   color: var(--color-4);
 }
 
-.queueItem.container.played
+.queueItem.container.played > .index,
+.queueItem.container.played > .artist,
+.queueItem.container.played > .title
 {
   color: var(--holder-2);
 }
