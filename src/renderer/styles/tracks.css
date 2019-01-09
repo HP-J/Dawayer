@@ -31,7 +31,7 @@
   max-height: 48px;
   max-width: 600px;
   width: 85%;
-  height: 9vh;
+  height: 10vh;
 
   margin: 1%;
 
@@ -49,13 +49,7 @@
 .track.container
 {
   position: relative;
-  display: grid;
-
-  grid-template-columns: 20% 1fr auto;
-  grid-template-rows: 50% 50%;
-  grid-template-areas: "cover artist duration" "cover title duration";
-
-  grid-column-gap: 1.5%;
+  display: flex;
 
   background-color: var(--color-4);
 
@@ -63,11 +57,10 @@
   overflow: hidden;
   user-select: none;
 
-  width: 98.5%;
+  width: 100%;
   height: 100%;
 
   box-shadow: 0px 0px 0px 0px var(--holder-2);
-  padding-right: 1.5%;
 
   transition-property: box-shadow;
   transition-duration: 0.25s;
@@ -82,13 +75,27 @@
 .track.cover
 {
   grid-area: cover;
-  position: relative;
 
   background-size: cover;
   background-position: center;
 
-  top: -5%;
-  height: 110%;
+  width: 20%;
+  height: 100%;
+}
+
+.track.card
+{
+  display: grid;
+
+  flex-grow: 1;
+
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 50% 50%;
+  grid-template-areas: "artist duration" "title duration";
+
+  grid-column-gap: 1.5%;
+
+  margin: 1%;
 }
 
 .track.cover:after

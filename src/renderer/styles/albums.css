@@ -119,7 +119,7 @@
 {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: 80% 11% 9%;
+  grid-template-rows: 82% 9% 7%;
 
   grid-template-areas:
   "tracks tracks"
@@ -167,7 +167,7 @@
   grid-area: tracks;
 
   width: 100%;
-  height: 100%;
+  height: 97%;
 
   overflow-x: hidden;
   overflow-y: hidden;

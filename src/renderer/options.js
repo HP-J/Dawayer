@@ -1,11 +1,29 @@
 import { remote } from 'electron';
 
+import { join } from 'path';
+import { readJSON, existsSync } from 'fs-extra';
+
 import { createElement } from './renderer.js';
-import { initStorage, addNewDirectories, removeDirectory, scanCacheAudioFiles } from './storage.js';
+import { addNewDirectories, removeDirectory, scanCacheAudioFiles } from './storage.js';
+
+/** @typedef { Object } BuildData
+* @property { string } build
+* @property { string } branch
+* @property { string } commit
+* @property { string } date
+*/
+
+/**  @type { BuildData }
+*/
+let localData;
 
 /**  @type { HTMLDivElement }
 */
 const directoriesContainer = document.body.querySelector('.optionsItem.container.directories');
+
+/**  @type { HTMLDivElement }
+*/
+const aboutContainer = document.body.querySelector('.optionsItem.container.about');
 
 export const mainWindow = remote.getCurrentWindow();
 
@@ -13,7 +31,23 @@ export const mainWindow = remote.getCurrentWindow();
 */
 export function initOptions()
 {
-  initStorage();
+  const buildDataPath = join(__dirname, '../../build.json');
+
+  // read build.json
+  // then append about section in the options page
+  if (existsSync(buildDataPath))
+  {
+    readJSON(buildDataPath).then((data) =>
+    {
+      localData = data;
+
+      appendAbout();
+    });
+  }
+  else
+  {
+    appendAbout();
+  }
 }
 
 /** initialize the events for the options elements, like the add button in the audio directories panel
@@ -31,7 +65,7 @@ export function initOptionsEvents()
     );
   };
 
-  document.body.querySelector('.option.directories.add').onclick = () =>
+  document.body.querySelector('.option.directories.rescan').onclick = () =>
   {
     // ADD re-scan button functionality
     // scanCacheAudioFiles();
@@ -70,4 +104,53 @@ export function appendDirectoryNode(directory)
     directoriesContainer.children[1]);
 
   return container;
+}
+
+/** @param  { string } text
+*/
+function createAboutText(text)
+{
+  const element = document.createElement('div');
+
+  element.innerText = text;
+
+  element.classList.add('option', 'about', 'text');
+
+  return element;
+}
+
+function appendAbout()
+{
+  if (localData)
+  {
+    if (localData.branch)
+      aboutContainer.appendChild(createAboutText('Branch: ' + localData.branch));
+
+    if (localData.commit)
+      aboutContainer.appendChild(createAboutText('Commit: ' + localData.commit));
+
+    if (localData.package)
+      aboutContainer.appendChild(createAboutText(`Package (${localData.package})`));
+
+    if (localData.date)
+      aboutContainer.appendChild(createAboutText('Release Date: ' + localData.date));
+  }
+
+  if (process.versions.electron)
+    aboutContainer.appendChild(createAboutText('Electron: ' + process.versions.electron));
+
+  if (process.versions.chrome)
+    aboutContainer.appendChild(createAboutText('Chrome: ' + process.versions.chrome));
+
+  if (process.versions.node)
+    aboutContainer.appendChild(createAboutText('Node.js: ' + process.versions.node));
+
+  if (process.versions.v8)
+    aboutContainer.appendChild(createAboutText('V8: ' + process.versions.v8));
+
+  const checkElement = createElement('.option.about.check');
+
+  checkElement.innerText = 'Check for Updates';
+
+  aboutContainer.appendChild(checkElement);
 }

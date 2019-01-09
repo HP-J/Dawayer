@@ -1,23 +1,31 @@
+import { remote } from 'electron';
+
+import { join } from 'path';
+
 import tippy from 'tippy.js';
+import * as settings from 'electron-json-config';
 
 import scroll from './scroll.js';
 import { initOptions, initOptionsEvents } from './options.js';
+import { initStorage } from './storage.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
 
-//#region Variables
+// Variables
+
+const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 let resizeEndTimeout;
 
 let menuIsCollapsed = false;
 
-let rewindTime = 10;
-let forwardTime = 30;
+let rewindTime;
+let forwardTime;
 
 let seekTime = 0;
 
-let currentVolume = 0.75;
+let currentVolume;
 let lastRememberedVolume = 1;
 
 /**  @type { HTMLDivElement }
@@ -191,9 +199,7 @@ function changeLocalSubPage(index)
   scroll(selectedLocalSubPage, { direction: 'vertical' });
 }
 
-//#endregion
-
-//#region Init
+// Init
 
 function initEvents()
 {
@@ -212,14 +218,15 @@ function initEvents()
 
   // menu collapsing events
 
-  // Add the new sub-pages collapsing events
-
   menu.onmouseenter = () =>
   {
     expandMenu();
   };
 
-  albumsWrapper.onscroll = (event) =>
+  albumsWrapper.onscroll =
+  tracksWrapper.onscroll =
+  artistsWrapper.onscroll =
+  (event) =>
   {
     if (event.srcElement.scrollTop >= 20)
       collapseMenu();
@@ -366,22 +373,20 @@ function init()
   initOptionsEvents();
 
   initTippy();
+
+  initStorage();
 }
 
 function initPages()
 {
-  selectedPage = pagesContainer.children.item(1);
+  selectedPage = pagesContainer.children.item(2);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
   scroll(selectedPage, { duration: 0 });
 }
 
-//#endregion
-
-//#region Menu Collapsing
-
-// TODO add menu collapsing for all 3 sub-pages
+// Menu Collapsing
 
 function collapseMenu()
 {
@@ -410,9 +415,7 @@ function expandMenu()
   }
 }
 
-//#endregion
-
-//#region Controls
+// Controls
 
 function playPause()
 {
@@ -512,6 +515,12 @@ function seekControl(playedPercentage)
 */
 function changeRewindForwardTimings(rewind, forward)
 {
+  if (!isDebug && (rewindTime !== rewind || forwardTime !== forward))
+  {
+    settings.set('rewindTime', rewind);
+    settings.set('forwardTime', forward);
+  }
+
   rewindTime = rewind;
   forwardTime = forward;
 
@@ -524,13 +533,16 @@ function changeRewindForwardTimings(rewind, forward)
   forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
 }
 
-/** @param { number } playedPercentage
+/** @param { number } volumePercentage
 */
-function volumeControl(playedPercentage)
+function volumeControl(volumePercentage)
 {
-  playedPercentage = playedPercentage || 0;
+  volumePercentage = volumePercentage || 0;
 
-  if (playedPercentage !== 0)
+  if (!isDebug && volumePercentage !== currentVolume)
+    settings.set('currentVolume', volumePercentage);
+
+  if (volumePercentage !== 0)
   {
     if (volumeButton.classList.contains('muted'))
       volumeButton.classList.remove('muted');
@@ -542,14 +554,12 @@ function volumeControl(playedPercentage)
   }
 
   lastRememberedVolume = currentVolume;
-  currentVolume = playedPercentage;
+  currentVolume = volumePercentage;
 
   updateBarPercentage(volumeBar, currentVolume);
 }
 
-//#endregion
-
-//#region Callbacks
+// Callbacks
 
 /** scroll coordinates break on resizing the containers and need to be reset every time
 */
@@ -570,16 +580,24 @@ function onload()
 {
   initPages();
 
+  // ADD save and load seek-time and current track
+  // when playing a track load a metadata for it, don't try to use a storage info
+
   seekControl(seekTime);
   initBar(seekBar, seekShowTime, seekControl);
+
+  currentVolume = (isDebug) ? 0.75 : settings.get('currentVolume', 0.75);
 
   volumeControl(currentVolume);
   initBar(volumeBar, undefined, volumeControl);
 
-  resizeEnd();
+  rewindTime = (isDebug) ? 10 : settings.get('rewindTime', 10);
+  forwardTime = (isDebug) ? 30 : settings.get('forwardTime', 30);
 
-  // set values
   changeRewindForwardTimings(rewindTime, forwardTime);
+
+  // remove fast-forward class from the html body
+  resizeEnd();
 }
 
 function onresize()
@@ -599,9 +617,7 @@ function onresize()
   resizeEndTimeout = setTimeout(resizeEnd, 25);
 }
 
-//#endregion
-
-//#region API
+// API
 
 /** @param { string } classes
 */
@@ -639,6 +655,5 @@ export function createIcon(name, classes)
   return svg;
 }
 
-//#endregion
-
+// initialize the app
 init();

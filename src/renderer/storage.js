@@ -367,6 +367,7 @@ function cacheArtist(artist, storage)
 
   return new Promise((resolve) =>
   {
+    const regex = /[0-9a-zA-z\s]/g;
     const promises = [];
 
     wiki.search(artist)
@@ -374,7 +375,7 @@ function cacheArtist(artist, storage)
       {
         for (let i = 0; i < search.results.length; i++)
         {
-          if (search.results[i].indexOf(artist) > -1)
+          if (search.results[i].match(regex)[0].indexOf(artist.match(regex)[0]) > -1)
             return wiki.page(search.results[i]);
         }
       })
@@ -730,6 +731,8 @@ function appendTracksPlaceholder()
   const placeholderContainer = createElement('.track.container');
 
   const cover = createElement('.track.cover');
+  const card = createElement('.track.card');
+
   const artist = createElement('.track.artist');
   const title = createElement('.track.title');
   const duration = createElement('.track.duration');
@@ -737,9 +740,11 @@ function appendTracksPlaceholder()
   placeholderWrapper.appendChild(placeholderContainer);
 
   placeholderContainer.appendChild(cover);
-  placeholderContainer.appendChild(artist);
-  placeholderContainer.appendChild(title);
-  placeholderContainer.appendChild(duration);
+  placeholderContainer.appendChild(card);
+
+  card.appendChild(artist);
+  card.appendChild(title);
+  card.appendChild(duration);
 
   tracksContainer.appendChild(placeholderWrapper);
 

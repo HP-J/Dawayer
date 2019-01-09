@@ -107,7 +107,7 @@ body
   z-index: -2;
   position: absolute;
 
-  background-color: var(--color-13);
+  background-color: var(--color-2);
   background-image: url(../../../missing.png);
   background-position: center;
   background-size: cover;

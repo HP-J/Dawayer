@@ -55,12 +55,12 @@ function loadTrayIcon()
 
   const enabled = settings.get('trayIcon', true);
 
-  // TODO add option to change dark tray to light
-
   if (enabled)
   {
     const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-    const iconPath = join(__dirname, '../../tray-dark.png');
+
+    const color = settings.get('trayIconColor', 'dark');
+    const iconPath = join(__dirname, `../../tray-${color}.png`);
 
     if (!existsSync(iconPath))
       return;
