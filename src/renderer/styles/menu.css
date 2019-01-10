@@ -108,19 +108,19 @@
 
 /* Sub-Menu */
 
-.submenu.container
+.submenuContainer
 {
   padding: 0 1.5%;
 }
 
-.submenu.button
+.submenuButton
 {
   cursor: pointer;
 
   padding: 1.5% 0;
 }
 
-.submenu.button:hover
+.submenuButton:hover
 {
   color: var(--color-7);
 }

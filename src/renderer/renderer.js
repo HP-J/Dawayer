@@ -243,27 +243,27 @@ function initEvents()
 
   // sub-menu events
 
-  document.body.querySelector('.submenu.playing').onclick = () =>
+  document.body.querySelector('.submenuButton.playing').onclick = () =>
   {
     changePage(playingButton);
   };
 
-  document.body.querySelector('.submenu.albums').onclick = () =>
+  document.body.querySelector('.submenuButton.albums').onclick = () =>
   {
     changePage(localButton, () => changeLocalSubPage(-1));
   };
 
-  document.body.querySelector('.submenu.tracks').onclick = () =>
+  document.body.querySelector('.submenuButton.tracks').onclick = () =>
   {
     changePage(localButton, () => changeLocalSubPage(0));
   };
 
-  document.body.querySelector('.submenu.artists').onclick = () =>
+  document.body.querySelector('.submenuButton.artists').onclick = () =>
   {
     changePage(localButton, () => changeLocalSubPage(1));
   };
 
-  document.body.querySelector('.submenu.options').onclick = () =>
+  document.body.querySelector('.submenuButton.options').onclick = () =>
   {
     changePage(optionsButton);
   };
@@ -285,21 +285,21 @@ function initTippy()
   });
 
   tippy(playingButton, {
-    content: document.body.querySelector('.submenu.container.playing'),
+    content: document.body.querySelector('.submenuContainer.playing'),
     placement: 'bottom',
     interactive: true,
     arrow: true
   }).instances[0];
 
   tippy(localButton, {
-    content: document.body.querySelector('.submenu.container.local'),
+    content: document.body.querySelector('.submenuContainer.local'),
     placement: 'bottom',
     interactive: true,
     arrow: true
   }).instances[0];
 
   tippy(optionsButton, {
-    content: document.body.querySelector('.submenu.container.options'),
+    content: document.body.querySelector('.submenuContainer.options'),
     placement: 'bottom',
     interactive: true,
     arrow: true

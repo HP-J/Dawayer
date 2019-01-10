@@ -1,7 +1,6 @@
 import { Menu, Tray, app, nativeImage } from 'electron';
 
 import { join } from 'path';
-import { platform } from 'os';
 import { existsSync } from 'fs';
 
 import * as settings from 'electron-json-config';

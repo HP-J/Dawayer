@@ -15,10 +15,12 @@ html
   --color-11: #5d4037;
   --color-12: #4C3731;
   --color-13: #101010;
+  --color-14: #381e28;
 
   --holder-1: rgba(0, 0, 0, 0.5);
   --holder-2: rgba(255, 255, 255, 0.5);
   --holder-3: #336947;
+  --holder-4: #6f3131;
 
   --gradient-1 : linear-gradient(to left, transparent 0%, rgba(204, 202, 202, 0.5) 50%, rgba(255, 255, 255, 0) 100%);
 }
@@ -107,7 +109,7 @@ body
   z-index: -2;
   position: absolute;
 
-  background-color: var(--color-2);
+  background-color: var(--color-14);
   background-image: url(../../../missing.png);
   background-position: center;
   background-size: cover;
