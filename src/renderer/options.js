@@ -1,21 +1,32 @@
 import { remote } from 'electron';
 
-import { join } from 'path';
+import { join, dirname, basename, extname } from 'path';
 import { readJSON, existsSync } from 'fs-extra';
+import { homedir, tmpdir, platform } from 'os';
+
+import request from 'request-promise-native';
 
 import { createElement } from './renderer.js';
 import { addNewDirectories, removeDirectory, scanCacheAudioFiles } from './storage.js';
 
 /** @typedef { Object } BuildData
-* @property { string } build
 * @property { string } branch
 * @property { string } commit
 * @property { string } date
+* @property { string } package
 */
+
+/** @type {{ download: (win: Electron.BrowserWindow, url: string, options: { saveAs: boolean, directory: string, filename: string, openFolderWhenDone: boolean, showBadge: boolean, onStarted: (item: Electron.DownloadItem) => void, onProgress: (percentage: number) => void, onCancel: () => void }) => Promise<Electron.DownloadItem> }}
+*/
+const { download: dl  } = remote.require('electron-dl');
 
 /**  @type { BuildData }
 */
 let localData;
+
+/**  @type { HTMLDivElement }
+*/
+let checkElement;
 
 /**  @type { HTMLDivElement }
 */
@@ -121,6 +132,9 @@ function createAboutText(text)
 
 function appendAbout()
 {
+  // create the check for updates button
+  checkElement = createElement('.option.about.check');
+
   if (localData)
   {
     if (localData.branch)
@@ -148,9 +162,79 @@ function appendAbout()
   if (process.versions.v8)
     aboutContainer.appendChild(createAboutText('V8: ' + process.versions.v8));
 
-  const checkElement = createElement('.option.about.check');
+  if (localData && localData.branch && localData.commit && localData.package)
+  {
+    checkElement.innerText = 'Check for Updates';
 
+    aboutContainer.appendChild(checkElement);
+
+    checkElement.onclick = checkForUpdates;
+  }
+}
+
+function checkForUpdates()
+{
+  checkElement.innerText = 'Checking...';
+
+  checkElement.classList.add('blocked');
+
+  // request the server's build.json, can fail silently
+  request('https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/' + localData.branch + '/raw/build.json?job=build', {  json: true })
+    .then((remoteData) =>
+    {
+      // if commit id is different, and there's an available package for this platform
+      if (remoteData.commit !== localData.commit && remoteData[localData.package])
+        updateDownload(remoteData[localData.package]);
+      else
+        checkElement.innerText = 'Up-to-date';
+    })
+    .catch(updateError);
+}
+
+/** @param { number } percentage
+*/
+function updateProgress(percentage)
+{
+  percentage = Math.floor(percentage * 100);
+
+  checkElement.innerText = `Downloading ${percentage}%`;
+}
+
+function updateError()
+{
   checkElement.innerText = 'Check for Updates';
 
-  aboutContainer.appendChild(checkElement);
+  checkElement.classList.remove('blocked');
+}
+
+/** @param { string } path
+*/
+function updateDownloaded(path)
+{
+  checkElement.innerText = 'Install Update';
+
+  checkElement.classList.remove('blocked');
+
+  checkElement.onclick = () => remote.shell.openItem(path);
+}
+
+/** @param { string } url
+*/
+function updateDownload(url)
+{
+  url = new URL(url);
+
+  const filename = 'tmp-' + Date.now() + '-' + url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
+
+  checkElement.innerText = 'Starting Download';
+
+  dl(mainWindow, url.href,
+    {
+      directory: tmpdir(),
+      filename: filename,
+      showBadge: false,
+      onProgress: updateProgress
+    })
+    .then(() => updateDownloaded(join(tmpdir(), filename)))
+    .catch(updateError);
 }

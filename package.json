@@ -96,6 +96,7 @@
     "fs-extra": "^7.0.1",
     "howler": "^2.0.15",
     "music-metadata": "^3.2.4",
+    "request-promise-native": "^1.0.5",
     "tippy.js": "^3.3.0",
     "wikijs": "^4.10.2"
   },
