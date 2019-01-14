@@ -68,7 +68,8 @@
   word-break: break-all;
 }
 
-.option.container.buttons
+.option.directories.buttons,
+.option.tray.buttons
 {
   display: flex;
 }
@@ -76,7 +77,8 @@
 .option.directories.remove,
 .option.directories.add,
 .option.directories.rescan,
-.option.about.check
+.option.about.check,
+.option.tray.button
 {
   display: flex;
 
@@ -90,6 +92,21 @@
   text-transform: uppercase;
 }
 
+.option.tray.button
+{
+  color: var(--holder-2);
+}
+
+.option.tray.button.highlight
+{
+  color: unset;
+
+  cursor: default;
+  pointer-events: none;
+
+  filter: drop-shadow(0px 0px 8px var(--holder-2));
+}
+
 .option.about.check
 {
   justify-content: flex-start;
@@ -101,6 +118,11 @@
 .option.directories.add:hover,
 .option.directories.rescan:hover,
 .option.about.check:hover
+{
+  color: var(--color-7);
+}
+
+.option.tray.button:not(.highlight):hover
 {
   color: var(--color-7);
 }

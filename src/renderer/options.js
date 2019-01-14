@@ -1,9 +1,10 @@
 import { remote } from 'electron';
 
-import { join, dirname, basename, extname } from 'path';
+import { join } from 'path';
 import { readJSON, existsSync } from 'fs-extra';
-import { homedir, tmpdir, platform } from 'os';
+import { tmpdir } from 'os';
 
+import * as settings from 'electron-json-config';
 import request from 'request-promise-native';
 
 import { createElement } from './renderer.js';
@@ -36,6 +37,10 @@ const directoriesContainer = document.body.querySelector('.optionsItem.container
 */
 const aboutContainer = document.body.querySelector('.optionsItem.container.about');
 
+/**  @type { HTMLDivElement }
+*/
+const trayContainer = document.body.querySelector('.optionsItem.container.tray');
+
 export const mainWindow = remote.getCurrentWindow();
 
 /** initialize options, like the storage/cache system that loads local albums and tracks
@@ -59,6 +64,8 @@ export function initOptions()
   {
     appendAbout();
   }
+
+  appendTray();
 }
 
 /** initialize the events for the options elements, like the add button in the audio directories panel
@@ -162,6 +169,8 @@ function appendAbout()
   if (process.versions.v8)
     aboutContainer.appendChild(createAboutText('V8: ' + process.versions.v8));
 
+  // if there's enough data to support the auto-update system,
+  // then add a check for updates button
   if (localData && localData.branch && localData.commit && localData.package)
   {
     checkElement.innerText = 'Check for Updates';
@@ -170,6 +179,47 @@ function appendAbout()
 
     checkElement.onclick = checkForUpdates;
   }
+}
+
+function appendTray()
+{
+  const enabled = settings.get('trayIcon', true);
+  const color = settings.get('trayIconColor', 'dark');
+
+  trayContainer.querySelector(`.${enabled}`).classList.add('highlight');
+  trayContainer.querySelector(`.${color}`).classList.add('highlight');
+
+  trayContainer.querySelector('.true').onclick = () =>
+  {
+    event.srcElement.classList.add('highlight');
+    trayContainer.querySelector('.false').classList.remove('highlight');
+    
+    settings.set('trayIcon', true);
+  };
+
+  trayContainer.querySelector('.false').onclick = (event) =>
+  {
+    event.srcElement.classList.add('highlight');
+    trayContainer.querySelector('.true').classList.remove('highlight');
+
+    settings.set('trayIcon', false);
+  };
+
+  trayContainer.querySelector('.dark').onclick = () =>
+  {
+    event.srcElement.classList.add('highlight');
+    trayContainer.querySelector('.light').classList.remove('highlight');
+
+    settings.set('trayIconColor', 'dark');
+  };
+
+  trayContainer.querySelector('.light').onclick = () =>
+  {
+    event.srcElement.classList.add('highlight');
+    trayContainer.querySelector('.dark').classList.remove('highlight');
+
+    settings.set('trayIconColor', 'light');
+  };
 }
 
 function checkForUpdates()
@@ -228,7 +278,9 @@ function updateDownload(url)
 
   checkElement.innerText = 'Starting Download';
 
-  dl(mainWindow, url.href,
+  dl(
+    mainWindow,
+    url.href,
     {
       directory: tmpdir(),
       filename: filename,
