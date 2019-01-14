@@ -76,7 +76,7 @@
   box-shadow: 0px 0px 0px 0px var(--color-11);
 
   transition-property: box-shadow, background-color;
-  transition-duration: 0.35s;
+  transition-duration: 0.25s;
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
@@ -84,7 +84,7 @@
 {
   background-color: var(--color-12);
 
-  box-shadow: 0px 0px 12px 0px var(--color-11);
+  box-shadow: 0px 0px 15px -2px var(--color-11);
 }
 
 /* Selected */

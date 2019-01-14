@@ -14,8 +14,6 @@ import { initStorage } from './storage.js';
 
 // Variables
 
-const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
-
 let resizeEndTimeout;
 
 let menuIsCollapsed = false;
@@ -513,9 +511,9 @@ function seekControl(playedPercentage)
 /** @param { number } rewind
 * @param { number } forward
 */
-function changeRewindForwardTimings(rewind, forward)
+export function changeRewindForwardTimings(rewind, forward)
 {
-  if (!isDebug && (rewindTime !== rewind || forwardTime !== forward))
+  if (rewindTime !== rewind || forwardTime !== forward)
   {
     settings.set('rewindTime', rewind);
     settings.set('forwardTime', forward);
@@ -539,7 +537,7 @@ function volumeControl(volumePercentage)
 {
   volumePercentage = volumePercentage || 0;
 
-  if (!isDebug && volumePercentage !== currentVolume)
+  if (volumePercentage !== currentVolume)
     settings.set('currentVolume', volumePercentage);
 
   if (volumePercentage !== 0)
@@ -586,13 +584,13 @@ function onload()
   seekControl(seekTime);
   initBar(seekBar, seekShowTime, seekControl);
 
-  currentVolume = (isDebug) ? 0.75 : settings.get('currentVolume', 0.75);
+  currentVolume = settings.get('currentVolume', 0.75);
 
   volumeControl(currentVolume);
   initBar(volumeBar, undefined, volumeControl);
 
-  rewindTime = (isDebug) ? 10 : settings.get('rewindTime', 10);
-  forwardTime = (isDebug) ? 30 : settings.get('forwardTime', 30);
+  rewindTime = settings.get('rewindTime', 10);
+  forwardTime = settings.get('forwardTime', 30);
 
   changeRewindForwardTimings(rewindTime, forwardTime);
 
