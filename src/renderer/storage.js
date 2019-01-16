@@ -28,7 +28,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 /** @typedef { Object } Storage
 * @property { Object<string, {  artist: string, tracks: string[], duration: number, element: HTMLDivElement }> } albums
-* @property { Object<string, { tracks: string[], albums: string[], element: HTMLDivElement }> } artists
+* @property { Object<string, { tracks: string[], albums: string[], bio: string, element: HTMLDivElement }> } artists
 * @property { Object<string, { url: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
 
@@ -318,8 +318,11 @@ function scanCacheAudioFiles()
 */
 function cacheStorage(storageInfo, storage)
 {
-  writeJson(storageInfoConfig, storageInfo);
-  writeJson(storageConfig, storage);
+  if (storageInfo)
+    writeJson(storageInfoConfig, storageInfo);
+
+  if (storage)
+    writeJson(storageConfig, storage);
 }
 
 /** @param  { number } date
@@ -346,32 +349,23 @@ function isStorageOld(date)
 */
 function cacheArtists(storage)
 {
-  // if there's a known artist, then get and store som information about them
-  // from Wikipeida
+  const promises = [];
 
-  // if (metadata.common.artists && metadata.common.artists.length > 0)
-  // {
-  //   return metadata.common.artists;
-  // }
+  for (const track in storage.tracks)
+  {
+    const artists = storage.tracks[track].artists;
 
-  // .then(artists =>
-  //   {
-  //     if (!artists)
-  //       return;
+    if (!artists)
+      continue;
+    
+    for (let i = 0; i < artists.length; i++)
+    {
+      if (!storage.artists[artists[i]].cachedWikiInfo)
+        promises.push(cacheArtist(artists[i], storage));
+    }
+  }
 
-  //     return new Promise((resolve) =>
-  //     {
-  //       const promises = [];
-
-  //       for (let i = 0; i < artists.length; i++)
-  //       {
-  //         if (!storage.artists[artists[i]].cachedWikiInfo)
-  //           promises.push(cacheArtist(artists[i], storage));
-  //       }
-
-  //       Promise.all(promises).then(resolve);
-  //     });
-  //   }
+  Promise.all(promises).then(() => cacheStorage(undefined, storage));
 }
 
 /** adds a summary and a picture url for an artist to the storage object
@@ -401,8 +395,39 @@ function cacheArtist(artist, storage)
       {
         if (page)
         {
-          promises.push(page.summary().then(summary => storage.artists[artist].bio = summary));
-          promises.push(page.mainImage().then(imageUrl => storage.artists[artist].pictureUrl = imageUrl));
+          promises.push(page.summary().then((summary) =>
+          {
+            storage.artists[artist].bio = summary;
+
+            updateArtistElement(storage.artists[artist].element, {
+              bio: summary
+            });
+          }));
+          
+          promises.push(page.mainImage().then(pictureUrl =>
+          {
+            const picturePath = join(configDir, 'cache', artist);
+
+            dl(mainWindow, pictureUrl, {
+              directory: tmpdir(),
+              filename: artist,
+              showBadge: false
+            })
+              .then(() => move(join(tmpdir(), artist), picturePath, { overwrite: true }))
+              .then(() =>
+              {
+                const img = new Image();
+
+                img.src = picturePath;
+            
+                img.onload = () =>
+                {
+                  updateArtistElement(storage.artists[artist].element, {
+                    picture: img.src
+                  });
+                };
+              });
+          }));
         }
 
         Promise.all(promises).then(resolve);
@@ -627,8 +652,10 @@ function updateArtistElement(placeholder, options)
   }
 
   if (options.picture)
+  {
     placeholder.querySelector('.artist.cover').style.backgroundImage =
     placeholder.querySelector('.artistOverlay.cover').style.backgroundImage = `url(${options.picture})`;
+  }
 
   if (options.title)
   {
@@ -644,7 +671,7 @@ function updateArtistElement(placeholder, options)
   if (options.bio)
     placeholder.querySelector('.artistOverlay.bio').innerText = options.bio;
 
-  if (options.albums.length > 0 || options.tracks.length > 0)
+  if ((options.albums && options.albums.length > 0) || (options.tracks && options.tracks.length > 0))
   {
     const stats = placeholder.querySelector('.artist.stats');
 
@@ -659,7 +686,7 @@ function updateArtistElement(placeholder, options)
     albumsText.innerText = '';
     tracksText.innerText = '';
 
-    if (options.albums.length > 0)
+    if (options.albums && options.albums.length > 0)
     {
       removeAllChildren(albumsContainer);
 
@@ -682,7 +709,7 @@ function updateArtistElement(placeholder, options)
       }
     }
 
-    if (options.tracks.length > 0)
+    if (options.tracks && options.tracks.length > 0)
     {
       removeAllChildren(tracksContainer);
 
@@ -721,10 +748,7 @@ function appendArtistsPageItems(storage)
 
   for (let i = 0; i < artists.length; i++)
   {
-    // TODO won't work need to be updated and moved to the new cacheArtists function
-    // if there is multiple artists grab the first image
-    // ADD should change it to have all artists' pictures using css a flex box for the cover
-    // const artistPicture = join(configDir, 'cache', artists[i]);
+    const artistPicture = join(configDir, 'cache', artists[i]);
     
     const placeholder = appendArtistPlaceholder();
 
@@ -739,33 +763,19 @@ function appendArtistsPageItems(storage)
       updateArtistElement(placeholder, {
         picture: img.src,
         title: artists[i],
+        bio: storage.artists[artists[i]].bio,
         albums: storage.artists[artists[i]].albums,
         tracks: storage.artists[artists[i]].tracks,
         storage: storage
       });
     };
 
-    // if image for the artist exists
-    // TODO won't work need to be updated and moved to the new cacheArtists function
-    // exists(artistPicture).then((exists) =>
-    // {
-    //   // if it does load it
-    //   if (exists)
-    //   {
-    //     img.src = artistPicture;
-    //   }
-    //   // else download/cache one form Wikipedia then load it
-    //   else if (storage.artists[artists[i]].pictureUrl)
-    //   {
-    //     dl(mainWindow, storage.artists[artists[i]].pictureUrl, {
-    //       directory: tmpdir(),
-    //       filename: artists[i],
-    //       showBadge: false
-    //     })
-    //       .then(() => move(join(tmpdir(), artists[i]), artistPicture))
-    //       .then(() => img.src = artistPicture);
-    //   }
-    // });
+    // if it does load it
+    exists(artistPicture).then((exists) =>
+    {
+      if (exists)
+        img.src = artistPicture;
+    });
   }
 }
 
