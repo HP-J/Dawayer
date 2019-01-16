@@ -2,7 +2,7 @@ import tippy from 'tippy.js';
 import * as settings from 'electron-json-config';
 
 import scroll from './scroll.js';
-import { initOptions, initOptionsEvents } from './options.js';
+import { initOptions } from './options.js';
 import { initStorage } from './storage.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
@@ -361,14 +361,13 @@ function init()
   initTippy();
   
   initOptions();
-  initOptionsEvents();
 
   initStorage();
 }
 
 function initPages()
 {
-  selectedPage = pagesContainer.children.item(2);
+  selectedPage = pagesContainer.children.item(1);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 

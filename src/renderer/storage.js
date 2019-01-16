@@ -28,7 +28,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 /** @typedef { Object } Storage
 * @property { Object<string, {  artist: string, tracks: string[], duration: number, element: HTMLDivElement }> } albums
-* @property { Object<string, { tracks: string[], albums: string[], bio: string, pictureUrl: string, element: HTMLDivElement }> } artists
+* @property { Object<string, { tracks: string[], albums: string[], element: HTMLDivElement }> } artists
 * @property { Object<string, { url: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
 
@@ -59,6 +59,10 @@ const tracksContainer = document.body.querySelector('.tracks.container');
 /** @type { string[] }
 */
 const audioDirectories = [];
+
+/** @type { (target: string) => {} }
+*/
+let navigation;
 
 /** @type { string }
 */
@@ -156,7 +160,8 @@ export function initStorage()
       .then((storage) =>
       {
         appendItems(storage);
-        window.onbeforeunload = () => storageNavigation(storage);
+
+        navigation = (target) => storageNavigation(storage, target);
 
         // update the cache if it's older than 2 days
         // take effect when the app is re-opened
@@ -165,6 +170,7 @@ export function initStorage()
           scanCacheAudioFiles().then((scan) =>
           {
             cacheStorage(scan.storageInfo, scan.storage);
+            cacheArtists(scan.storage);
           });
         }
       });
@@ -173,20 +179,14 @@ export function initStorage()
   // load them and then create a new cache for them
   else
   {
-    scanCacheAudioFiles().then((scan) =>
-    {
-      appendItems(scan.storage);
-      cacheStorage(scan.storageInfo, scan.storage);
-      
-      window.onbeforeunload = () => storageNavigation(scan.storage);
-    });
+    rescanStorage();
   }
 }
 
 /** scan the audio directories for audio files then parses them for their metadata,
 * and adds the important data to the storage object
 */
-export function scanCacheAudioFiles()
+function scanCacheAudioFiles()
 {
   /** @type { Storage }
   */
@@ -195,6 +195,11 @@ export function scanCacheAudioFiles()
     artists: {},
     tracks: {}
   };
+
+  const rescanElement = document.body.querySelector('.option.rescan');
+
+  rescanElement.innerText = 'Scanning';
+  rescanElement.classList.add('.clean');
 
   return new Promise((resolve) =>
   {
@@ -221,6 +226,8 @@ export function scanCacheAudioFiles()
                   // using the metadata fill
                   // the storage object and cache it to the
                   // hard disk
+
+                  rescanElement.innerText = `Scanning ${Math.round((i / files.length) * 100)}%`;
 
                   const title = metadata.common.title || basename(file, extname(file));
                   const artists = metadata.common.artists || [ 'Unknown Artist' ];
@@ -283,32 +290,6 @@ export function scanCacheAudioFiles()
                       };
                     }
                   }
-
-                  // if there's a known artist, then get and store som information about them
-                  // from Wikipeida
-                  if (metadata.common.artists && metadata.common.artists.length > 0)
-                  {
-                    return metadata.common.artists;
-                  }
-                })
-                // cache and store info like pictures, bio about the artists form Wikipedia
-                .then(artists =>
-                {
-                  if (!artists)
-                    return;
-
-                  return new Promise((resolve) =>
-                  {
-                    const promises = [];
-
-                    for (let i = 0; i < artists.length; i++)
-                    {
-                      if (!storage.artists[artists[i]].cachedWikiInfo)
-                        promises.push(cacheArtist(artists[i], storage));
-                    }
-
-                    Promise.all(promises).then(resolve);
-                  });
                 }));
           }
         }
@@ -321,6 +302,9 @@ export function scanCacheAudioFiles()
           const storageInfo = {
             date: Date.now()
           };
+
+          rescanElement.innerText = 'Rescan';
+          rescanElement.classList.remove('.clean');
 
           resolve({ storageInfo, storage });
         });
@@ -355,6 +339,39 @@ function isStorageOld(date)
   // then that means it's been more than two days since the last time
   // storage been cached
   return (now.getTime() >= date.getTime());
+}
+
+/** cache and store info like pictures, bio about the artists form Wikipedia
+* @param { Storage } storage
+*/
+function cacheArtists(storage)
+{
+  // if there's a known artist, then get and store som information about them
+  // from Wikipeida
+
+  // if (metadata.common.artists && metadata.common.artists.length > 0)
+  // {
+  //   return metadata.common.artists;
+  // }
+
+  // .then(artists =>
+  //   {
+  //     if (!artists)
+  //       return;
+
+  //     return new Promise((resolve) =>
+  //     {
+  //       const promises = [];
+
+  //       for (let i = 0; i < artists.length; i++)
+  //       {
+  //         if (!storage.artists[artists[i]].cachedWikiInfo)
+  //           promises.push(cacheArtist(artists[i], storage));
+  //       }
+
+  //       Promise.all(promises).then(resolve);
+  //     });
+  //   }
 }
 
 /** adds a summary and a picture url for an artist to the storage object
@@ -438,14 +455,28 @@ function updateAlbumElement(placeholder, options)
   }
 
   if (options.title)
+  {
     placeholder.querySelector('.album.title').innerText = options.title;
+
+    placeholder.onclick = () => navigation(`play-album:${options.title}`);
+  }
 
   if (options.duration)
     placeholder.querySelector('.album.duration').innerText = options.duration;
 
   if (options.artist)
-    placeholder.querySelector('.album.artist').innerHTML =
-    `by <a href='artists:${options.artist}' class='album artistLink'>${options.artist}</a>`;
+  {
+    const artist = placeholder.querySelector('.album.artist');
+    const artistLink = createElement('.album.artistLink');
+
+    artistLink.innerText = options.artist;
+    artistLink.onclick = () => navigation(`artists:${options.artist}`);
+    
+    removeAllChildren(artist);
+    
+    artist.appendChild(document.createTextNode('by '));
+    artist.appendChild(artistLink);
+  }
 
   if (options.tracks)
   {
@@ -456,12 +487,16 @@ function updateAlbumElement(placeholder, options)
       if (tracksContainer.children.length - 1 >= i)
       {
         tracksContainer.children[i].innerText = options.tracks[i];
+        tracksContainer.children[i].onclick = () => navigation(`play-track:${options.tracks[i]}`);
       }
       else
       {
-        tracksContainer
-          .appendChild(createElement('.album.track'))
-          .innerText = options.tracks[i];
+        const track = createElement('.album.track');
+
+        track.innerText = options.tracks[i];
+        track.onclick = () => navigation(`play-track:${options.tracks[i]}`);
+
+        tracksContainer.appendChild(track);
       }
     }
   }
@@ -600,8 +635,10 @@ function updateArtistElement(placeholder, options)
     placeholder.querySelector('.artist.title').innerText =
     placeholder.querySelector('.artistOverlay.title').innerText = options.title;
 
-    placeholder.querySelector('.artistOverlay.button').innerHTML =
-    `<a href='play-artist:${options.title}' class='artistOverlay button'> Play</a>`;
+    const playElement = placeholder.querySelector('.artistOverlay.button');
+
+    playElement.innerText = 'Play';
+    playElement.onclick = () => navigation(`play-artist:${options.title}`);
   }
 
   if (options.bio)
@@ -684,7 +721,11 @@ function appendArtistsPageItems(storage)
 
   for (let i = 0; i < artists.length; i++)
   {
-    const artistPicture = join(configDir, 'cache', artists[i]);
+    // TODO won't work need to be updated and moved to the new cacheArtists function
+    // if there is multiple artists grab the first image
+    // ADD should change it to have all artists' pictures using css a flex box for the cover
+    // const artistPicture = join(configDir, 'cache', artists[i]);
+    
     const placeholder = appendArtistPlaceholder();
 
     storage.artists[artists[i]].element = placeholder;
@@ -698,7 +739,6 @@ function appendArtistsPageItems(storage)
       updateArtistElement(placeholder, {
         picture: img.src,
         title: artists[i],
-        bio: storage.artists[artists[i]].bio,
         albums: storage.artists[artists[i]].albums,
         tracks: storage.artists[artists[i]].tracks,
         storage: storage
@@ -706,25 +746,26 @@ function appendArtistsPageItems(storage)
     };
 
     // if image for the artist exists
-    exists(artistPicture).then((exists) =>
-    {
-      // if it does load it
-      if (exists)
-      {
-        img.src = artistPicture;
-      }
-      // else download/cache one form Wikipedia then load it
-      else if (storage.artists[artists[i]].pictureUrl)
-      {
-        dl(mainWindow, storage.artists[artists[i]].pictureUrl, {
-          directory: tmpdir(),
-          filename: artists[i],
-          showBadge: false
-        })
-          .then(() => move(join(tmpdir(), artists[i]), artistPicture))
-          .then(() => img.src = artistPicture);
-      }
-    });
+    // TODO won't work need to be updated and moved to the new cacheArtists function
+    // exists(artistPicture).then((exists) =>
+    // {
+    //   // if it does load it
+    //   if (exists)
+    //   {
+    //     img.src = artistPicture;
+    //   }
+    //   // else download/cache one form Wikipedia then load it
+    //   else if (storage.artists[artists[i]].pictureUrl)
+    //   {
+    //     dl(mainWindow, storage.artists[artists[i]].pictureUrl, {
+    //       directory: tmpdir(),
+    //       filename: artists[i],
+    //       showBadge: false
+    //     })
+    //       .then(() => move(join(tmpdir(), artists[i]), artistPicture))
+    //       .then(() => img.src = artistPicture);
+    //   }
+    // });
   }
 }
 
@@ -766,8 +807,17 @@ function updateTracksElement(placeholder, options)
     placeholder.querySelector('.track.cover').style.backgroundImage = `url(${options.picture})`;
 
   if (options.artist)
-    placeholder.querySelector('.track.artist').innerHTML =
-    `<a href='artists:${options.artist}' class='track artistLink'>${options.artist}</a>`;
+  {
+    const artist = placeholder.querySelector('.track.artist');
+    const artistLink = createElement('.track.artistLink');
+
+    artistLink.innerText = options.artist;
+    artistLink.onclick = () => navigation(`artists:${options.artist}`);
+
+    removeAllChildren(artist);
+    
+    artist.appendChild(artistLink);
+  }
 
   if (options.title)
     placeholder.querySelector('.track.title').innerText = options.title;
@@ -838,18 +888,31 @@ function removeAllChildren(element)
 
 /** because clicking an artist name should take you to them
 * @param { Storage } storage
+* @param { string } target
 */
-function storageNavigation(storage)
+function storageNavigation(storage, target)
 {
-  if (!document.activeElement.href)
-    return;
-
-  const key = document.activeElement.href.match(/.+:/)[0].slice(0, -1);
-  const value = document.activeElement.href.match(/:.+/)[0].substring(1);
+  const key = target.match(/.+:/)[0].slice(0, -1);
+  const value = target.match(/:.+/)[0].substring(1);
 
   // open the artist's overlay
   if (key === 'artists')
     storage.artists[value].element.classList.toggle('activeOverlay');
+  else
+    console.log(key, value);
+}
+
+export function rescanStorage()
+{
+  scanCacheAudioFiles().then((scan) =>
+  {
+    cacheStorage(scan.storageInfo, scan.storage);
+
+    appendItems(scan.storage);
+    cacheArtists(scan.storage);
+    
+    navigation = (target) => storageNavigation(scan.storage, target);
+  });
 }
 
 /** adds the directories to the save file and the scan array,

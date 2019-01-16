@@ -8,7 +8,7 @@ import * as settings from 'electron-json-config';
 import request from 'request-promise-native';
 
 import { createElement, rewindTimeText, rewindTimeTooltip, forwardTimeText, forwardTimeTooltip } from './renderer.js';
-import { addNewDirectories, removeDirectory, scanCacheAudioFiles } from './storage.js';
+import { addNewDirectories, removeDirectory, rescanStorage } from './storage.js';
 
 /** @typedef { Object } BuildData
 * @property { string } branch
@@ -39,19 +39,19 @@ let checkElement;
 
 /**  @type { HTMLDivElement }
 */
-const directoriesContainer = document.body.querySelector('.optionsItem.container.directories');
+const directoriesContainer = document.body.querySelector('.optionsItem.directories');
 
 /**  @type { HTMLDivElement }
 */
-const aboutContainer = document.body.querySelector('.optionsItem.container.about');
+const aboutContainer = document.body.querySelector('.optionsItem.about');
 
 /**  @type { HTMLDivElement }
 */
-const trayContainer = document.body.querySelector('.optionsItem.container.tray');
+const trayContainer = document.body.querySelector('.optionsItem.tray');
 
 /**  @type { HTMLDivElement }
 */
-const controlsContainer = document.body.querySelector('.optionsItem.container.controls');
+const controlsContainer = document.body.querySelector('.optionsItem.controls');
 
 /** @type { HTMLInputElement }
 */
@@ -85,30 +85,10 @@ export function initOptions()
     appendAbout();
   }
 
+  appendDirectories();
+
   appendTray();
-  appendPlayback();
-}
-
-/** initialize the events for the options elements, like the add button in the audio directories panel
-*/
-export function initOptionsEvents()
-{
-  document.body.querySelector('.option.directories.add').onclick = () =>
-  {
-    remote.dialog.showOpenDialog(
-      mainWindow, {
-        title: 'Choose the directory where your audio files exists',
-        properties: [ 'openDirectory', 'multiSelections' ]
-      },
-      addNewDirectories
-    );
-  };
-
-  document.body.querySelector('.option.directories.rescan').onclick = () =>
-  {
-    // ADD re-scan button functionality
-    // scanCacheAudioFiles();
-  };
+  appendControls();
 }
 
 /** appends a directory element in the options, allowing the user to see
@@ -156,6 +136,25 @@ function createAboutText(text)
   element.classList.add('option', 'text');
 
   return element;
+}
+
+function appendDirectories()
+{
+  document.body.querySelector('.option.directories.add').onclick = () =>
+  {
+    remote.dialog.showOpenDialog(
+      mainWindow, {
+        title: 'Choose the directory where your audio files exists',
+        properties: [ 'openDirectory', 'multiSelections' ]
+      },
+      addNewDirectories
+    );
+  };
+
+  document.body.querySelector('.option.directories.rescan').onclick = () =>
+  {
+    rescanStorage();
+  };
 }
 
 function appendAbout()
@@ -243,7 +242,7 @@ function appendTray()
   };
 }
 
-function appendPlayback()
+function appendControls()
 {
   const applyElement = controlsContainer.querySelector('.apply');
 

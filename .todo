@@ -1,10 +1,6 @@
 main:
   ☐ check different tracks with different metadata to find issues with the cache code
 
-  ☐ playback options section to change rewind and forward timings
-
-  ☐ test saved volume percentage and rewind/forward timings
-
 graphics:
 
 playback:

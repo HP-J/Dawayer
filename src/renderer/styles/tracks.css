@@ -164,8 +164,6 @@
 .track.artistLink
 {
   color: var(--color-3);
-
-  text-decoration: none;
 }
 
 .track.artistLink:hover

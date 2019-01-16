@@ -183,18 +183,16 @@
   width: 100%;
   height: auto;
 
-  opacity: 0;
-  overflow: hidden;
+  color: unset;
 
   white-space: pre-line;
   word-break: break-word;
   font-weight: 700;
 
-  margin: 5% 0%;
+  overflow: hidden;
+  opacity: 0;
 
-  transition-property: opacity;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  margin: 5% 0%;
 }
 
 .album.track:hover
@@ -225,6 +223,8 @@
 
 .album.artist
 {
+  display: flex;
+
   z-index: 1;
   grid-area: artist;
 
@@ -238,11 +238,9 @@
 .album.artistLink
 {
   color: var(--color-3);
-
-  white-space: pre-line;
+  
+  white-space: nowrap;
   overflow: hidden;
-
-  text-decoration: none;
 }
 
 .album.artistLink:hover
@@ -268,10 +266,6 @@
   overflow: hidden;
 
   font-weight: 900;
-
-  transition-property: opacity;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
 }
 
 .album.wrapper:not(.placeholder):hover > .container > .card > .duration

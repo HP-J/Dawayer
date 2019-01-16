@@ -80,12 +80,11 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.menuItem.wrapper:hover > .container
+/* .menuItem.wrapper:hover > .container
 {
   background-color: var(--color-12);
-
   box-shadow: 0px 0px 15px -2px var(--color-11);
-}
+} */
 
 /* Selected */
 

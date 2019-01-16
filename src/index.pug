@@ -79,11 +79,13 @@ html(lang='en')
       .menuItem.wrapper
         .menuItem.container
           +icon('playing')
+
       .menuItem.wrapper.selected
         .menuItem.container
           +icon('albums')
           +icon('music')
           +icon('artist')
+
       .menuItem.wrapper
         .menuItem.container
           +icon('settings')
@@ -93,6 +95,7 @@ html(lang='en')
 
     .pages.container
       .page.playing
+
       .page.local
         .page.extended.local
           .albums.wrapper
@@ -101,25 +104,26 @@ html(lang='en')
             .tracks.container
           .artists.wrapper
             .artists.container
+
       .page.options
         .options.wrapper
+
           .options.container
-            .optionsItem.container.directories
+            .optionsItem.directories
               .option.title Audio Directories
               .option.directories.buttons
                 .option.directories.button.add Add
                 .option.directories.button.rescan Rescan
-            .optionsItem.container.controls
+            .optionsItem.controls
               .option.title Controls
               .option.text Rewind
               input.option.controls.rewind(type='number')
               .option.text Forward
               input.option.controls.forward(type='number')
               .option.controls.button.apply.clean Apply
+
           .options.container
-            .optionsItem.container.about
-              .option.title About
-            .optionsItem.container.tray
+            .optionsItem.tray
               .option.applied Changes are applied after the app is restarted*
               .option.title Tray
               .option.tray.buttons
@@ -129,6 +133,8 @@ html(lang='en')
               .option.tray.buttons
                 .option.tray.button.dark Dark
                 .option.tray.button.light Light
+            .optionsItem.about
+              .option.title About
 
     .submenuContainer.playing
       .submenuButton.playing Playing Now

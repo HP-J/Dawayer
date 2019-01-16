@@ -311,10 +311,13 @@
 {
   grid-area: button;
 
-  text-decoration: none;
+  width: fit-content;
+  height: fit-content;
+
+  cursor: pointer;
 }
 
-.artistOverlay.button > a:hover
+.artistOverlay.button:hover
 {
   text-decoration: underline;
 }
@@ -400,12 +403,6 @@
     top: calc(-25vh - 10vw);
 
     margin-left: 3%;
-  }
-
-  .artistOverlay.button a
-  {
-    top: 0;
-    margin-left: 0;
   }
 
   .artistOverlay.title,
