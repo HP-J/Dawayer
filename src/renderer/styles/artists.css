@@ -433,6 +433,11 @@
 
   padding: 2.5% 0%;
   width: 40%;
+
+  animation-name: placeholder-animation;
+  animation-duration: 1s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
 }
 
 .artist.placeholder > .container > .card > .stats
@@ -446,8 +451,6 @@
   display: block;
 
   position: absolute;
-
-  background: var(--gradient-1);
 
   top: 0;
   width: 100%;

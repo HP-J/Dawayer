@@ -94,6 +94,7 @@
   grid-template-areas: "artist duration" "title duration";
 
   grid-column-gap: 1.5%;
+  grid-row-gap: 1px;
 
   margin: 1%;
 }
@@ -175,16 +176,21 @@
 /* Content Placeholders */
 
 .track.placeholder > .container > .cover,
-.track.placeholder > .container > .artist,
-.track.placeholder > .container > .title,
-.track.placeholder > .container > .duration
+.track.placeholder > .container > .card > .artist,
+.track.placeholder > .container > .card > .title,
+.track.placeholder > .container > .card > .duration
 {
   background-color: var(--color-9);
+
+  animation-name: placeholder-animation;
+  animation-duration: 1s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
 }
 
-.track.placeholder > .container > .artist,
-.track.placeholder > .container > .title,
-.track.placeholder > .container > .duration
+.track.placeholder > .container > .card > .artist,
+.track.placeholder > .container > .card > .title,
+.track.placeholder > .container > .card > .duration
 {
   position: relative;
 
@@ -196,16 +202,16 @@
   margin: 0;
 }
 
-.track.placeholder > .container > .title
+.track.placeholder > .container > .card > .title
 {
   top: 5%;
   width: 70%;
 }
 
-.track.placeholder > .container > .duration
+.track.placeholder > .container > .card > .duration
 {
   top: 30%;
-  width: 75%;
+  width: 32px;
   height: 40%;
 }
 
@@ -227,8 +233,6 @@
   display: block;
 
   position: absolute;
-
-  background: var(--gradient-1);
 
   top: 0;
   width: 100%;

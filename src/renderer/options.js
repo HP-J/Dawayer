@@ -7,7 +7,7 @@ import { tmpdir } from 'os';
 import * as settings from 'electron-json-config';
 import request from 'request-promise-native';
 
-import { createElement } from './renderer.js';
+import { createElement, rewindTimeText, rewindTimeTooltip, forwardTimeText, forwardTimeTooltip } from './renderer.js';
 import { addNewDirectories, removeDirectory, scanCacheAudioFiles } from './storage.js';
 
 /** @typedef { Object } BuildData
@@ -20,6 +20,14 @@ import { addNewDirectories, removeDirectory, scanCacheAudioFiles } from './stora
 /** @type {{ download: (win: Electron.BrowserWindow, url: string, options: { saveAs: boolean, directory: string, filename: string, openFolderWhenDone: boolean, showBadge: boolean, onStarted: (item: Electron.DownloadItem) => void, onProgress: (percentage: number) => void, onCancel: () => void }) => Promise<Electron.DownloadItem> }}
 */
 const { download: dl  } = remote.require('electron-dl');
+
+/** @type { number }
+*/
+export let rewindTime;
+
+/** @type { number }
+*/
+export let forwardTime;
 
 /**  @type { BuildData }
 */
@@ -40,6 +48,18 @@ const aboutContainer = document.body.querySelector('.optionsItem.container.about
 /**  @type { HTMLDivElement }
 */
 const trayContainer = document.body.querySelector('.optionsItem.container.tray');
+
+/**  @type { HTMLDivElement }
+*/
+const controlsContainer = document.body.querySelector('.optionsItem.container.controls');
+
+/** @type { HTMLInputElement }
+*/
+const rewindOptionInput = controlsContainer.querySelector('input.rewind');
+
+/** @type { HTMLInputElement }
+*/
+const forwardOptionInput = controlsContainer.querySelector('input.forward');
 
 export const mainWindow = remote.getCurrentWindow();
 
@@ -66,6 +86,7 @@ export function initOptions()
   }
 
   appendTray();
+  appendPlayback();
 }
 
 /** initialize the events for the options elements, like the add button in the audio directories panel
@@ -101,7 +122,7 @@ export function appendDirectoryNode(directory)
   const directoryText = createElement('.option.directories.directory');
   directoryText.innerText = directory;
 
-  const removeButton = createElement('.option.directories.remove');
+  const removeButton = createElement('.option.directories.button.remove');
   removeButton.innerText = 'Remove';
 
   removeButton.onclick = () =>
@@ -132,7 +153,7 @@ function createAboutText(text)
 
   element.innerText = text;
 
-  element.classList.add('option', 'about', 'text');
+  element.classList.add('option', 'text');
 
   return element;
 }
@@ -140,7 +161,7 @@ function createAboutText(text)
 function appendAbout()
 {
   // create the check for updates button
-  checkElement = createElement('.option.about.check');
+  checkElement = createElement('.option.about.button.check');
 
   if (localData)
   {
@@ -220,6 +241,92 @@ function appendTray()
 
     settings.set('trayIconColor', 'light');
   };
+}
+
+function appendPlayback()
+{
+  const applyElement = controlsContainer.querySelector('.apply');
+
+  rewindTime = settings.get('rewindTime', 10);
+  forwardTime = settings.get('forwardTime', 30);
+
+  changeRewindTimings(rewindTime);
+  changeForwardTimings(forwardTime);
+
+  rewindOptionInput.value = rewindTime;
+  forwardOptionInput.value = forwardTime;
+
+  rewindOptionInput.tabIndex = forwardOptionInput.tabIndex = -1;
+  
+  rewindOptionInput.oninput =
+  forwardOptionInput.oninput = (event) =>
+  {
+    if (event.srcElement.value !== '')
+    {
+      if (event.srcElement.value > 99)
+        event.srcElement.value = 99;
+    
+      if (event.srcElement.value < 1)
+        event.srcElement.value = 1;
+    }
+
+    if (
+      rewindOptionInput.value == '' ||
+      forwardOptionInput.value == '' ||
+      (rewindTime == rewindOptionInput.value && forwardTime == forwardOptionInput.value))
+    {
+      if (!applyElement.classList.contains('clean'))
+        applyElement.classList.add('clean');
+    }
+    else
+    {
+      if (applyElement.classList.contains('clean'))
+        applyElement.classList.remove('clean');
+    }
+  };
+
+  applyElement.onclick = () =>
+  {
+    if (rewindTime != rewindOptionInput.value)
+      changeRewindTimings(rewindOptionInput.value);
+
+    if (forwardTime != forwardOptionInput.value)
+      changeForwardTimings(forwardOptionInput.value);
+    
+    applyElement.classList.add('clean');
+  };
+}
+
+/** @param { number } rewind
+*/
+function changeRewindTimings(rewind)
+{
+  rewindTime = rewind;
+
+  // save the new timing
+  settings.set('rewindTime', rewind);
+
+  // the icon text
+  rewindTimeText.innerText = rewind;
+
+  // the tool-tip text
+  rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
+}
+
+/** @param { number } forward
+*/
+function changeForwardTimings(forward)
+{
+  forwardTime = forward;
+
+  // save the new timing
+  settings.set('forwardTime', forward);
+
+  // the icon text
+  forwardTimeText.innerText = forward;
+
+  // the tool-tip text
+  forwardTimeTooltip.setContent(`Forward ${forward}s`);
 }
 
 function checkForUpdates()

@@ -142,8 +142,6 @@ export function initStorage()
   else
     addNewDirectories(savedAudioDirectories);
 
-  window.onbeforeunload = storageNavigation;
-
   // if a cached storage object exists
   if (!isDebug() && existsSync(storageConfig))
   {
@@ -158,6 +156,7 @@ export function initStorage()
       .then((storage) =>
       {
         appendItems(storage);
+        window.onbeforeunload = () => storageNavigation(storage);
 
         // update the cache if it's older than 2 days
         // take effect when the app is re-opened
@@ -178,6 +177,8 @@ export function initStorage()
     {
       appendItems(scan.storage);
       cacheStorage(scan.storageInfo, scan.storage);
+      
+      window.onbeforeunload = () => storageNavigation(scan.storage);
     });
   }
 }
@@ -686,6 +687,8 @@ function appendArtistsPageItems(storage)
     const artistPicture = join(configDir, 'cache', artists[i]);
     const placeholder = appendArtistPlaceholder();
 
+    storage.artists[artists[i]].element = placeholder;
+
     const img = new Image();
 
     img.src = missingPicture;
@@ -833,13 +836,20 @@ function removeAllChildren(element)
   }
 }
 
-function storageNavigation()
+/** because clicking an artist name should take you to them
+* @param { Storage } storage
+*/
+function storageNavigation(storage)
 {
-  // storage key
-  // console.log(document.activeElement.href.match(/.+:/)[0].slice(0, -1));
+  if (!document.activeElement.href)
+    return;
 
-  // storage value
-  // console.log(document.activeElement.href.match(/:.+/)[0].substring(1));
+  const key = document.activeElement.href.match(/.+:/)[0].slice(0, -1);
+  const value = document.activeElement.href.match(/:.+/)[0].substring(1);
+
+  // open the artist's overlay
+  if (key === 'artists')
+    storage.artists[value].element.classList.toggle('activeOverlay');
 }
 
 /** adds the directories to the save file and the scan array,

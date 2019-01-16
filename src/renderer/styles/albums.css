@@ -301,6 +301,11 @@
 .album.placeholder > .container > .card > .artist
 {
   background-color: var(--color-9);
+
+  animation-name: placeholder-animation;
+  animation-duration: 1s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
 }
 
 .album.placeholder > .container > .card > .title
@@ -328,8 +333,6 @@
   display: block;
 
   position: absolute;
-
-  background: var(--gradient-1);
 
   top: 0;
   width: 100%;

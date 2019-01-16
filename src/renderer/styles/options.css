@@ -46,15 +46,15 @@
 
 .option.title
 {
-  font-weight: 700;
+  width: 100%;
 
+  font-weight: 700;
   margin-bottom: 2%;
 }
 
 .option.applied
 {
   display: flex;
-
   justify-content: flex-end;
 }
 
@@ -81,11 +81,14 @@
   display: flex;
 }
 
-.option.directories.remove,
-.option.directories.add,
-.option.directories.rescan,
-.option.about.check,
-.option.tray.button
+.option.applied,
+.option.tray.buttons,
+input.option.controls
+{
+  margin-bottom: 9px;
+}
+
+.option.button
 {
   display: flex;
 
@@ -98,21 +101,6 @@
   text-transform: uppercase;
 }
 
-.option.tray.button
-{
-  color: var(--holder-2);
-}
-
-.option.tray.button.highlight
-{
-  color: unset;
-
-  cursor: default;
-  pointer-events: none;
-
-  filter: drop-shadow(0px 0px 8px var(--holder-2));
-}
-
 .option.about.check
 {
   justify-content: flex-start;
@@ -120,25 +108,47 @@
   margin-top: 2%;
 }
 
-.option.directories.remove:hover,
-.option.directories.add:hover,
-.option.directories.rescan:hover,
-.option.about.check:hover
+input.option.controls
+{
+  width: 100%;
+
+  background-color: transparent;
+  color: var(--color-4);
+
+  outline: none; 
+  border: none;
+
+  font-family: Montserrat, sans-serif;
+}
+
+.option.tray.button,
+.option.controls.button.clean
+{
+  color: var(--holder-2);
+}
+
+.option.button.highlight,
+.option.controls.button.clean
+{
+  cursor: default;
+  pointer-events: none;
+}
+
+.option.button.highlight
+{
+  color: var(--color-4);
+
+  filter: drop-shadow(0px 0px 8px var(--holder-2));
+}
+
+.option.button:not(.highlight):not(.clean):hover
 {
   color: var(--color-7);
 }
 
-.option.tray.button:not(.highlight):hover
-{
-  color: var(--color-7);
-}
-
+.option.button,
 .option.directories.title,
-.option.directories.directory,
-.option.directories.remove,
-.option.directories.add,
-.option.directories.rescan,
-.option.about.check
+.option.directories.directory
 {
   white-space: pre-line;
 }
@@ -149,7 +159,7 @@
   pointer-events: none;
 }
 
-.option.about.text
+.about > .option.text
 {
   user-select: text;
 }
@@ -164,7 +174,8 @@
 
 /* Font Sizes */
 
-.optionsItem.container
+.optionsItem.container,
+input.option.controls
 {
   font-size: calc(6px + 0.5vw + 0.5vh);
 }
@@ -176,7 +187,8 @@
 
 @media screen and (max-width: 600px)
 {
-  .optionsItem.container
+  .optionsItem.container,
+  input.option.controls
   {
     font-size:11px;
   }
@@ -189,10 +201,12 @@
 
 @media screen and (min-width: 1020px)
 {
-  .optionsItem.container
+  .optionsItem.container,
+  input.option.controls
   {
     font-size: 14px;
   }
+
   .option.applied
   {
     font-size: 11px;

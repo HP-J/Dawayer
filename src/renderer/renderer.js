@@ -1,7 +1,3 @@
-import { remote } from 'electron';
-
-import { join } from 'path';
-
 import tippy from 'tippy.js';
 import * as settings from 'electron-json-config';
 
@@ -17,9 +13,6 @@ import { initStorage } from './storage.js';
 let resizeEndTimeout;
 
 let menuIsCollapsed = false;
-
-let rewindTime;
-let forwardTime;
 
 let seekTime = 0;
 
@@ -100,11 +93,11 @@ const forwardButton = controlBar.querySelector('.forwardButton');
 
 /**  @type { HTMLDivElement }
 */
-const rewindTimeText = rewindButton.children[1];
+export const rewindTimeText = rewindButton.children[1];
 
 /**  @type { HTMLDivElement }
 */
-const forwardTimeText = forwardButton.children[1];
+export const forwardTimeText = forwardButton.children[1];
 
 /**  @type { HTMLDivElement }
 */
@@ -128,15 +121,13 @@ let seekTooltip;
 
 /** @type { TippyInstance }
 */
-let rewindTimeTooltip;
+export let rewindTimeTooltip;
 
 /** @type { TippyInstance }
 */
-let forwardTimeTooltip;
+export let forwardTimeTooltip;
 
-//#endregion
-
-//#region Page Transactions
+// Page Transactions
 
 /** @param { HTMLDivElement } element
 * @param { () => void } callback
@@ -181,8 +172,9 @@ function changePage(element, callback)
 }
 
 /** @param { number } index
+* @param { () => void } callback
 */
-function changeLocalSubPage(index)
+function changeLocalSubPage(index, callback)
 {
   if ((index + 1) >= localIconsContainer.children.length)
     index = 0;
@@ -194,7 +186,7 @@ function changeLocalSubPage(index)
 
   // smooth scroll to the sub-page and its icon
   scroll(selectedLocalIcon, { direction: 'vertical' });
-  scroll(selectedLocalSubPage, { direction: 'vertical' });
+  scroll(selectedLocalSubPage, { direction: 'vertical', callback: callback });
 }
 
 // Init
@@ -365,12 +357,11 @@ function initBar(element, mousemove, mousedown)
 
 function init()
 {
-  initOptions();
-
   initEvents();
-  initOptionsEvents();
-
   initTippy();
+  
+  initOptions();
+  initOptionsEvents();
 
   initStorage();
 }
@@ -508,29 +499,6 @@ function seekControl(playedPercentage)
   updateBarPercentage(seekBar, playedPercentage);
 }
 
-/** @param { number } rewind
-* @param { number } forward
-*/
-export function changeRewindForwardTimings(rewind, forward)
-{
-  if (rewindTime !== rewind || forwardTime !== forward)
-  {
-    settings.set('rewindTime', rewind);
-    settings.set('forwardTime', forward);
-  }
-
-  rewindTime = rewind;
-  forwardTime = forward;
-
-  // the icon text
-  rewindTimeText.innerText = rewindTime;
-  forwardTimeText.innerText = forwardTime;
-
-  // the tool-tip text
-  rewindTimeTooltip.setContent(`Rewind ${rewindTime}s`);
-  forwardTimeTooltip.setContent(`Forward ${forwardTime}s`);
-}
-
 /** @param { number } volumePercentage
 */
 function volumeControl(volumePercentage)
@@ -588,11 +556,6 @@ function onload()
 
   volumeControl(currentVolume);
   initBar(volumeBar, undefined, volumeControl);
-
-  rewindTime = settings.get('rewindTime', 10);
-  forwardTime = settings.get('forwardTime', 30);
-
-  changeRewindForwardTimings(rewindTime, forwardTime);
 
   // remove fast-forward class from the html body
   resizeEnd();

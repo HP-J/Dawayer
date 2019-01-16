@@ -107,21 +107,24 @@ html(lang='en')
             .optionsItem.container.directories
               .option.title Audio Directories
               .option.directories.buttons
-                .option.directories.add Add
-                .option.directories.rescan Rescan
-            .optionsItem.container.playback
-              .option.title Playback
+                .option.directories.button.add Add
+                .option.directories.button.rescan Rescan
+            .optionsItem.container.controls
+              .option.title Controls
+              .option.text Rewind
+              input.option.controls.rewind(type='number')
+              .option.text Forward
+              input.option.controls.forward(type='number')
+              .option.controls.button.apply.clean Apply
           .options.container
             .optionsItem.container.about
               .option.title About
             .optionsItem.container.tray
               .option.applied Changes are applied after the app is restarted*
-              br
               .option.title Tray
               .option.tray.buttons
                 .option.tray.button.true Enabled
                 .option.tray.button.false Disabled
-              br
               .option.title Tray Color
               .option.tray.buttons
                 .option.tray.button.dark Dark
