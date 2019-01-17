@@ -5,7 +5,7 @@ import { existsSync, exists, stat, move, remove, writeJson, readJSON, readdir } 
 import { join, dirname, basename, extname } from 'path';
 import { homedir, tmpdir, platform } from 'os';
 
-import * as settings from 'electron-json-config';
+import * as settings from '../settings.js';
 
 /** @type {{ download: (win: Electron.BrowserWindow, url: string, options: { saveAs: boolean, directory: string, filename: string, openFolderWhenDone: boolean, showBadge: boolean, onStarted: (item: Electron.DownloadItem) => void, onProgress: (percentage: number) => void, onCancel: () => void }) => Promise<Electron.DownloadItem> }}
 */
@@ -36,7 +36,7 @@ const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.fla
 
 /* the base directory for the app config files
 */
-const configDir = dirname(settings.file());
+const configDir = dirname(settings.getPath());
 
 /**  @type { string }
 */
@@ -203,7 +203,7 @@ function scanCacheAudioFiles()
 
   return new Promise((resolve) =>
   {
-    remove(join(configDir, 'cache')).then(() =>
+    remove(join(configDir, 'ArtistsCache')).then(() =>
     {
       // walk through all the listed audio directories
       walk(audioDirectories).then((files) =>
@@ -406,7 +406,7 @@ function cacheArtist(artist, storage)
           
           promises.push(page.mainImage().then(pictureUrl =>
           {
-            const picturePath = join(configDir, 'cache', artist);
+            const picturePath = join(configDir, 'ArtistsCache', artist);
 
             dl(mainWindow, pictureUrl, {
               directory: tmpdir(),
@@ -748,7 +748,7 @@ function appendArtistsPageItems(storage)
 
   for (let i = 0; i < artists.length; i++)
   {
-    const artistPicture = join(configDir, 'cache', artists[i]);
+    const artistPicture = join(configDir, 'ArtistsCache', artists[i]);
     
     const placeholder = appendArtistPlaceholder();
 
@@ -908,8 +908,6 @@ function storageNavigation(storage, target)
   // open the artist's overlay
   if (key === 'artists')
     storage.artists[value].element.classList.toggle('activeOverlay');
-  else
-    console.log(key, value);
 }
 
 export function rescanStorage()

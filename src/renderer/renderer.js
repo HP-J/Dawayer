@@ -1,9 +1,10 @@
 import tippy from 'tippy.js';
-import * as settings from 'electron-json-config';
+import * as settings from '../settings.js';
 
 import scroll from './scroll.js';
-import { initOptions } from './options.js';
+
 import { initStorage } from './storage.js';
+import { initOptions } from './options.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */

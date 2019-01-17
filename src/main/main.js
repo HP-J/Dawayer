@@ -3,7 +3,7 @@ import { BrowserWindow, app, screen, ipcMain, dialog, Menu } from 'electron';
 import path from 'path';
 import url from 'url';
 
-import * as settings from 'electron-json-config';
+import * as settings from '../settings.js';
 
 import { setWindow, setApp, focus, isDebug } from './window.js';
 import { loadOptions } from './options.js';

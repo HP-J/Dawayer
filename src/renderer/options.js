@@ -4,7 +4,8 @@ import { join } from 'path';
 import { readJSON, existsSync } from 'fs-extra';
 import { tmpdir } from 'os';
 
-import * as settings from 'electron-json-config';
+import * as settings from '../settings.js';
+
 import request from 'request-promise-native';
 
 import { createElement, rewindTimeText, rewindTimeTooltip, forwardTimeText, forwardTimeTooltip } from './renderer.js';

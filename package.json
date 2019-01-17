@@ -92,7 +92,6 @@
   "license": "MIT",
   "dependencies": {
     "electron-dl": "^1.12.0",
-    "electron-json-config": "^1.5.3",
     "fs-extra": "^7.0.1",
     "howler": "^2.0.15",
     "music-metadata": "^3.2.4",

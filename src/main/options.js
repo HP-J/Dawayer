@@ -3,7 +3,7 @@ import { Menu, Tray, app, nativeImage } from 'electron';
 import { join } from 'path';
 import { existsSync } from 'fs';
 
-import * as settings from 'electron-json-config';
+import * as settings from '../settings.js';
 
 import { showHide, isDebug } from './window.js';
 
