@@ -5,7 +5,7 @@ import scroll from './scroll.js';
 import { initStorage } from './storage.js';
 import { initOptions } from './options.js';
 
-import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume } from './playback.js';
+import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume, getShuffleMode, setShuffleMode, getRepeatMode, setRepeatMode } from './playback.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
@@ -223,11 +223,13 @@ function initEvents()
       expandMenu();
   };
 
-  // controls events
+  // playback events
 
   playButton.onclick = playPause;
-  shuffleButton.onclick = shuffleMode;
-  repeatButton.onclick = repeatMode;
+
+  shuffleButton.onclick = switchShuffleMode;
+  repeatButton.onclick = switchRepeatMode;
+
   volumeButton.onclick = muteVolume;
 
   // sub-menu events
@@ -370,6 +372,13 @@ function init()
 
   volumeControl(getVolume());
   initBar(volumeBar, undefined, volumeControl);
+
+  // they have default classes
+  shuffleButton.classList.remove('shuffled');
+  repeatButton.classList.remove('looping');
+
+  shuffleButton.classList.add(getShuffleMode());
+  repeatButton.classList.add(getRepeatMode());
 }
 
 function initPages()
@@ -410,7 +419,7 @@ function expandMenu()
   }
 }
 
-// Controls
+// Playback
 
 function playPause()
 {
@@ -428,42 +437,47 @@ function playPause()
   }
 }
 
-function shuffleMode()
+function switchShuffleMode()
 {
-  // turn off shuffling (play songs with their original indices)
-  if (shuffleButton.classList.contains('shuffled'))
+  const modes =
   {
-    shuffleButton.classList.remove('shuffled');
-    shuffleButton.classList.add('normal');
-  }
-  // turn on shuffling (play songs with shuffled indices)
-  else
-  {
-    shuffleButton.classList.remove('normal');
-    shuffleButton.classList.add('shuffled');
-  }
+    shuffled: 'normal',
+    normal: 'shuffled'
+  };
+
+  const shuffleMode = getShuffleMode();
+
+  shuffleButton.classList.remove(shuffleMode);
+  shuffleButton.classList.add(modes[shuffleMode]);
+
+  setShuffleMode(modes[shuffleMode]);
 }
 
-function repeatMode()
+function switchRepeatMode()
 {
-  // turn on repeating (the same track on loop)
-  if (repeatButton.classList.contains('looping'))
+  const modes =
   {
-    repeatButton.classList.remove('looping');
-    repeatButton.classList.add('repeating');
-  }
-  // turn off repeating (stop playing when the current track ends)
-  else if (repeatButton.classList.contains('repeating'))
-  {
-    repeatButton.classList.remove('repeating');
-    repeatButton.classList.add('once');
-  }
-  // turn on looping (loop the playlist) (goes to play track [0] when the last track ends)
+    looping: 'repeating',
+    repeating: 'once',
+    once: 'looping'
+  };
+
+  const repeatMode = getRepeatMode();
+
+  repeatButton.classList.remove(repeatMode);
+  repeatButton.classList.add(modes[repeatMode]);
+
+  setRepeatMode(modes[repeatMode]);
+}
+
+function muteVolume()
+{
+  if (!volumeButton.classList.contains('muted'))
+    volumeControl(0);
+  else if (lastRememberedVolume === 0 || 0.15 >= lastRememberedVolume)
+    volumeControl(0.15);
   else
-  {
-    repeatButton.classList.remove('once');
-    repeatButton.classList.add('looping');
-  }
+    volumeControl(lastRememberedVolume);
 }
 
 /** @param { HTMLDivElement } element
@@ -475,16 +489,6 @@ function updateBarPercentage(element, playedPercentage)
 
   element.querySelector('.played').style.width = `${playedPercentage * 100}%`;
   element.querySelector('.remaining').style.width = `${remainingPercentage * 100}%`;
-}
-
-function muteVolume()
-{
-  if (!volumeButton.classList.contains('muted'))
-    volumeControl(0);
-  else if (lastRememberedVolume === 0 || 0.15 >= lastRememberedVolume)
-    volumeControl(0.15);
-  else
-    volumeControl(lastRememberedVolume);
 }
 
 /** @param { number } highlightedPercentage

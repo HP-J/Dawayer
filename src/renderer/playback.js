@@ -6,6 +6,14 @@ let forwardTime = 0;
 let seekTime = 0;
 let currentVolume = 0;
 
+/** @type { 'shuffled' | 'normal' }
+*/
+let shuffleMode;
+
+/** @type { 'looping' | 'repeating' | 'once' }
+*/
+let repeatMode;
+
 export function initPlayback()
 {
   // ADD save and load seek-time and current track
@@ -15,6 +23,9 @@ export function initPlayback()
   forwardTime = settings.get('forwardTime', 30);
 
   currentVolume = settings.get('currentVolume', 0.75);
+
+  shuffleMode = settings.get('shuffleMode', 'shuffled');
+  repeatMode = settings.get('repeatMode', 'looping');
 }
 
 export function getSeekTime()
@@ -77,5 +88,39 @@ export function setForwardTiming(forward)
     forwardTime = forward;
 
     settings.set('forwardTime', forward);
+  }
+}
+
+export function getShuffleMode()
+{
+  return shuffleMode;
+}
+
+/** @param { 'shuffled' | 'normal' } mode
+*/
+export function setShuffleMode(mode)
+{
+  if (mode !== shuffleMode)
+  {
+    shuffleMode = mode;
+
+    settings.set('shuffleMode', mode);
+  }
+}
+
+export function getRepeatMode()
+{
+  return repeatMode;
+}
+
+/** @param { 'looping' | 'repeating' | 'once' } mode
+*/
+export function setRepeatMode(mode)
+{
+  if (mode !== repeatMode)
+  {
+    repeatMode = mode;
+
+    settings.set('repeatMode', mode);
   }
 }
