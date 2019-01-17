@@ -2,7 +2,6 @@ import { remote, app } from 'electron';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 
-
 /** @param { string } key
 */
 export function has(key)

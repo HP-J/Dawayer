@@ -9,7 +9,9 @@ import * as settings from '../settings.js';
 import request from 'request-promise-native';
 
 import { createElement, rewindTimeText, rewindTimeTooltip, forwardTimeText, forwardTimeTooltip } from './renderer.js';
+
 import { addNewDirectories, removeDirectory, rescanStorage } from './storage.js';
+import { getRewindTiming, setRewindTiming, getForwardTiming, setForwardTiming } from './playback.js';
 
 /** @typedef { Object } BuildData
 * @property { string } branch
@@ -21,14 +23,6 @@ import { addNewDirectories, removeDirectory, rescanStorage } from './storage.js'
 /** @type {{ download: (win: Electron.BrowserWindow, url: string, options: { saveAs: boolean, directory: string, filename: string, openFolderWhenDone: boolean, showBadge: boolean, onStarted: (item: Electron.DownloadItem) => void, onProgress: (percentage: number) => void, onCancel: () => void }) => Promise<Electron.DownloadItem> }}
 */
 const { download: dl  } = remote.require('electron-dl');
-
-/** @type { number }
-*/
-export let rewindTime;
-
-/** @type { number }
-*/
-export let forwardTime;
 
 /**  @type { BuildData }
 */
@@ -104,7 +98,7 @@ export function appendDirectoryNode(directory)
   directoryText.innerText = directory;
 
   const removeButton = createElement('.option.directories.button.remove');
-  removeButton.innerText = 'Remove';
+  removeButton.innerText = 'X';
 
   removeButton.onclick = () =>
   {
@@ -247,14 +241,17 @@ function appendControls()
 {
   const applyElement = controlsContainer.querySelector('.apply');
 
-  rewindTime = settings.get('rewindTime', 10);
-  forwardTime = settings.get('forwardTime', 30);
+  const rewind = getRewindTiming();
 
-  changeRewindTimings(rewindTime);
-  changeForwardTimings(forwardTime);
+  rewindOptionInput.value = rewind;
+  rewindTimeText.innerText = rewind;
+  rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
 
-  rewindOptionInput.value = rewindTime;
-  forwardOptionInput.value = forwardTime;
+  const forward = getForwardTiming();
+
+  forwardOptionInput.value = forward;
+  forwardTimeText.innerText = forward;
+  forwardTimeTooltip.setContent(`Forward ${forward}s`);
 
   rewindOptionInput.tabIndex = forwardOptionInput.tabIndex = -1;
   
@@ -273,7 +270,7 @@ function appendControls()
     if (
       rewindOptionInput.value == '' ||
       forwardOptionInput.value == '' ||
-      (rewindTime == rewindOptionInput.value && forwardTime == forwardOptionInput.value))
+      (getRewindTiming() == rewindOptionInput.value && getForwardTiming() == forwardOptionInput.value))
     {
       if (!applyElement.classList.contains('clean'))
         applyElement.classList.add('clean');
@@ -287,11 +284,11 @@ function appendControls()
 
   applyElement.onclick = () =>
   {
-    if (rewindTime != rewindOptionInput.value)
-      changeRewindTimings(rewindOptionInput.value);
+    if (getRewindTiming() != rewindOptionInput.value)
+      changeRewindTiming(rewindOptionInput.value);
 
-    if (forwardTime != forwardOptionInput.value)
-      changeForwardTimings(forwardOptionInput.value);
+    if (getForwardTiming() != forwardOptionInput.value)
+      changeForwardTiming(forwardOptionInput.value);
     
     applyElement.classList.add('clean');
   };
@@ -299,34 +296,22 @@ function appendControls()
 
 /** @param { number } rewind
 */
-function changeRewindTimings(rewind)
+function changeRewindTiming(rewind)
 {
-  rewindTime = rewind;
-
-  // save the new timing
-  settings.set('rewindTime', rewind);
-
-  // the icon text
   rewindTimeText.innerText = rewind;
-
-  // the tool-tip text
   rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
+
+  setRewindTiming(rewind);
 }
 
 /** @param { number } forward
 */
-function changeForwardTimings(forward)
+function changeForwardTiming(forward)
 {
-  forwardTime = forward;
-
-  // save the new timing
-  settings.set('forwardTime', forward);
-
-  // the icon text
   forwardTimeText.innerText = forward;
-
-  // the tool-tip text
   forwardTimeTooltip.setContent(`Forward ${forward}s`);
+
+  setForwardTiming(forward);
 }
 
 function checkForUpdates()

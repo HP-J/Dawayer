@@ -1,10 +1,11 @@
 import tippy from 'tippy.js';
-import * as settings from '../settings.js';
 
 import scroll from './scroll.js';
 
 import { initStorage } from './storage.js';
 import { initOptions } from './options.js';
+
+import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume } from './playback.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
@@ -15,9 +16,6 @@ let resizeEndTimeout;
 
 let menuIsCollapsed = false;
 
-let seekTime = 0;
-
-let currentVolume;
 let lastRememberedVolume = 1;
 
 /**  @type { HTMLDivElement }
@@ -361,9 +359,17 @@ function init()
   initEvents();
   initTippy();
   
+  initPlayback();
+  
   initOptions();
 
   initStorage();
+
+  seekControl(getSeekTime());
+  initBar(seekBar, showSeekTime, seekControl);
+
+  volumeControl(getVolume());
+  initBar(volumeBar, undefined, volumeControl);
 }
 
 function initPages()
@@ -483,7 +489,7 @@ function muteVolume()
 
 /** @param { number } highlightedPercentage
 */
-function seekShowTime(highlightedPercentage)
+function showSeekTime(highlightedPercentage)
 {
   seekTooltip.setContent(highlightedPercentage);
 }
@@ -494,9 +500,9 @@ function seekControl(playedPercentage)
 {
   playedPercentage = playedPercentage || 0;
 
-  seekTime = playedPercentage;
-
   updateBarPercentage(seekBar, playedPercentage);
+
+  setSeekTime(playedPercentage);
 }
 
 /** @param { number } volumePercentage
@@ -504,9 +510,6 @@ function seekControl(playedPercentage)
 function volumeControl(volumePercentage)
 {
   volumePercentage = volumePercentage || 0;
-
-  if (volumePercentage !== currentVolume)
-    settings.set('currentVolume', volumePercentage);
 
   if (volumePercentage !== 0)
   {
@@ -519,10 +522,10 @@ function volumeControl(volumePercentage)
       volumeButton.classList.add('muted');
   }
 
-  lastRememberedVolume = currentVolume;
-  currentVolume = volumePercentage;
-
-  updateBarPercentage(volumeBar, currentVolume);
+  lastRememberedVolume = volumePercentage;
+  updateBarPercentage(volumeBar, volumePercentage);
+  
+  setVolume(volumePercentage);
 }
 
 // Callbacks
@@ -545,17 +548,6 @@ function resizeEnd()
 function onload()
 {
   initPages();
-
-  // ADD save and load seek-time and current track
-  // when playing a track load a metadata for it, don't try to use a storage info
-
-  seekControl(seekTime);
-  initBar(seekBar, seekShowTime, seekControl);
-
-  currentVolume = settings.get('currentVolume', 0.75);
-
-  volumeControl(currentVolume);
-  initBar(volumeBar, undefined, volumeControl);
 
   // remove fast-forward class from the html body
   resizeEnd();
