@@ -5,7 +5,7 @@ import scroll from './scroll.js';
 import { initStorage } from './storage.js';
 import { initOptions } from './options.js';
 
-import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume, getShuffleMode, setShuffleMode, getRepeatMode, setRepeatMode } from './playback.js';
+import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume, getPlayingMode, setPlayingMode, getShuffleMode, setShuffleMode, getRepeatMode, setRepeatMode } from './playback.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
@@ -225,7 +225,7 @@ function initEvents()
 
   // playback events
 
-  playButton.onclick = playPause;
+  playButton.onclick = switchPlayingMode;
 
   shuffleButton.onclick = switchShuffleMode;
   repeatButton.onclick = switchRepeatMode;
@@ -374,9 +374,11 @@ function init()
   initBar(volumeBar, undefined, volumeControl);
 
   // they have default classes
+  playButton.classList.remove('paused');
   shuffleButton.classList.remove('shuffled');
   repeatButton.classList.remove('looping');
 
+  playButton.classList.add(getPlayingMode());
   shuffleButton.classList.add(getShuffleMode());
   repeatButton.classList.add(getRepeatMode());
 }
@@ -421,20 +423,20 @@ function expandMenu()
 
 // Playback
 
-function playPause()
+function switchPlayingMode()
 {
-  // pause playback
-  if (playButton.classList.contains('playing'))
+  const modes =
   {
-    playButton.classList.remove('playing');
-    playButton.classList.add('paused');
-  }
-  // resume playback
-  else
-  {
-    playButton.classList.remove('paused');
-    playButton.classList.add('playing');
-  }
+    paused: 'playing',
+    playing: 'paused'
+  };
+
+  const playingMode = getPlayingMode();
+
+  playButton.classList.remove(playingMode);
+  playButton.classList.add(modes[playingMode]);
+
+  setPlayingMode(modes[playingMode]);
 }
 
 function switchShuffleMode()

@@ -6,6 +6,10 @@ let forwardTime = 0;
 let seekTime = 0;
 let currentVolume = 0;
 
+/** @type { 'paused' | 'playing' }
+*/
+let playingMode;
+
 /** @type { 'shuffled' | 'normal' }
 */
 let shuffleMode;
@@ -23,6 +27,8 @@ export function initPlayback()
   forwardTime = settings.get('forwardTime', 30);
 
   currentVolume = settings.get('currentVolume', 0.75);
+
+  playingMode = settings.get('playingMode', 'paused');
 
   shuffleMode = settings.get('shuffleMode', 'shuffled');
   repeatMode = settings.get('repeatMode', 'looping');
@@ -88,6 +94,23 @@ export function setForwardTiming(forward)
     forwardTime = forward;
 
     settings.set('forwardTime', forward);
+  }
+}
+
+export function getPlayingMode()
+{
+  return playingMode;
+}
+
+/** @param { 'paused' | 'playing' } mode
+*/
+export function setPlayingMode(mode)
+{
+  if (mode !== playingMode)
+  {
+    playingMode = mode;
+
+    settings.set('playingMode', mode);
   }
 }
 
