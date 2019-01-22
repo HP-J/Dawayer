@@ -253,10 +253,11 @@ function scanCacheAudioFiles()
                     }
 
                     // if the track does belong in an album and
-                    // the album isn't added to the artist yet, and
+                    // and the artist isn't unknown
                     // the album's artist is the same as the track's artist
-                    if (metadata.common.album && metadata.common.albumartist === artists[i])
+                    if (metadata.common.album && artists[i] !== 'Unknown Artist' && metadata.common.albumartist === artists[i])
                     {
+                      // if the album isn't added to the artist yet
                       if (!storage.artists[artists[i]].albums.includes(metadata.common.album))
                         storage.artists[artists[i]].albums.push(metadata.common.album);
                     }
@@ -379,7 +380,15 @@ function cacheArtist(artist, storage)
 
   return new Promise((resolve) =>
   {
-    const regex = /[0-9a-zA-z\s]/g;
+    // don't get info about unknown artists
+    if (artist === 'Unknown Artist')
+    {
+      resolve();
+
+      return;
+    }
+
+    const regex = /([0-9a-zA-z\s])/g;
     const promises = [];
 
     wiki.search(artist)
@@ -387,7 +396,7 @@ function cacheArtist(artist, storage)
       {
         for (let i = 0; i < search.results.length; i++)
         {
-          if (search.results[i].match(regex)[0].indexOf(artist.match(regex)[0]) > -1)
+          if (search.results[i].match(regex).join('').indexOf(artist.match(regex).join('')) > -1)
             return wiki.page(search.results[i]);
         }
       })
@@ -442,10 +451,9 @@ function appendAlbumPlaceholder()
   const albumContainer = createElement('.album.container');
 
   const cover = createElement('.album.cover');
+  const tracks = createElement('.album.tracks');
   const card = createElement('.album.card');
 
-  const tracks = createElement('.album.tracks');
-  const background = createElement('.album.background');
   const title = createElement('.album.title');
   const duration = createElement('.album.duration');
   const artist = createElement('.album.artist');
@@ -453,10 +461,9 @@ function appendAlbumPlaceholder()
   placeholderWrapper.appendChild(albumContainer);
 
   albumContainer.appendChild(cover);
+  albumContainer.appendChild(tracks);
   albumContainer.appendChild(card);
 
-  card.appendChild(tracks);
-  card.appendChild(background);
   card.appendChild(title);
   card.appendChild(duration);
   card.appendChild(artist);
@@ -492,15 +499,9 @@ function updateAlbumElement(placeholder, options)
   if (options.artist)
   {
     const artist = placeholder.querySelector('.album.artist');
-    const artistLink = createElement('.album.artistLink');
 
-    artistLink.innerText = options.artist;
-    artistLink.onclick = () => navigation(`artists:${options.artist}`);
-    
-    removeAllChildren(artist);
-    
-    artist.appendChild(document.createTextNode('by '));
-    artist.appendChild(artistLink);
+    artist.innerText = options.artist;
+    artist.onclick = () => navigation(`artists:${options.artist}`);
   }
 
   if (options.tracks)
