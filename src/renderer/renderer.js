@@ -205,24 +205,6 @@ function initEvents()
 
   optionsButton.onclick = () => changePage(optionsButton);
 
-  // menu collapsing events
-
-  menu.onmouseenter = () =>
-  {
-    expandMenu();
-  };
-
-  albumsWrapper.onscroll =
-  tracksWrapper.onscroll =
-  artistsWrapper.onscroll =
-  (event) =>
-  {
-    if (event.srcElement.scrollTop >= 20)
-      collapseMenu();
-    else
-      expandMenu();
-  };
-
   // playback events
 
   playButton.onclick = switchPlayingMode;
@@ -390,35 +372,6 @@ function initPages()
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
   scroll(selectedPage, { duration: 0 });
-}
-
-// Menu Collapsing
-
-function collapseMenu()
-{
-  if (!menuIsCollapsed)
-  {
-    const height = menu.getBoundingClientRect().height;
-    const collapsedHeight = height * 0.65;
-
-    menu.style.top = `-${collapsedHeight}px`;
-    pagesContainer.style.top = `-${height}px`;
-    pagesContainer.style.height = `calc(100% + ${height}px)`;
-
-    setTimeout(() => menuIsCollapsed = true, 125);
-  }
-}
-
-function expandMenu()
-{
-  if (menuIsCollapsed)
-  {
-    menu.style.setProperty('top', '');
-    pagesContainer.style.setProperty('top', '');
-    pagesContainer.style.setProperty('height', '');
-
-    setTimeout(() => menuIsCollapsed = false, 125);
-  }
 }
 
 // Playback
