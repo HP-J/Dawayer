@@ -140,14 +140,9 @@ body
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.controlBar.container.extended ~ * ~ * ~ .pages.background
+.controlBar.container.extended ~ div ~ div ~ .pages.background
 {
   left: 100%;
-}
-
-.controlBar.container.hidden ~ * ~ * ~ .pages.container
-{
-  height: calc(100% + 30vh);
 }
 
 .page.playing

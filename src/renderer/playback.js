@@ -20,8 +20,9 @@ let repeatMode;
 
 export function initPlayback()
 {
-  // ADD save and load seek-time and current track
-  // when playing a track load a metadata for it, don't try to use a storage info
+  // ADD save and load seek-time and current queue
+  // ADD when playing mode is set to playing after loading the saved queue, start playing the first track in said queue immediately,
+  // then load the metadata for the tracks, when loading load the metadata for them, don't try to use a storage info since they might not exists for the wait might take too long
 
   rewindTime = settings.get('rewindTime', 10);
   forwardTime = settings.get('forwardTime', 30);
