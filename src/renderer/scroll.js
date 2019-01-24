@@ -50,62 +50,70 @@ function scrollTo(element, options)
   if (element.parentElement._cancelScroll)
   {
     clearInterval(element.parentElement._cancelScroll);
-
+  
     element.parentElement._cancelScroll = undefined;
   }
-
+  
   const index = Array.prototype.indexOf.call(element.parentElement.children, element);
-
+  
   let scrollLocation;
   let scrollDifference;
-
+  
   let scrollStartPosition;
   let scrollEndPosition;
-
+  
   if (options.direction === 'horizontal')
   {
     scrollLocation = Math.round(element.getBoundingClientRect().width) * index;
+    
     scrollStartPosition = element.parentElement.scrollLeft;
-
+  
     // the location of the element - the current scroll position
     scrollDifference = scrollLocation - scrollStartPosition;
-
+  
     scrollEndPosition = element.parentElement.scrollLeft + scrollDifference;
   }
   else
   {
     scrollLocation = Math.round(element.getBoundingClientRect().height) * index;
+
     scrollStartPosition = element.parentElement.scrollTop;
 
     // the location of the element - the current scroll position
     scrollDifference = scrollLocation - scrollStartPosition;
-
+  
     scrollEndPosition = element.parentElement.scrollTop + scrollDifference;
   }
-
+  
   let elapsedTime = 0;
-
+  
+  // loop every millisecond
   element.parentElement._cancelScroll = setInterval(scroll, 1);
-
+  
   scroll();
-
+  
   function scroll()
   {
     elapsedTime += 1;
 
-    if (elapsedTime >= options.duration)
+    const lerpConst = lerp(scrollStartPosition, scrollEndPosition, elapsedTime / options.duration);
+  
+    if (options.direction === 'horizontal')
+      element.parentElement.scrollLeft = lerpConst;
+    else
+      element.parentElement.scrollTop = lerpConst;
+
+    // there's some window sizes where element.parentElement.scrollTop will be one pixel off
+    // even though lerp equals the end position, which properly means that it's on chrome's end
+
+    if (scrollEndPosition === lerpConst)
     {
       clearInterval(element.parentElement._cancelScroll);
-
+    
       element.parentElement._cancelScroll = undefined;
-
+  
       if (options.callback)
         options.callback();
     }
-
-    if (options.direction === 'horizontal')
-      element.parentElement.scrollLeft = lerp(scrollStartPosition, scrollEndPosition, elapsedTime / options.duration);
-    else
-      element.parentElement.scrollTop = lerp(scrollStartPosition, scrollEndPosition, elapsedTime / options.duration);
   }
 }

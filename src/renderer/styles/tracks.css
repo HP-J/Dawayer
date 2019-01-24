@@ -107,7 +107,7 @@
 
 .track.wrapper:not(.placeholder):hover > .container > .track.cover:after
 {
-  opacity: 0.725;
+  opacity: 0.765;
 }
 
 .track.card

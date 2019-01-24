@@ -51,9 +51,9 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.artist.wrapper:not(.placeholder) > .container:hover
+.artist.wrapper:not(.placeholder):hover > .container
 {
-  box-shadow: 0px 0px 20px 0px var(--color-2);
+  box-shadow: 0px 0px 11px 0px var(--color-2);
 }
 
 .artist.cover
@@ -84,7 +84,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.artist.wrapper:not(.placeholder) > .container:hover > .artist.cover:after
+.artist.wrapper:not(.placeholder):hover > .container > .artist.cover:after
 {
   background-color: var(--color-2);
   opacity: 0.35;
