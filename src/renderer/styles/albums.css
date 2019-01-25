@@ -174,7 +174,6 @@
 
   color: unset;
 
-  white-space: pre-line;
   word-break: break-word;
 
   font-weight: 700;
@@ -192,6 +191,14 @@
   opacity: 1;
 }
 
+.album.track
+.album.title,
+.track.artistLink,
+.album.duration
+{
+  white-space: pre-line;
+}
+
 .album.title
 {
   grid-area: title;
@@ -201,23 +208,20 @@
 
   color: var(--color-5);
 
-  white-space: pre-line;
-
   font-weight: 700;
 }
 
 .album.artist
 {
-  display: flex;
-
   grid-area: artist;
-
-  color: var(--color-3);
-
-  white-space: pre-line;
 }
 
-.album.artist:hover
+.album.artistLink
+{
+  color: var(--color-3);
+}
+
+.album.artistLink:hover
 {
   text-decoration: underline;
 }
@@ -235,7 +239,6 @@
   width: 100%;
   height: 100%;
 
-  white-space: pre-line;
   overflow: hidden;
 
   font-weight: 900;

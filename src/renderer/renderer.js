@@ -14,8 +14,6 @@ import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume, getPlayin
 
 let resizeEndTimeout;
 
-let menuIsCollapsed = false;
-
 let lastRememberedVolume = 1;
 
 /**  @type { HTMLDivElement }
@@ -532,10 +530,11 @@ function onresize()
 // API
 
 /** @param { string } classes
+* @param { string } [tagName]
 */
-export function createElement(classes)
+export function createElement(classes, tagName)
 {
-  const element = document.createElement('div');
+  const element = document.createElement(tagName || 'div');
 
   const classesArray = classes.split('.');
   classesArray.shift();

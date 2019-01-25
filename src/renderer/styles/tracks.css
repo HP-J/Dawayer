@@ -63,7 +63,7 @@
 
 .track.wrapper:not(.placeholder):hover > .container
 {
-  /* box-shadow: 0px 0px 14px -2px var(--holder-2); */
+  box-shadow: 0px 0px 14px -2px var(--holder-2);
 }
 
 .track.cover
@@ -126,8 +126,10 @@
 
   left: 0;
   width: 97%;
-
+  
   margin: 3%;
+
+  font-family: Montserrat, sans-serif;
 
   transition-property: left, width;
   transition-duration: 0.35s;
@@ -140,8 +142,6 @@
   width: 103%;
 }
 
-.track.artist,
-.track.artistLink,
 .track.title,
 .track.duration
 {
@@ -149,16 +149,23 @@
 
   white-space: pre-line;
   overflow: hidden;
-
-  font-family: Montserrat, sans-serif;
 }
 
 .track.artist
 {
   grid-area: artist;
+}
 
-  display: flex;
-  align-items: flex-end;
+.track.artistLink
+{
+  color: var(--color-3);
+
+  white-space: pre-line;
+}
+
+.track.artistLink:hover
+{
+  text-decoration: underline;
 }
 
 .track.title
@@ -178,16 +185,6 @@
   width: fit-content;
 
   font-weight: 700;
-}
-
-.track.artistLink
-{
-  color: var(--color-3);
-}
-
-.track.artistLink:hover
-{
-  text-decoration: underline;
 }
 
 /* Content Placeholders */

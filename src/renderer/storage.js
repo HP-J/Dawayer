@@ -2,6 +2,7 @@ import { remote } from 'electron';
 
 import { existsSync, exists, stat, move, remove, writeJson, readJSON, readdir } from 'fs-extra';
 
+import { union } from 'lodash';
 import { join, dirname, basename, extname } from 'path';
 import { homedir, tmpdir, platform } from 'os';
 
@@ -27,7 +28,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 */
 
 /** @typedef { Object } Storage
-* @property { Object<string, {  artist: string, tracks: string[], duration: number, element: HTMLDivElement }> } albums
+* @property { Object<string, {  artist: string[], tracks: string[], duration: number, element: HTMLDivElement }> } albums
 * @property { Object<string, { tracks: string[], albums: string[], bio: string, element: HTMLDivElement }> } artists
 * @property { Object<string, { url: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
@@ -230,13 +231,24 @@ function scanCacheAudioFiles()
                   rescanElement.innerText = `Scanning ${Math.round((i / files.length) * 100)}%`;
 
                   const title = metadata.common.title || basename(file, extname(file));
-                  const artists = metadata.common.artists || [ 'Unknown Artist' ];
+                  const duration = metadata.format.duration;
+
+                  let artists = metadata.common.artists || [ 'Unknown Artist' ];
+
+                  // split artists by comma
+                  artists = union(...[].concat(artists).map((v) => v.split(/,\s+/g)));
+
+                  const albumTitle = metadata.common.title;
+                  let albumArtist = metadata.common.albumartist || 'Unknown Artist';
+
+                  // split artists by comma
+                  albumArtist = albumArtist.split(/,\s+/g);
 
                   // store the track important metadata
                   storage.tracks[title] = {
                     url: file,
                     artists: artists,
-                    duration: metadata.format.duration
+                    duration: duration
                   };
 
                   // store the artist
@@ -255,40 +267,54 @@ function scanCacheAudioFiles()
                     // if the track does belong in an album and
                     // and the artist isn't unknown
                     // the album's artist is the same as the track's artist
-                    if (metadata.common.album && artists[i] !== 'Unknown Artist' && metadata.common.albumartist === artists[i])
+                    if (albumTitle && artists[i] !== 'Unknown Artist' && albumArtist.includes(artists[i]))
                     {
                       // if the album isn't added to the artist yet
-                      if (!storage.artists[artists[i]].albums.includes(metadata.common.album))
-                        storage.artists[artists[i]].albums.push(metadata.common.album);
+                      if (!storage.artists[artists[i]].albums.includes(albumTitle))
+                        storage.artists[artists[i]].albums.push(albumTitle);
                     }
                     else if (!storage.artists[artists[i]].tracks.includes(title))
                       storage.artists[artists[i]].tracks.push(title);
                   }
 
                   // if the track belongs in an album, store the album
-                  if (metadata.common.album)
+                  if (albumTitle)
                   {
-                    const album = metadata.common.album;
-
                     // if the track's album is in the storage object already
-                    if (storage.albums[album])
+                    if (storage.albums[albumTitle])
                     {
                       // push the new track to the album's list
-                      storage.albums[album].tracks.push(title);
+                      storage.albums[albumTitle].tracks.push(title);
 
                       // add the track's duration to the overall album duration
-                      storage.albums[album].duration =
-                        storage.albums[album].duration +
-                        metadata.format.duration;
+                      storage.albums[albumTitle].duration =
+                        storage.albums[albumTitle].duration + duration;
                     }
                     else
                     {
                       // add the album to the storage object
-                      storage.albums[album] = {
-                        artist: metadata.common.albumartist || 'Unknown Artist',
+                      storage.albums[albumTitle] = {
+                        artist: albumArtist,
                         tracks: [ title ],
-                        duration: metadata.format.duration
+                        duration: duration
                       };
+                    }
+
+                    // make sure that all artists of the album have entries and pages
+                    for (let i = 0; i < albumArtist.length; i++)
+                    {
+                      if (storage.artists[albumArtist[i]])
+                      {
+                        if (!storage.artists[albumArtist[i]].albums.includes(albumTitle))
+                          storage.artists[albumArtist[i]].albums.push(albumTitle);
+                      }
+                      else
+                      {
+                        storage.artists[albumArtist[i]] = {
+                          tracks: [],
+                          albums: [ albumTitle ]
+                        };
+                      }
                     }
                   }
                 }));
@@ -474,7 +500,7 @@ function appendAlbumPlaceholder()
 }
 
 /** @param { HTMLDivElement } placeholder
-* @param { { picture: string, title: string, artist: string, tracks: string[], duration: string } } options
+* @param { { picture: string, title: string, artist: string[], tracks: string[], duration: string } } options
 */
 function updateAlbumElement(placeholder, options)
 {
@@ -500,8 +526,20 @@ function updateAlbumElement(placeholder, options)
   {
     const artist = placeholder.querySelector('.album.artist');
 
-    artist.innerText = options.artist;
-    artist.onclick = () => navigation(`artists:${options.artist}`);
+    removeAllChildren(artist);
+
+    for (let i = 0; i < options.artist.length; i++)
+    {
+      const artistLink = createElement('.album.artistLink', 'a');
+
+      artistLink.innerText = options.artist[i];
+      artistLink.onclick = () => navigation(`artists:${options.artist[i]}`);
+
+      if (i > 0)
+        artist.appendChild(document.createTextNode(', '));
+
+      artist.appendChild(artistLink);
+    }
   }
 
   if (options.tracks)
@@ -807,7 +845,7 @@ function appendTracksPlaceholder()
 }
 
 /** @param { HTMLDivElement } placeholder
-* @param { { picture: string, artist: string, title: string, duration: string } } options
+* @param { { picture: string, artist: string[], title: string, duration: string } } options
 */
 function updateTracksElement(placeholder, options)
 {
@@ -820,14 +858,21 @@ function updateTracksElement(placeholder, options)
   if (options.artist)
   {
     const artist = placeholder.querySelector('.track.artist');
-    const artistLink = createElement('.track.artistLink');
-
-    artistLink.innerText = options.artist;
-    artistLink.onclick = () => navigation(`artists:${options.artist}`);
 
     removeAllChildren(artist);
-    
-    artist.appendChild(artistLink);
+
+    for (let i = 0; i < options.artist.length; i++)
+    {
+      const artistLink = createElement('.track.artistLink', 'a');
+
+      artistLink.innerText = options.artist[i];
+      artistLink.onclick = () => navigation(`artists:${options.artist[i]}`);
+
+      if (i > 0)
+        artist.appendChild(document.createTextNode(', '));
+
+      artist.appendChild(artistLink);
+    }
   }
 
   if (options.title)
@@ -863,7 +908,7 @@ function appendTracksPageItems(storage)
     {
       updateTracksElement(placeholder, {
         picture: img.src,
-        artist: track.artists.join(', '),
+        artist: track.artists,
         title: tracks[i],
         duration: secondsToDuration(track.duration)
       });

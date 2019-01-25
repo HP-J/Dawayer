@@ -93,12 +93,9 @@
 
 .queue.container:hover, .controlBar.container.extended > .queue.container
 {
-  bottom: 0;
-}
-
-.queue.container:hover
-{
   box-shadow: 0px 0px 22px 0px var(--holder-4);
+
+  bottom: 0;
 }
 
 @media screen and (max-width: 800px)
