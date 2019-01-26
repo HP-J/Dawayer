@@ -1,4 +1,21 @@
+import { parseFile as getMetadata } from 'music-metadata';
+
 import * as settings from '../settings.js';
+
+import { createElement } from './renderer.js';
+import { missingPicture, toBase64 } from './storage.js';
+
+/**  @type { [ { url: string, index: string, element: HTMLDivElement } ] }
+*/
+let queue = [];
+
+const queueCurrent = document.body.querySelector('.queue.card');
+
+/**  @type { HTMLDivElement }
+*/
+const queueContainer = document.body.querySelector('.queue.tracks');
+
+const playingBackground = document.body.querySelector('.playing.background');
 
 let rewindTime = 0;
 let forwardTime = 0;
@@ -20,10 +37,6 @@ let repeatMode;
 
 export function initPlayback()
 {
-  // ADD save and load seek-time and current queue
-  // ADD when playing mode is set to playing after loading the saved queue, start playing the first track in said queue immediately,
-  // then load the metadata for the tracks, when loading load the metadata for them, don't try to use a storage info since they might not exists for the wait might take too long
-
   rewindTime = settings.get('rewindTime', 10);
   forwardTime = settings.get('forwardTime', 30);
 
@@ -33,6 +46,9 @@ export function initPlayback()
 
   shuffleMode = settings.get('shuffleMode', 'shuffled');
   repeatMode = settings.get('repeatMode', 'looping');
+
+  // ADD save and load seek-time and current queue
+  emptyQueue();
 }
 
 export function getSeekTime()
@@ -45,6 +61,8 @@ export function getSeekTime()
 export function setSeekTime(time)
 {
   seekTime = time;
+
+  return true;
 }
 
 export function getVolume()
@@ -62,6 +80,8 @@ export function setVolume(volume)
 
     currentVolume = volume;
   }
+
+  return true;
 }
 
 export function getRewindTiming()
@@ -79,6 +99,8 @@ export function setRewindTiming(rewind)
 
     settings.set('rewindTime', rewind);
   }
+
+  return true;
 }
 
 export function getForwardTiming()
@@ -96,6 +118,8 @@ export function setForwardTiming(forward)
 
     settings.set('forwardTime', forward);
   }
+
+  return true;
 }
 
 export function getPlayingMode()
@@ -113,6 +137,8 @@ export function setPlayingMode(mode)
 
     settings.set('playingMode', mode);
   }
+
+  return true;
 }
 
 export function getShuffleMode()
@@ -130,6 +156,8 @@ export function setShuffleMode(mode)
 
     settings.set('shuffleMode', mode);
   }
+
+  return true;
 }
 
 export function getRepeatMode()
@@ -147,4 +175,67 @@ export function setRepeatMode(mode)
 
     settings.set('repeatMode', mode);
   }
+
+  return true;
+}
+
+/** @param { string } url
+* @param { string } artist
+* @param { string } title
+*/
+function updateCurrent(url, artist, title)
+{
+  const img = new Image();
+
+  img.src = missingPicture;
+
+  img.onload = () =>
+  {
+    queueCurrent.querySelector('.cover').style.backgroundImage =
+    playingBackground.style.backgroundImage = `url(${img.src})`;
+  };
+
+  queueCurrent.querySelector('.artist').innerText = artist;
+  queueCurrent.querySelector('.title').innerText = title;
+
+  if (url)
+  {
+    getMetadata(url)
+      .then(metadata =>
+      {
+        if (metadata.common.picture && metadata.common.picture.length > 0)
+          img.src = toBase64(metadata.common.picture[0]);
+      });
+  }
+}
+
+/** @param { number } index
+* @param { string } artist
+* @param { string } title
+*/
+function createQueueItem(index, artist, title)
+{
+  const queueItem = createElement('.queueItem.container');
+
+  const indexElement = createElement('.queueItem.index');
+  const artistElement = createElement('.queueItem.artist');
+  const titleElement = createElement('.queueItem.title');
+
+  queueItem.appendChild(indexElement);
+  queueItem.appendChild(artistElement);
+  queueItem.appendChild(titleElement);
+
+  indexElement.innerText = index;
+  artistElement.innerText = artist;
+  titleElement.innerText = title;
+
+  return queueItem;
+}
+
+function emptyQueue()
+{
+  queue = [];
+
+  updateCurrent(undefined, 'the Queue', 'Is Empty');
+  queueContainer.appendChild(createQueueItem('', '', 'Nothing else is queued.')).classList.add('played');
 }

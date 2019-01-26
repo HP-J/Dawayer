@@ -12,3 +12,6 @@ playback:
   ☐ previous button goes back only if playback time is less than 5 seconds else resets the playback to the start of the audio file
 
   ☐ queue sorts audio files (if same album sort by track number) then sort by title then sort by filename
+
+ci:
+  ☐ add pipeline id to build.json using the CI

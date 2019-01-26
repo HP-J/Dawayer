@@ -62,18 +62,6 @@ const optionsButton = menu.children.item(2);
 
 /**  @type { HTMLDivElement }
 */
-const albumsWrapper = document.body.querySelector('.albums.wrapper');
-
-/**  @type { HTMLDivElement }
-*/
-const tracksWrapper = document.body.querySelector('.tracks.wrapper');
-
-/**  @type { HTMLDivElement }
-*/
-const artistsWrapper = document.body.querySelector('.artists.wrapper');
-
-/**  @type { HTMLDivElement }
-*/
 const seekBar = controlBar.querySelector('.seekBar.container');
 
 /**  @type { HTMLDivElement }
@@ -384,10 +372,11 @@ function switchPlayingMode()
 
   const playingMode = getPlayingMode();
 
-  playButton.classList.remove(playingMode);
-  playButton.classList.add(modes[playingMode]);
-
-  setPlayingMode(modes[playingMode]);
+  if (setPlayingMode(modes[playingMode]))
+  {
+    playButton.classList.remove(playingMode);
+    playButton.classList.add(modes[playingMode]);
+  }
 }
 
 function switchShuffleMode()
@@ -400,10 +389,11 @@ function switchShuffleMode()
 
   const shuffleMode = getShuffleMode();
 
-  shuffleButton.classList.remove(shuffleMode);
-  shuffleButton.classList.add(modes[shuffleMode]);
-
-  setShuffleMode(modes[shuffleMode]);
+  if (setShuffleMode(modes[shuffleMode]))
+  {
+    shuffleButton.classList.remove(shuffleMode);
+    shuffleButton.classList.add(modes[shuffleMode]);
+  }
 }
 
 function switchRepeatMode()
@@ -417,10 +407,11 @@ function switchRepeatMode()
 
   const repeatMode = getRepeatMode();
 
-  repeatButton.classList.remove(repeatMode);
-  repeatButton.classList.add(modes[repeatMode]);
-
-  setRepeatMode(modes[repeatMode]);
+  if (setRepeatMode(modes[repeatMode]))
+  {
+    repeatButton.classList.remove(repeatMode);
+    repeatButton.classList.add(modes[repeatMode]);
+  }
 }
 
 function muteVolume()
@@ -457,9 +448,10 @@ function seekControl(playedPercentage)
 {
   playedPercentage = playedPercentage || 0;
 
-  updateBarPercentage(seekBar, playedPercentage);
-
-  setSeekTime(playedPercentage);
+  if (setSeekTime(playedPercentage))
+  {
+    updateBarPercentage(seekBar, playedPercentage);
+  }
 }
 
 /** @param { number } volumePercentage
@@ -468,21 +460,23 @@ function volumeControl(volumePercentage)
 {
   volumePercentage = volumePercentage || 0;
 
-  if (volumePercentage !== 0)
-  {
-    if (volumeButton.classList.contains('muted'))
-      volumeButton.classList.remove('muted');
-  }
-  else
-  {
-    if (!volumeButton.classList.contains('muted'))
-      volumeButton.classList.add('muted');
-  }
+  lastRememberedVolume = getVolume();
 
-  lastRememberedVolume = volumePercentage;
-  updateBarPercentage(volumeBar, volumePercentage);
+  if (setVolume(volumePercentage))
+  {
+    if (volumePercentage !== 0)
+    {
+      if (volumeButton.classList.contains('muted'))
+        volumeButton.classList.remove('muted');
+    }
+    else
+    {
+      if (!volumeButton.classList.contains('muted'))
+        volumeButton.classList.add('muted');
+    }
   
-  setVolume(volumePercentage);
+    updateBarPercentage(volumeBar, volumePercentage);
+  }
 }
 
 // Callbacks

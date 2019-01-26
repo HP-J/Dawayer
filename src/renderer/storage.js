@@ -1,22 +1,20 @@
 import { remote } from 'electron';
 
-import { existsSync, exists, stat, move, remove, writeJson, readJSON, readdir } from 'fs-extra';
+import { existsSync, exists, stat, emptyDir, writeFile, writeJson, readJSON, readdir } from 'fs-extra';
 
 import { union } from 'lodash';
 import { join, dirname, basename, extname } from 'path';
-import { homedir, tmpdir, platform } from 'os';
+import { homedir, platform } from 'os';
 
 import * as settings from '../settings.js';
 
-/** @type {{ download: (win: Electron.BrowserWindow, url: string, options: { saveAs: boolean, directory: string, filename: string, openFolderWhenDone: boolean, showBadge: boolean, onStarted: (item: Electron.DownloadItem) => void, onProgress: (percentage: number) => void, onCancel: () => void }) => Promise<Electron.DownloadItem> }}
-*/
-const { download: dl  } = remote.require('electron-dl');
+import download from 'download';
 
 import { parseFile as getMetadata } from 'music-metadata';
 import getWiki from 'wikijs';
 
 import { createElement, createIcon } from './renderer.js';
-import { mainWindow, appendDirectoryNode } from './options.js';
+import { appendDirectoryNode } from './options.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -41,7 +39,7 @@ const configDir = dirname(settings.getPath());
 
 /**  @type { string }
 */
-let missingPicture;
+export const missingPicture = join(__dirname, '../../missing.png');
 
 const wiki = getWiki();
 
@@ -67,11 +65,11 @@ let navigation;
 
 /** @type { string }
 */
-let storageInfoConfig;
+const storageInfoConfig = join(configDir, '/storageInfo.json');
 
 /** @type { string }
 */
-let storageConfig;
+const storageConfig = join(configDir, '/storage.json');
 
 /** @param { string[] } directories
 * @returns { string[] }
@@ -117,7 +115,6 @@ function walk(directories)
 
 function getDefaultMusicDir()
 {
-  // TEST the default music dir on windows
   const currentPlatform = platform();
 
   if (currentPlatform === 'linux' || currentPlatform === 'win32')
@@ -129,20 +126,15 @@ function getDefaultMusicDir()
 */
 export function initStorage()
 {
-  // TEST changing the directory (from ~/Music to /mnt/k/Music Tester) during runtime
-  // and then re-scanning
-
-  missingPicture = join(__dirname, '../../missing.png');
-
-  storageInfoConfig = join(configDir, '/storageInfo.json');
-  storageConfig = join(configDir, '/storage.json');
-
   // loaded the saved audio directories
 
   const savedAudioDirectories = settings.get('audioDirectories');
 
+  // TEST the default music dir on windows
+  // console.log(getDefaultMusicDir());
+
   // if now audio directories are saved, then use the OS default directory for music
-  if (!savedAudioDirectories || !savedAudioDirectories.length <= 0)
+  if (!savedAudioDirectories || savedAudioDirectories.length <= 0)
     addNewDirectories([ getDefaultMusicDir() ]);
   else
     addNewDirectories(savedAudioDirectories);
@@ -187,7 +179,7 @@ export function initStorage()
 /** scan the audio directories for audio files then parses them for their metadata,
 * and adds the important data to the storage object
 */
-function scanCacheAudioFiles()
+function  scanCacheAudioFiles()
 {
   /** @type { Storage }
   */
@@ -204,7 +196,8 @@ function scanCacheAudioFiles()
 
   return new Promise((resolve) =>
   {
-    remove(join(configDir, 'ArtistsCache')).then(() =>
+    // empty the artists cache directory and ensures that it exists
+    emptyDir(join(configDir, 'ArtistsCache')).then(() =>
     {
       // walk through all the listed audio directories
       walk(audioDirectories).then((files) =>
@@ -236,13 +229,13 @@ function scanCacheAudioFiles()
                   let artists = metadata.common.artists || [ 'Unknown Artist' ];
 
                   // split artists by comma
-                  artists = union(...[].concat(artists).map((v) => v.split(/,\s+/g)));
+                  artists = union(...[].concat(artists).map((v) => v.split(/,\s+|\s+ft.?\s+|\s+feat.?\s+/g)));
 
-                  const albumTitle = metadata.common.title;
+                  const albumTitle = metadata.common.album;
                   let albumArtist = metadata.common.albumartist || 'Unknown Artist';
 
                   // split artists by comma
-                  albumArtist = albumArtist.split(/,\s+/g);
+                  albumArtist = albumArtist.split(/,\s+|\s+ft.?\s+|\s+feat.?\s+/g);
 
                   // store the track important metadata
                   storage.tracks[title] = {
@@ -414,15 +407,17 @@ function cacheArtist(artist, storage)
       return;
     }
 
-    const regex = /([0-9a-zA-z\s])/g;
+    const regex = /[^a-zA-Z0-9]+/g;
     const promises = [];
 
-    wiki.search(artist)
+    wiki.search(artist, 5)
       .then(search =>
       {
+        const artistForSearch = artist.replace(regex, ' ');
+
         for (let i = 0; i < search.results.length; i++)
         {
-          if (search.results[i].match(regex).join('').indexOf(artist.match(regex).join('')) > -1)
+          if (search.results[i].replace(regex, ' ').indexOf(artistForSearch) > -1)
             return wiki.page(search.results[i]);
         }
       })
@@ -443,25 +438,19 @@ function cacheArtist(artist, storage)
           {
             const picturePath = join(configDir, 'ArtistsCache', artist);
 
-            dl(mainWindow, pictureUrl, {
-              directory: tmpdir(),
-              filename: artist,
-              showBadge: false
-            })
-              .then(() => move(join(tmpdir(), artist), picturePath, { overwrite: true }))
-              .then(() =>
-              {
-                const img = new Image();
+            download(pictureUrl).then((data) => writeFile(picturePath, data)).then(() =>
+            {
+              const img = new Image();
 
-                img.src = picturePath;
-            
-                img.onload = () =>
-                {
-                  updateArtistElement(storage.artists[artist].element, {
-                    picture: img.src
-                  });
-                };
-              });
+              img.src = picturePath;
+
+              img.onload = () =>
+              {
+                updateArtistElement(storage.artists[artist].element, {
+                  picture: img.src
+                });
+              };
+            });
           }));
         }
 
@@ -537,6 +526,8 @@ function updateAlbumElement(placeholder, options)
 
       if (i > 0)
         artist.appendChild(document.createTextNode(', '));
+      else
+        artist.appendChild(document.createTextNode('by '));
 
       artist.appendChild(artistLink);
     }
@@ -954,6 +945,8 @@ function storageNavigation(storage, target)
   // open the artist's overlay
   if (key === 'artists')
     storage.artists[value].element.classList.toggle('activeOverlay');
+  else
+    console.log(key, value);
 }
 
 export function rescanStorage()
@@ -1002,7 +995,7 @@ export function removeDirectory(directory)
 
 /** @param { { format: string, data: Buffer } } picture
 */
-function toBase64(picture)
+export function toBase64(picture)
 {
   return `data:${picture.format};base64,${picture.data.toString('base64')}`;
 }

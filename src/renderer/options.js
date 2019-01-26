@@ -165,6 +165,9 @@ function appendAbout()
     if (localData.commit)
       aboutContainer.appendChild(createAboutText('Commit: ' + localData.commit));
 
+    if (localData.pipeline)
+      aboutContainer.appendChild(createAboutText('Pipeline: ' + localData.pipeline));
+
     if (localData.package)
       aboutContainer.appendChild(createAboutText(`Package (${localData.package})`));
 
@@ -298,20 +301,22 @@ function appendControls()
 */
 function changeRewindTiming(rewind)
 {
-  rewindTimeText.innerText = rewind;
-  rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
-
-  setRewindTiming(rewind);
+  if (setRewindTiming(rewind))
+  {
+    rewindTimeText.innerText = rewind;
+    rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
+  }
 }
 
 /** @param { number } forward
 */
 function changeForwardTiming(forward)
 {
-  forwardTimeText.innerText = forward;
-  forwardTimeTooltip.setContent(`Forward ${forward}s`);
-
-  setForwardTiming(forward);
+  if (setForwardTiming(forward))
+  {
+    forwardTimeText.innerText = forward;
+    forwardTimeTooltip.setContent(`Forward ${forward}s`);
+  }
 }
 
 function checkForUpdates()
