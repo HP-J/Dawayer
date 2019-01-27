@@ -1,11 +1,17 @@
 import { parseFile as getMetadata } from 'music-metadata';
 
+import { basename, extname } from 'path';
+import { union } from 'lodash';
+
 import * as settings from '../settings.js';
 
 import { createElement } from './renderer.js';
-import { missingPicture, toBase64 } from './storage.js';
+import { missingPicture, artistsRegex, toBase64, removeAllChildren } from './storage.js';
 
-/**  @type { [ { url: string, index: string, element: HTMLDivElement } ] }
+/** @typedef { import('./storage.js').Storage } Storage
+*/
+
+/**  @type { [ { url: string, index: number, title: string, artist: string, picture: string, element: HTMLDivElement } ] }
 */
 let queue = [];
 
@@ -19,6 +25,8 @@ const playingBackground = document.body.querySelector('.playing.background');
 
 let rewindTime = 0;
 let forwardTime = 0;
+
+let playingIndex = -1;
 
 let seekTime = 0;
 let currentVolume = 0;
@@ -42,13 +50,16 @@ export function initPlayback()
 
   currentVolume = settings.get('currentVolume', 0.75);
 
-  playingMode = settings.get('playingMode', 'paused');
+  // ADD load saved queue and seek-time here
+  clearQueue();
 
+  playingMode = 'paused';
+  setPlayingMode(settings.get('playingMode', 'paused'));
+
+  // ADD if shuffled shuffle the queue indices
   shuffleMode = settings.get('shuffleMode', 'shuffled');
-  repeatMode = settings.get('repeatMode', 'looping');
 
-  // ADD save and load seek-time and current queue
-  emptyQueue();
+  repeatMode = settings.get('repeatMode', 'looping');
 }
 
 export function getSeekTime()
@@ -60,9 +71,14 @@ export function getSeekTime()
 */
 export function setSeekTime(time)
 {
-  seekTime = time;
+  if (time !== seekTime)
+  {
+    seekTime = time;
 
-  return true;
+    return true;
+  }
+  
+  return false;
 }
 
 export function getVolume()
@@ -79,9 +95,11 @@ export function setVolume(volume)
     settings.set('currentVolume', volume);
 
     currentVolume = volume;
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 export function getRewindTiming()
@@ -98,9 +116,11 @@ export function setRewindTiming(rewind)
     rewindTime = rewind;
 
     settings.set('rewindTime', rewind);
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 export function getForwardTiming()
@@ -117,9 +137,11 @@ export function setForwardTiming(forward)
     forwardTime = forward;
 
     settings.set('forwardTime', forward);
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 export function getPlayingMode()
@@ -131,14 +153,16 @@ export function getPlayingMode()
 */
 export function setPlayingMode(mode)
 {
-  if (mode !== playingMode)
+  if (mode !== playingMode && queue.length > 0)
   {
     playingMode = mode;
 
     settings.set('playingMode', mode);
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 export function getShuffleMode()
@@ -155,9 +179,11 @@ export function setShuffleMode(mode)
     shuffleMode = mode;
 
     settings.set('shuffleMode', mode);
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 export function getRepeatMode()
@@ -174,46 +200,73 @@ export function setRepeatMode(mode)
     repeatMode = mode;
 
     settings.set('repeatMode', mode);
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 /** @param { string } url
-* @param { string } artist
-* @param { string } title
 */
-function updateCurrent(url, artist, title)
+function updateCurrentCard(index)
 {
-  const img = new Image();
+  queueCurrent.setAttribute('style', '');
 
-  img.src = missingPicture;
+  queueCurrent.querySelector('.cover').style.backgroundImage =
+  playingBackground.style.backgroundImage = queue[index].picture;
 
-  img.onload = () =>
+  queueCurrent.querySelector('.artist').innerText =  queue[index].artist;
+  queueCurrent.querySelector('.title').innerText = queue[index].title;
+}
+
+/** @param { Storage } storage
+* @param { string } title
+* @param { string } url
+*/
+function getTrackMetadata(storage, title, url)
+{
+  if (
+    storage &&
+    storage.tracks[title] &&
+    storage.tracks[title].element.querySelector('.cover').style.backgroundImage
+  )
   {
-    queueCurrent.querySelector('.cover').style.backgroundImage =
-    playingBackground.style.backgroundImage = `url(${img.src})`;
-  };
-
-  queueCurrent.querySelector('.artist').innerText = artist;
-  queueCurrent.querySelector('.title').innerText = title;
-
-  if (url)
+    return new Promise((resolve) =>
+    {
+      resolve({
+        title: title,
+        artist: storage.tracks[title].artists.join(', '),
+        picture: storage.tracks[title].element.querySelector('.cover').style.backgroundImage
+      });
+    });
+  }
+  else
   {
-    getMetadata(url)
+    return getMetadata(url)
       .then(metadata =>
       {
+        const title = metadata.common.title || basename(url, extname(url));
+        let artists = metadata.common.artists || [ 'Unknown Artist' ];
+
+        let picture;
+
+        // split artists by comma
+        artists = union(...[].concat(artists).map((v) => v.split(artistsRegex))).join(', ');
+
         if (metadata.common.picture && metadata.common.picture.length > 0)
-          img.src = toBase64(metadata.common.picture[0]);
+          picture = `url(${toBase64(metadata.common.picture[0])})`;
+
+        return { title: title, artist: artists, picture: picture };
       });
   }
 }
 
 /** @param { number } index
-* @param { string } artist
 * @param { string } title
+* @param { string } artist
 */
-function createQueueItem(index, artist, title)
+function appendQueueItem(index, title, artist)
 {
   const queueItem = createElement('.queueItem.container');
 
@@ -229,13 +282,103 @@ function createQueueItem(index, artist, title)
   artistElement.innerText = artist;
   titleElement.innerText = title;
 
-  return queueItem;
+  return queueContainer.appendChild(queueItem);
 }
 
-function emptyQueue()
+/** @param { Storage } storage
+* @param { string } tracks
+*/
+export function queueTracks(storage, ...tracks)
 {
+  for (let i = 0; i < tracks.length; i++)
+  {
+    const url = storage.tracks[tracks[i]].url;
+
+    const exists = queue.find((obj) => obj.url === url);
+
+    // if the same track already exists in the queue
+    if (exists && tracks.length === 1)
+    {
+      resortQueue(exists.index);
+    }
+    else if (!exists)
+    {
+      getTrackMetadata(storage, tracks[i], url).then((obj) =>
+      {
+        queue.push({
+          url: url,
+          index: queue.length,
+          title: obj.title,
+          artist: obj.artist,
+          picture: obj.picture,
+          element: appendQueueItem(queue.length, obj.title, obj.artist)
+        });
+  
+        if (playingIndex < 0)
+          resortQueue(0);
+        else if (tracks.length === 1)
+          resortQueue(queue.length - 1);
+        else
+          resortQueue(playingIndex);
+      });
+    }
+  }
+}
+
+/** @param { string } fromIndex
+*/
+function resortQueue(fromIndex)
+{
+  const clearElement = queueContainer.querySelector('.clear');
+  
+  playingIndex = fromIndex;
+  updateCurrentCard(fromIndex);
+
+  if (clearElement)
+    queueContainer.removeChild(clearElement);
+
+  for (let i = 0; i < queue.length; i++)
+  {
+    if (playingIndex > i)
+    {
+      queue[i].element.querySelector('.index').innerText = -(playingIndex - i);
+
+      if (!queue[i].element.classList.contains('played'))
+        queue[i].element.classList.add('played');
+    }
+    else
+    {
+      queue[i].element.querySelector('.index').innerText = i - playingIndex;
+      
+      if (queue[i].element.classList.contains('played'))
+        queue[i].element.classList.remove('played');
+    }
+  }
+}
+
+function clearQueue()
+{
+  // reset to the default picture
+  const img = new Image();
+
+  img.src = missingPicture;
+
+  img.onload = () =>
+  {
+    queueCurrent.querySelector('.cover').style.backgroundImage =
+    playingBackground.style.backgroundImage = `url(${img.src})`;
+  };
+
+  // nothing is playing
+  playingIndex = -1;
+
+  // empty queue array
   queue = [];
 
-  updateCurrent(undefined, 'the Queue', 'Is Empty');
-  queueContainer.appendChild(createQueueItem('', '', 'Nothing else is queued.')).classList.add('played');
+  // hide the current card
+  queueCurrent.setAttribute('style', 'display: none;');
+
+  // reset the queue list
+  removeAllChildren(queueContainer);
+  appendQueueItem('', 'Nothing is queued to play.', '').classList.add('played', 'clear');
 }

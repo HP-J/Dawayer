@@ -15,6 +15,7 @@ import getWiki from 'wikijs';
 
 import { createElement, createIcon } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
+import { queueTracks } from './playback.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -36,6 +37,8 @@ const AUDIO_EXTENSIONS_REGEX = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.fla
 /* the base directory for the app config files
 */
 const configDir = dirname(settings.getPath());
+
+export const artistsRegex = /,\s+|\s+ft.?\s+|\s+feat.?\s+/g;
 
 /**  @type { string }
 */
@@ -229,13 +232,13 @@ function  scanCacheAudioFiles()
                   let artists = metadata.common.artists || [ 'Unknown Artist' ];
 
                   // split artists by comma
-                  artists = union(...[].concat(artists).map((v) => v.split(/,\s+|\s+ft.?\s+|\s+feat.?\s+/g)));
+                  artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
 
                   const albumTitle = metadata.common.album;
                   let albumArtist = metadata.common.albumartist || 'Unknown Artist';
 
                   // split artists by comma
-                  albumArtist = albumArtist.split(/,\s+|\s+ft.?\s+|\s+feat.?\s+/g);
+                  albumArtist = albumArtist.split(artistsRegex);
 
                   // store the track important metadata
                   storage.tracks[title] = {
@@ -925,7 +928,7 @@ function appendItems(storage)
 
 /** @param { HTMLElement } element
 */
-function removeAllChildren(element)
+export function removeAllChildren(element)
 {
   while (element.lastChild)
   {
@@ -945,8 +948,15 @@ function storageNavigation(storage, target)
   // open the artist's overlay
   if (key === 'artists')
     storage.artists[value].element.classList.toggle('activeOverlay');
-  else
-    console.log(key, value);
+  // queue a track
+  else if (key === 'play-track')
+    queueTracks(storage, value);
+  // queue a album
+  else if (key === 'play-album')
+    queueTracks(storage, ...storage.albums[value].tracks);
+  // queue a artist
+  else if (key === 'play-artist')
+    queueTracks(storage, ...storage.artists[value].tracks);
 }
 
 export function rescanStorage()
