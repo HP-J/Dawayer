@@ -33,7 +33,7 @@ let currentVolume = 0;
 
 /** @type { 'paused' | 'playing' }
 */
-let playingMode;
+let playingMode = 'paused';
 
 /** @type { 'shuffled' | 'normal' }
 */
@@ -50,15 +50,12 @@ export function initPlayback()
 
   currentVolume = settings.get('currentVolume', 0.75);
 
-  // ADD load saved queue and seek-time here
-  clearQueue();
-
-  playingMode = 'paused';
-  setPlayingMode(settings.get('playingMode', 'paused'));
+  // if there is a saved queue
+  if (!loadQueue())
+    clearQueue();
 
   // ADD if shuffled shuffle the queue indices
   shuffleMode = settings.get('shuffleMode', 'shuffled');
-
   repeatMode = settings.get('repeatMode', 'looping');
 }
 
@@ -71,8 +68,10 @@ export function getSeekTime()
 */
 export function setSeekTime(time)
 {
-  if (time !== seekTime)
+  if (time !== seekTime && queue.length > 0)
   {
+    settings.set('seekTime', time);
+
     seekTime = time;
 
     return true;
@@ -156,8 +155,6 @@ export function setPlayingMode(mode)
   if (mode !== playingMode && queue.length > 0)
   {
     playingMode = mode;
-
-    settings.set('playingMode', mode);
 
     return true;
   }
@@ -288,7 +285,7 @@ function appendQueueItem(index, title, artist)
 /** @param { Storage } storage
 * @param { string } tracks
 */
-export function queueTracks(storage, ...tracks)
+export function queueStorageTracks(storage, ...tracks)
 {
   for (let i = 0; i < tracks.length; i++)
   {
@@ -320,8 +317,39 @@ export function queueTracks(storage, ...tracks)
           resortQueue(queue.length - 1);
         else
           resortQueue(playingIndex);
+
+        saveQueue();
       });
     }
+  }
+}
+
+/** @param { string[] } urls
+*/
+function queueTracks(...urls)
+{
+  for (let i = 0; i < urls.length; i++)
+  {
+    getTrackMetadata(undefined, undefined, urls[i]).then((obj) =>
+    {
+      queue.push({
+        url: urls[i],
+        index: queue.length,
+        title: obj.title,
+        artist: obj.artist,
+        picture: obj.picture,
+        element: appendQueueItem(queue.length, obj.title, obj.artist)
+      });
+
+      if (playingIndex < 0)
+        resortQueue(0);
+      else if (urls.length === 1)
+        resortQueue(queue.length - 1);
+      else
+        resortQueue(playingIndex);
+
+      saveQueue();
+    });
   }
 }
 
@@ -369,7 +397,10 @@ function clearQueue()
     playingBackground.style.backgroundImage = `url(${img.src})`;
   };
 
-  // nothing is playing
+  // end playback
+  // TODO update playing mode and seek-time graphics to paused and 0
+  playingMode = 'paused';
+  seekTime = 0;
   playingIndex = -1;
 
   // empty queue array
@@ -381,4 +412,25 @@ function clearQueue()
   // reset the queue list
   removeAllChildren(queueContainer);
   appendQueueItem('', 'Nothing is queued to play.', '').classList.add('played', 'clear');
+}
+
+function saveQueue()
+{
+  settings.set('playingIndex', playingIndex);
+  settings.set('queueTracks', queue.map(item => item.url));
+}
+
+function loadQueue()
+{
+  const tracks = settings.get('queueTracks', []);
+
+  if (tracks.length > 0)
+  {
+    queueTracks(...tracks);
+
+    playingIndex = settings.get('playingIndex', -1);
+    seekTime = settings.get('seekTime', 0);
+
+    return true;
+  }
 }

@@ -335,18 +335,16 @@ function init()
 
   initStorage();
 
-  seekControl(getSeekTime());
+  seekControl(getSeekTime(), true);
   initBar(seekBar, showSeekTime, seekControl);
 
-  volumeControl(getVolume());
+  volumeControl(getVolume(), true);
   initBar(volumeBar, undefined, volumeControl);
 
   // they have default classes
-  playButton.classList.remove('paused');
   shuffleButton.classList.remove('shuffled');
   repeatButton.classList.remove('looping');
 
-  playButton.classList.add(getPlayingMode());
   shuffleButton.classList.add(getShuffleMode());
   repeatButton.classList.add(getRepeatMode());
 }
@@ -443,26 +441,28 @@ function showSeekTime(highlightedPercentage)
 }
 
 /** @param { number } playedPercentage
+* @param { boolean } ignoreLock
 */
-function seekControl(playedPercentage)
+function seekControl(playedPercentage, ignoreLock)
 {
   playedPercentage = playedPercentage || 0;
 
-  if (setSeekTime(playedPercentage))
+  if (setSeekTime(playedPercentage) || ignoreLock)
   {
     updateBarPercentage(seekBar, playedPercentage);
   }
 }
 
 /** @param { number } volumePercentage
+* @param { boolean } ignoreLock
 */
-function volumeControl(volumePercentage)
+function volumeControl(volumePercentage, ignoreLock)
 {
   volumePercentage = volumePercentage || 0;
 
   lastRememberedVolume = getVolume();
 
-  if (setVolume(volumePercentage))
+  if (setVolume(volumePercentage) || ignoreLock)
   {
     if (volumePercentage !== 0)
     {

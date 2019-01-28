@@ -15,7 +15,7 @@ import getWiki from 'wikijs';
 
 import { createElement, createIcon } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
-import { queueTracks } from './playback.js';
+import { queueStorageTracks } from './playback.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -950,13 +950,13 @@ function storageNavigation(storage, target)
     storage.artists[value].element.classList.toggle('activeOverlay');
   // queue a track
   else if (key === 'play-track')
-    queueTracks(storage, value);
+    queueStorageTracks(storage, value);
   // queue a album
   else if (key === 'play-album')
-    queueTracks(storage, ...storage.albums[value].tracks);
+    queueStorageTracks(storage, ...storage.albums[value].tracks);
   // queue a artist
   else if (key === 'play-artist')
-    queueTracks(storage, ...storage.artists[value].tracks);
+    queueStorageTracks(storage, ...storage.artists[value].tracks);
 }
 
 export function rescanStorage()
