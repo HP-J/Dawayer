@@ -427,10 +427,7 @@ function muteVolume()
 */
 function updateBarPercentage(element, playedPercentage)
 {
-  const remainingPercentage = 1 - playedPercentage;
-
   element.querySelector('.played').style.width = `${playedPercentage * 100}%`;
-  element.querySelector('.remaining').style.width = `${remainingPercentage * 100}%`;
 }
 
 /** @param { number } highlightedPercentage
