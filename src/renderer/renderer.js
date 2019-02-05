@@ -2,10 +2,10 @@ import tippy from 'tippy.js';
 
 import scroll from './scroll.js';
 
-import { initStorage } from './storage.js';
+import { initStorage, secondsToDuration } from './storage.js';
 import { initOptions } from './options.js';
 
-import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume, getPlayingMode, setPlayingMode, getShuffleMode, setShuffleMode, getRepeatMode, setRepeatMode } from './playback.js';
+import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume, getPlayingMode, setPlayingMode, getShuffleMode, setShuffleMode, getRepeatMode, setRepeatMode, getDuration } from './playback.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
@@ -283,8 +283,8 @@ function initTippy()
 }
 
 /** @param { HTMLDivElement } element
- * @param { (highlightedPercentage: number) => void } mousemove
-* @param { (playedPercentage: number) => void } mousedown
+ * @param { (percentage: number) => void } mousemove
+* @param { (percentage: number) => void } mousedown
 */
 function initBar(element, mousemove, mousedown)
 {
@@ -335,8 +335,8 @@ function init()
 
   initStorage();
 
-  seekControl(getSeekTime(), true);
-  initBar(seekBar, showSeekTime, seekControl);
+  seekTimeControl(getSeekTime(), true);
+  initBar(seekBar, showSeekTime, seekTimeControl);
 
   volumeControl(getVolume(), true);
   initBar(volumeBar, undefined, volumeControl);
@@ -360,7 +360,7 @@ function initPages()
 
 // Playback
 
-function switchPlayingMode()
+export function switchPlayingMode()
 {
   const modes =
   {
@@ -427,41 +427,50 @@ function muteVolume()
 */
 function updateBarPercentage(element, playedPercentage)
 {
-  element.querySelector('.played').style.width = `${playedPercentage * 100}%`;
+  element.style.setProperty('--bar-percentage', (playedPercentage * 100) + '%');
 }
 
-/** @param { number } highlightedPercentage
+/** @param { number } percentage
 */
-function showSeekTime(highlightedPercentage)
+function showSeekTime(percentage)
 {
-  seekTooltip.setContent(highlightedPercentage);
-}
+  const duration = getDuration();
 
-/** @param { number } playedPercentage
-* @param { boolean } ignoreLock
-*/
-function seekControl(playedPercentage, ignoreLock)
-{
-  playedPercentage = playedPercentage || 0;
-
-  if (setSeekTime(playedPercentage) || ignoreLock)
+  if (duration > -1)
   {
-    updateBarPercentage(seekBar, playedPercentage);
+    seekTooltip.enable();
+
+    seekTooltip.setContent(secondsToDuration(duration * percentage));
+  }
+  else
+  {
+    seekTooltip.disable();
   }
 }
 
-/** @param { number } volumePercentage
+/** @param { number } percentage
+* @param { boolean } visual
+*/
+export function seekTimeControl(percentage, visual)
+{
+  if (setSeekTime(percentage * getDuration(), visual))
+  {
+    updateBarPercentage(seekBar, percentage);
+  }
+}
+
+/** @param { number } percentage
 * @param { boolean } ignoreLock
 */
-function volumeControl(volumePercentage, ignoreLock)
+function volumeControl(percentage, ignoreLock)
 {
-  volumePercentage = volumePercentage || 0;
+  percentage = percentage || 0;
 
   lastRememberedVolume = getVolume();
 
-  if (setVolume(volumePercentage) || ignoreLock)
+  if (ignoreLock || setVolume(percentage))
   {
-    if (volumePercentage !== 0)
+    if (percentage !== 0)
     {
       if (volumeButton.classList.contains('muted'))
         volumeButton.classList.remove('muted');
@@ -472,7 +481,7 @@ function volumeControl(volumePercentage, ignoreLock)
         volumeButton.classList.add('muted');
     }
   
-    updateBarPercentage(volumeBar, volumePercentage);
+    updateBarPercentage(volumeBar, percentage);
   }
 }
 

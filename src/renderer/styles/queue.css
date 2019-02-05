@@ -31,6 +31,10 @@
 
   background-size: cover;
   background-position: center;
+
+  transition-property: background-image;
+  transition-duration: 0.25s;
+  transition-timing-function: ease-in-out;
 }
 
 .queue.playing.artist,
@@ -50,6 +54,7 @@
   align-items: flex-end;
 
   padding-top: 5px;
+  padding-bottom: 1px;
 }
 
 .queue.playing.title
@@ -97,7 +102,7 @@
 {
   display: grid;
 
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 5% 1fr;
   grid-template-rows: auto auto;
   grid-template-areas: "index artist" "index title";
 
@@ -124,9 +129,9 @@
   font-weight: 700;
 }
 
-.queueItem.index:not(:empty)
+.queueItem.clear
 {
-  padding-right: 8px;
+  grid-template-columns: 0 100%;
 }
 
 .queueItem.artist
@@ -135,6 +140,8 @@
 
   display: flex;
   align-items: flex-end;
+
+  padding-bottom: 1px;
 }
 
 .queueItem.title
@@ -151,6 +158,10 @@
   white-space: pre-line;
 
   color: var(--color-4);
+
+  transition-property: color;
+  transition-duration: 0.25s;
+  transition-timing-function: ease-in-out;
 }
 
 .queueItem.container.played > .index,

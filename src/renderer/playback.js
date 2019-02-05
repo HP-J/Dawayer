@@ -1,21 +1,25 @@
 import { parseFile as getMetadata } from 'music-metadata';
 
+import { Howl, Howler as howler } from 'howler';
+
 import { basename, extname } from 'path';
 import { union } from 'lodash';
 
 import * as settings from '../settings.js';
 
-import { createElement } from './renderer.js';
+import { createElement, seekTimeControl, switchPlayingMode } from './renderer.js';
 import { missingPicture, artistsRegex, toBase64, removeAllChildren } from './storage.js';
 
 /** @typedef { import('./storage.js').Storage } Storage
 */
 
-/**  @type { [ { url: string, index: number, title: string, artist: string, picture: string, element: HTMLDivElement } ] }
+/**  @type { [ { url: string, index: number, title: string, artist: string, picture: string, duration: number, element: HTMLDivElement } ] }
 */
 let queue = [];
 
-const queueCurrent = document.body.querySelector('.queue.card');
+const seekBarPlayed = document.body.querySelector('.seekBar.played');
+
+const queueCurrentElement = document.body.querySelector('.queue.card');
 
 /**  @type { HTMLDivElement }
 */
@@ -26,10 +30,8 @@ const playingBackground = document.body.querySelector('.playing.background');
 let rewindTime = 0;
 let forwardTime = 0;
 
+let currentHowl;
 let playingIndex = -1;
-
-let seekTime = 0;
-let currentVolume = 0;
 
 /** @type { 'paused' | 'playing' }
 */
@@ -48,31 +50,57 @@ export function initPlayback()
   rewindTime = settings.get('rewindTime', 10);
   forwardTime = settings.get('forwardTime', 30);
 
-  currentVolume = settings.get('currentVolume', 0.75);
+  howler.volume(settings.get('currentVolume', 0.75));
 
   // if there is a saved queue
-  if (!loadQueue())
-    clearQueue();
+  // TODO load a saved queue
+  // if (!loadQueue())
+  clearQueue();
 
   // ADD if shuffled shuffle the queue indices
   shuffleMode = settings.get('shuffleMode', 'shuffled');
   repeatMode = settings.get('repeatMode', 'looping');
 }
 
+export function getDuration()
+{
+  if (playingIndex > -1)
+    return queue[playingIndex].duration;
+  else
+    return -1;
+}
+
 export function getSeekTime()
 {
-  return seekTime;
+  if (playingIndex > -1)
+    return currentHowl.seek();
+  else
+    return 0;
+}
+
+/** @param { number } index
+*/
+export function setPlayingIndex(index)
+{
+  playingIndex = index;
 }
 
 /** @param { number } time
+* @param { boolean } visual
 */
-export function setSeekTime(time)
+export function setSeekTime(time, visual)
 {
-  if (time !== seekTime && queue.length > 0)
+  if (playingIndex > -1)
   {
-    settings.set('seekTime', time);
+    // TODO save seekTime
+    // settings.set('seekTime', time);
 
-    seekTime = time;
+    if (!visual)
+    {
+      currentHowl.seek(time);
+
+      currentHowl.seekTimeProgress = time * 1000;
+    }
 
     return true;
   }
@@ -82,18 +110,18 @@ export function setSeekTime(time)
 
 export function getVolume()
 {
-  return currentVolume;
+  return howler.volume();
 }
 
 /** @param { number } volume
 */
 export function setVolume(volume)
 {
-  if (volume !== currentVolume)
+  if (volume !== howler.volume())
   {
     settings.set('currentVolume', volume);
 
-    currentVolume = volume;
+    howler.volume(volume);
 
     return true;
   }
@@ -148,14 +176,30 @@ export function getPlayingMode()
   return playingMode;
 }
 
+// TEST all the (if) cases included in the function
 /** @param { 'paused' | 'playing' } mode
 */
 export function setPlayingMode(mode)
 {
-  if (mode !== playingMode && queue.length > 0)
+  if (mode !== playingMode && playingIndex > -1)
   {
     playingMode = mode;
 
+    if (playingMode === 'paused')
+    {
+      currentHowl.pause();
+    }
+    else
+    {
+      // if the current howl url doesn't match the playing-index track url
+      // restart playback to the playingIndex
+      // TODO might need to be changed when implementing the looping system
+      if (queue[playingIndex].url !== currentHowl.url)
+        changeQueue();
+      else
+        currentHowl.play();
+    }
+      
     return true;
   }
 
@@ -208,18 +252,19 @@ export function setRepeatMode(mode)
 */
 function updateCurrentCard(index)
 {
-  queueCurrent.setAttribute('style', '');
+  queueCurrentElement.setAttribute('style', '');
 
-  queueCurrent.querySelector('.cover').style.backgroundImage =
+  queueCurrentElement.querySelector('.cover').style.backgroundImage =
   playingBackground.style.backgroundImage = queue[index].picture;
 
-  queueCurrent.querySelector('.artist').innerText =  queue[index].artist;
-  queueCurrent.querySelector('.title').innerText = queue[index].title;
+  queueCurrentElement.querySelector('.artist').innerText =  queue[index].artist;
+  queueCurrentElement.querySelector('.title').innerText = queue[index].title;
 }
 
 /** @param { Storage } storage
 * @param { string } title
 * @param { string } url
+* @returns { Promise<{ title: string, artist: string, picture: string, duration: number }> }
 */
 function getTrackMetadata(storage, title, url)
 {
@@ -234,13 +279,14 @@ function getTrackMetadata(storage, title, url)
       resolve({
         title: title,
         artist: storage.tracks[title].artists.join(', '),
-        picture: storage.tracks[title].element.querySelector('.cover').style.backgroundImage
+        picture: storage.tracks[title].element.querySelector('.cover').style.backgroundImage,
+        duration: storage.tracks[title].duration
       });
     });
   }
   else
   {
-    return getMetadata(url)
+    return getMetadata(url, { duration: true })
       .then(metadata =>
       {
         const title = metadata.common.title || basename(url, extname(url));
@@ -254,7 +300,12 @@ function getTrackMetadata(storage, title, url)
         if (metadata.common.picture && metadata.common.picture.length > 0)
           picture = `url(${toBase64(metadata.common.picture[0])})`;
 
-        return { title: title, artist: artists, picture: picture };
+        return {
+          title: title,
+          artist: artists,
+          picture: picture,
+          duration: metadata.format.duration
+        };
       });
   }
 }
@@ -287,6 +338,8 @@ function appendQueueItem(index, title, artist)
 */
 export function queueStorageTracks(storage, ...tracks)
 {
+  const promises = [];
+
   for (let i = 0; i < tracks.length; i++)
   {
     const url = storage.tracks[tracks[i]].url;
@@ -300,7 +353,7 @@ export function queueStorageTracks(storage, ...tracks)
     }
     else if (!exists)
     {
-      getTrackMetadata(storage, tracks[i], url).then((obj) =>
+      promises.push(getTrackMetadata(storage, tracks[i], url).then((obj) =>
       {
         queue.push({
           url: url,
@@ -308,29 +361,36 @@ export function queueStorageTracks(storage, ...tracks)
           title: obj.title,
           artist: obj.artist,
           picture: obj.picture,
+          duration: obj.duration,
           element: appendQueueItem(queue.length, obj.title, obj.artist)
         });
-  
-        if (playingIndex < 0)
-          resortQueue(0);
-        else if (tracks.length === 1)
-          resortQueue(queue.length - 1);
-        else
-          resortQueue(playingIndex);
-
-        saveQueue();
-      });
+      }));
     }
   }
+
+  Promise.all(promises).then(() =>
+  {
+    if (playingIndex < 0)
+      resortQueue(0);
+    else if (tracks.length === 1)
+      resortQueue(queue.length - 1);
+    else
+      resortQueue(playingIndex);
+
+    saveQueue();
+    changeQueue();
+  });
 }
 
 /** @param { string[] } urls
 */
 function queueTracks(...urls)
 {
+  const promises = [];
+
   for (let i = 0; i < urls.length; i++)
   {
-    getTrackMetadata(undefined, undefined, urls[i]).then((obj) =>
+    promises.push(getTrackMetadata(undefined, undefined, urls[i]).then((obj) =>
     {
       queue.push({
         url: urls[i],
@@ -340,17 +400,21 @@ function queueTracks(...urls)
         picture: obj.picture,
         element: appendQueueItem(queue.length, obj.title, obj.artist)
       });
-
-      if (playingIndex < 0)
-        resortQueue(0);
-      else if (urls.length === 1)
-        resortQueue(queue.length - 1);
-      else
-        resortQueue(playingIndex);
-
-      saveQueue();
-    });
+    }));
   }
+
+  Promise.all(promises).then(() =>
+  {
+    if (playingIndex < 0)
+      resortQueue(0);
+    else if (urls.length === 1)
+      resortQueue(queue.length - 1);
+    else
+      resortQueue(playingIndex);
+
+    saveQueue();
+    changeQueue();
+  });
 }
 
 /** @param { string } fromIndex
@@ -384,6 +448,7 @@ function resortQueue(fromIndex)
   }
 }
 
+// TEST clearing the queue in multiple cases
 function clearQueue()
 {
   // reset to the default picture
@@ -393,44 +458,180 @@ function clearQueue()
 
   img.onload = () =>
   {
-    queueCurrent.querySelector('.cover').style.backgroundImage =
+    queueCurrentElement.querySelector('.cover').style.backgroundImage =
     playingBackground.style.backgroundImage = `url(${img.src})`;
   };
 
-  // end playback
-  // TODO update playing mode and seek-time graphics to paused and 0
-  playingMode = 'paused';
-  seekTime = 0;
+  // stop playback
   playingIndex = -1;
+
+  // if there is a current howl, stop it too
+  changeQueue();
 
   // empty queue array
   queue = [];
 
-  // hide the current card
-  queueCurrent.setAttribute('style', 'display: none;');
+  // empty the seek-bar ui
 
-  // reset the queue list
+  if (seekBarPlayed.classList.contains('loading'))
+    seekBarPlayed.classList.remove('loading');
+
+  seekTimeControl(0);
+
+  // pause
+  if (playingMode === 'playing')
+    switchPlayingMode();
+
+  // hide the current card ui
+  queueCurrentElement.setAttribute('style', 'display: none;');
+
+  // reset the queue list ui
   removeAllChildren(queueContainer);
   appendQueueItem('', 'Nothing is queued to play.', '').classList.add('played', 'clear');
 }
 
 function saveQueue()
 {
-  settings.set('playingIndex', playingIndex);
-  settings.set('queueTracks', queue.map(item => item.url));
+  // settings.set('playingIndex', playingIndex);
+  // settings.set('queueTracks', queue.map(item => item.url));
 }
 
-function loadQueue()
+// function loadQueue()
+// {
+//   // const tracks = settings.get('queueTracks', []);
+
+//   // if (tracks.length > 0)
+//   // {
+//   // queueTracks(...tracks);
+
+//   // playingIndex = settings.get('playingIndex', -1);
+//   // seekTime = settings.get('seekTime', 0);
+
+//   //   return true;
+//   // }
+// }
+
+function changeQueue()
 {
-  const tracks = settings.get('queueTracks', []);
+  // if playing index is -1, this is a clear, not a change
+  if (playingIndex === -1 && !currentHowl)
+    return;
 
-  if (tracks.length > 0)
+  if (currentHowl)
   {
-    queueTracks(...tracks);
+    // if nothing changed, don't do anything
+    if (playingIndex > -1 && currentHowl.url === queue[playingIndex].url)
+    {
+      // reset the track to the beginning
+      seekTimeControl(0);
 
-    playingIndex = settings.get('playingIndex', -1);
-    seekTime = settings.get('seekTime', 0);
+      // if pause then start playing
+      if (playingMode === 'paused')
+        switchPlayingMode();
 
-    return true;
+      return;
+    }
+
+    // a new track is queued to play instantly,
+    // so stop the current playing track
+
+    currentHowl.stop();
+    currentHowl.unload();
+    
+    // stop updating the seek-bar ui
+    cancelAnimationFrame(currentHowl.updateSeekTimeHandle);
+
+    // if playing index is -1, this is a clear, not a change
+    if (playingIndex === -1)
+      return;
   }
+
+  const url = queue[playingIndex].url;
+
+  const howl = new Howl({
+    src: url,
+  });
+
+  function updateSeekTime()
+  {
+    if (!howl.seekTimeProgress)
+      howl.seekTimeProgress = 0;
+
+    const now = Date.now();
+
+    if (howl.last === undefined)
+      howl.last = now;
+
+    const delta = now - howl.last;
+
+    howl.last = now;
+
+    howl.seekTimeProgress = howl.seekTimeProgress + delta;
+
+    seekTimeControl(
+      Math.min(
+        (howl.seekTimeProgress / 1000) / queue[playingIndex].duration,
+        queue[playingIndex].duration
+      ), true);
+
+    howl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTime);
+  }
+
+  howl.on('play', () =>
+  {
+    howl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTime);
+  });
+
+  howl.on('pause', () =>
+  {
+    // stop updating the seek-bar ui
+    cancelAnimationFrame(howl.updateSeekTimeHandle);
+
+    // set a more accurate seek-time
+    howl.seekTimeProgress = howl.seek() * 1000;
+    howl.last = undefined;
+  });
+
+  howl.on('end', () =>
+  {
+    // stop updating the seek-bar ui
+    cancelAnimationFrame(howl.updateSeekTimeHandle);
+
+    // update the seek-bar ui to show that the current track is done
+    seekTimeControl(1, true);
+
+    if (queue.length <= playingIndex + 1)
+    {
+      // queue ended
+      // TODO add looping functionality
+        
+      playingIndex = 0;
+
+      // make sure the playing mode is paused
+      if (playingMode === 'playing')
+        switchPlayingMode();
+    }
+    else
+    {
+      playingIndex = playingIndex + 1;
+
+      // start playing the next track in the queue
+      changeQueue();
+    }
+
+    // update the queue ui to show the current state of itself
+    resortQueue(playingIndex);
+  });
+
+  howl.url = url;
+  currentHowl = howl;
+
+  seekTimeControl(0, true);
+
+  // if playing mode is set to paused, then set it to playing
+  if (playingMode === 'paused')
+    switchPlayingMode();
+
+  // start playback
+  howl.play();
 }

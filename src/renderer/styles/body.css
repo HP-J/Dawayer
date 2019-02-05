@@ -119,7 +119,9 @@ body
   filter: blur(5px);
   transform: scale(1.05);
 
-  pointer-events: none;
+  transition-property: background-image;
+  transition-duration: 0.25s;
+  transition-timing-function: ease-in-out;
 }
 
 .pages.background

@@ -28,8 +28,6 @@ html(lang='en')
     .controlBar.container
       .controls.container
         .seekBar.container
-          .seekBar.played
-          .seekBar.remaining
         .playButton.paused
           .pause(data-tippy='Pause')
             +icon('pause')
@@ -144,8 +142,6 @@ html(lang='en')
       .submenuButton.options Options
 
     .volumeBar.container
-      .volumeBar.played
-      .volumeBar.remaining
 
   script.
     window.onerror = function(message, url, line, column, error)
