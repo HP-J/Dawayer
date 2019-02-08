@@ -8,10 +8,10 @@ import * as settings from '../settings.js';
 
 import request from 'request-promise-native';
 
-import { createElement, rewindTimeText, rewindTimeTooltip, forwardTimeText, forwardTimeTooltip } from './renderer.js';
+import { createElement, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
 
 import { addNewDirectories, removeDirectory, rescanStorage } from './storage.js';
-import { getRewindTiming, setRewindTiming, getForwardTiming, setForwardTiming } from './playback.js';
+import { getRewindTiming, setRewindTiming, getSkipTiming, setSkipTiming } from './playback.js';
 
 /** @typedef { Object } BuildData
 * @property { string } branch
@@ -54,7 +54,7 @@ const rewindOptionInput = controlsContainer.querySelector('input.rewind');
 
 /** @type { HTMLInputElement }
 */
-const forwardOptionInput = controlsContainer.querySelector('input.forward');
+const skipOptionInput = controlsContainer.querySelector('input.skip');
 
 export const mainWindow = remote.getCurrentWindow();
 
@@ -250,16 +250,16 @@ function appendControls()
   rewindTimeText.innerText = rewind;
   rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
 
-  const forward = getForwardTiming();
+  const skip = getSkipTiming();
 
-  forwardOptionInput.value = forward;
-  forwardTimeText.innerText = forward;
-  forwardTimeTooltip.setContent(`Forward ${forward}s`);
+  skipOptionInput.value = skip;
+  skipTimeText.innerText = skip;
+  skipTimeTooltip.setContent(`Skip ${skip}s`);
 
-  rewindOptionInput.tabIndex = forwardOptionInput.tabIndex = -1;
+  rewindOptionInput.tabIndex = skipOptionInput.tabIndex = -1;
   
   rewindOptionInput.oninput =
-  forwardOptionInput.oninput = (event) =>
+  skipOptionInput.oninput = (event) =>
   {
     if (event.srcElement.value !== '')
     {
@@ -272,8 +272,8 @@ function appendControls()
 
     if (
       rewindOptionInput.value == '' ||
-      forwardOptionInput.value == '' ||
-      (getRewindTiming() == rewindOptionInput.value && getForwardTiming() == forwardOptionInput.value))
+      skipOptionInput.value == '' ||
+      (getRewindTiming() == rewindOptionInput.value && getSkipTiming() == skipOptionInput.value))
     {
       if (!applyElement.classList.contains('clean'))
         applyElement.classList.add('clean');
@@ -290,8 +290,8 @@ function appendControls()
     if (getRewindTiming() != rewindOptionInput.value)
       changeRewindTiming(rewindOptionInput.value);
 
-    if (getForwardTiming() != forwardOptionInput.value)
-      changeForwardTiming(forwardOptionInput.value);
+    if (getSkipTiming() != skipOptionInput.value)
+      changeSkipTiming(skipOptionInput.value);
     
     applyElement.classList.add('clean');
   };
@@ -308,14 +308,14 @@ function changeRewindTiming(rewind)
   }
 }
 
-/** @param { number } forward
+/** @param { number } skip
 */
-function changeForwardTiming(forward)
+function changeSkipTiming(skip)
 {
-  if (setForwardTiming(forward))
+  if (setSkipTiming(skip))
   {
-    forwardTimeText.innerText = forward;
-    forwardTimeTooltip.setContent(`Forward ${forward}s`);
+    skipTimeText.innerText = skip;
+    skipTimeTooltip.setContent(`Skip ${skip}s`);
   }
 }
 

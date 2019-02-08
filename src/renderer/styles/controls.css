@@ -33,7 +33,7 @@
 }
 
 .playButton, .previousButton, .nextButton,
-.rewindButton, .forwardButton, .shuffleButton,
+.rewindButton, .skipButton, .shuffleButton,
 .repeatButton, .volumeButton
 {
   cursor: pointer;
@@ -54,16 +54,16 @@
 }
 
 .playButton:hover, .previousButton:hover, .nextButton:hover,
-.rewindButton:hover, .forwardButton:hover, .shuffleButton:hover,
+.rewindButton:hover, .skipButton:hover, .shuffleButton:hover,
 .repeatButton:hover, .volumeButton:hover
 {
   filter: drop-shadow(0px 0px 12px var(--holder-3));
 }
 
 .playButton:hover > * > .icon > *, .previousButton:hover > .icon > *, .nextButton:hover > .icon > *,
-.rewindButton:hover > .icon > *, .forwardButton:hover > .icon > *, .shuffleButton:hover > * >.icon > *,
+.rewindButton:hover > .icon > *, .skipButton:hover > .icon > *, .shuffleButton:hover > * >.icon > *,
 .repeatButton:hover > * > .icon > *, .volumeButton:hover > * .icon > *,
-.rewindButton:hover > .rewindTime, .forwardButton:hover > .forwardTime
+.rewindButton:hover > .rewindTime, .skipButton:hover > .skipTime
 {
   fill: var(--color-7);
   stroke: var(--color-7);
@@ -71,9 +71,9 @@
 }
 
 .playButton:active > * > .icon, .nextButton:active > .icon,
-.forwardButton:active > .icon, .shuffleButton:active > * > .icon,
+.skipButton:active > .icon, .shuffleButton:active > * > .icon,
 .repeatButton:active > * > .icon,  .volumeButton:active > * .icon,
-.rewindButton:active > .rewindTime, .forwardButton:active > .forwardTime
+.rewindButton:active > .rewindTime, .skipButton:active > .skipTime
 {
   transition-property: transform;
   transition-duration: 0.05s;
@@ -89,7 +89,7 @@
   transform: scale(0.85) scaleX(-1);
 }
 
-.rewindButton, .forwardButton
+.rewindButton, .skipButton
 {
   display: flex;
   justify-content: center;
@@ -119,7 +119,7 @@
   margin-right: calc(1.5vw + 1vh);
 }
 
-.rewindTime, .forwardTime
+.rewindTime, .skipTime
 {
   display: flex;
   justify-content: center;
@@ -199,7 +199,7 @@
 
 @media screen and (max-width: 800px)
 {
-  .rewindTime, .forwardTime
+  .rewindTime, .skipTime
   {
     font-size: calc(4px + 0.6vw + 0.5vh);
   }

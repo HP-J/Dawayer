@@ -5,7 +5,13 @@ import scroll from './scroll.js';
 import { initStorage, secondsToDuration } from './storage.js';
 import { initOptions } from './options.js';
 
-import { initPlayback, setVolume, setSeekTime, getSeekTime, getVolume, getPlayingMode, setPlayingMode, getShuffleMode, setShuffleMode, getRepeatMode, setRepeatMode, getDuration } from './playback.js';
+import {
+  initPlayback, setVolume, setSeekTime,
+  getSeekTime, getVolume, getPlayingMode, setPlayingMode,
+  getShuffleMode, setShuffleMode, getRepeatMode, setRepeatMode,
+  getDuration, nextInQueue, previouslyOnQueue,
+  rewindBackwards, skipForward
+} from './playback.js';
 
 /** @typedef { import('tippy.js').Instance } TippyInstance
 */
@@ -74,7 +80,15 @@ const rewindButton = controlBar.querySelector('.rewindButton');
 
 /**  @type { HTMLDivElement }
 */
-const forwardButton = controlBar.querySelector('.forwardButton');
+const previousButton = controlBar.querySelector('.previousButton');
+
+/**  @type { HTMLDivElement }
+*/
+const nextButton = controlBar.querySelector('.nextButton');
+
+/**  @type { HTMLDivElement }
+*/
+const skipButton = controlBar.querySelector('.skipButton');
 
 /**  @type { HTMLDivElement }
 */
@@ -82,7 +96,7 @@ export const rewindTimeText = rewindButton.children[1];
 
 /**  @type { HTMLDivElement }
 */
-export const forwardTimeText = forwardButton.children[1];
+export const skipTimeText = skipButton.children[1];
 
 /**  @type { HTMLDivElement }
 */
@@ -110,7 +124,7 @@ export let rewindTimeTooltip;
 
 /** @type { TippyInstance }
 */
-export let forwardTimeTooltip;
+export let skipTimeTooltip;
 
 // Page Transactions
 
@@ -195,6 +209,12 @@ function initEvents()
 
   playButton.onclick = switchPlayingMode;
 
+  previousButton.onclick = previouslyOnQueue;
+  nextButton.onclick = nextInQueue;
+
+  rewindButton.onclick = rewindBackwards;
+  skipButton.onclick = skipForward;
+
   shuffleButton.onclick = switchShuffleMode;
   repeatButton.onclick = switchRepeatMode;
 
@@ -274,7 +294,7 @@ function initTippy()
   }).instances[0];
 
   rewindTimeTooltip = tippy(rewindButton).instances[0];
-  forwardTimeTooltip = tippy(forwardButton).instances[0];
+  skipTimeTooltip = tippy(skipButton).instances[0];
 
   tippy(volumeButton, {
     content: volumeBar,

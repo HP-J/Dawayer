@@ -1,4 +1,4 @@
-import { BrowserWindow, app, screen, ipcMain, dialog, Menu } from 'electron';
+import { BrowserWindow, Menu, app, screen, dialog, ipcMain } from 'electron';
 
 import path from 'path';
 import url from 'url';
@@ -116,12 +116,23 @@ function createWindow()
     slashes: true
   }));
 
-  mainWindow.webContents.openDevTools({ mode: 'detach' });
+  // set arguments as a global variable
+  global.argv = process.argv;
+
+  if (isDebug())
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
 
   mainWindow.on('close', () =>
   {
+    mainWindow.webContents.send('close');
+
     settings.set('size', mainWindow.getSize());
     settings.set('position', mainWindow.getPosition());
+  });
+
+  ipcMain.on('closing', (e, data) =>
+  {
+    settings.set(data.key, data.value);
   });
 
   // emits when the window is closed

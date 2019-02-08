@@ -38,11 +38,11 @@ html(lang='en')
         .nextButton(data-tippy='Next Track')
           +icon('next')
         .rewindButton
-          +icon('forward')
+          +icon('skip')
           .rewindTime
-        .forwardButton
-          +icon('forward')
-          .forwardTime
+        .skipButton
+          +icon('skip')
+          .skipTime
         .shuffleButton.shuffled
           .shuffle(data-tippy='Shuffled queue')
             +icon('shuffle')
@@ -112,13 +112,13 @@ html(lang='en')
               .option.title Controls
               .option.text Rewind
               input.option.controls.rewind(type='number')
-              .option.text Forward
-              input.option.controls.forward(type='number')
+              .option.text Skip
+              input.option.controls.skip(type='number')
               .option.controls.button.apply.clean Apply
 
           .options.container
             .optionsItem.tray
-              .option.applied Changes are applied after the app is restarted*
+              .option.applied Changes are applied after the app is restarted
               .option.title Tray
               .option.tray.buttons
                 .option.tray.button.true Enabled

@@ -33,7 +33,7 @@
   max-height: fit-content;
   width: 5.65vw;
 
-  margin: 0px 0.6vw;
+  margin: 0 0.6vw;
 
   transition-property: min-width, width, max-height, height;
   transition-duration: 0.2s;
@@ -46,7 +46,7 @@
   display: block;
   position: sticky;
 
-  top: 0px;
+  top: 0;
   width: 100%;
   padding-bottom: 60%;
 

@@ -121,8 +121,8 @@
   grid-template-rows: 50% 50%;
   grid-template-areas: "artist duration" "title duration";
 
-  grid-column-gap: 1.5%;
-  grid-row-gap: 1px;
+  grid-column-gap: 3px;
+  grid-row-gap: 3px;
 
   left: 0;
   width: 97%;

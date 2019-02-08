@@ -1,18 +1,11 @@
 main:
-  ☐ opening up file(s) with Dawayer
+  ☐ since play-album-track was added, queue something new from album will always play it
+     while queue a normal track won't, make queuing consistent and offer a good UX syntax
 
 graphics:
+  ☐ currently you can't remove or clear the queue
+  ☐ sketching podcast page interface
 
 playback:
-  ☐ playing and pausing a song
-  ☐ update progress in the seek bar
-  ☐ allow the user to change the position of the playback using the seek bar
-  ☐ change the global volume using the volume bar
-
-  ☐ next button always skips to next song
-  ☐ previous button goes back only if playback time is less than 5 seconds else resets the playback to the start of the audio file
-
-  ☐ queue sorts audio files (if same album sort by track number) then sort by title then sort by filename
 
 ci:
-  ☐ add pipeline id to build.json using the CI
