@@ -61,12 +61,18 @@ html(lang='en')
           .mute
             +icon('mute')
       .queue.container
-        .queue.playing.card
+        .queue.playing.card(style={display: 'none'})
           .queue.playing.cover
           .queue.playing.artist
           .queue.playing.title
-        .queue.text Up Next
+        .queue.textContainer
+          .queue.upNext Up Next
+          .queue.clear.empty Clear
         .queue.tracks
+          .queueItem.container.played.clear
+            .queueItem.index
+            .queueItem.artist
+            .queueItem.title Nothing is queued to play.
       .controlBar.background
 
     .menu.container

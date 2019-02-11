@@ -67,12 +67,11 @@
   font-weight: 700;
 }
 
-.queue.text
+.queue.textContainer
 {
   grid-area: text;
 
   display: flex;
-  align-items: flex-end;
 
   color: var(--color-4);
 
@@ -82,6 +81,28 @@
   font-weight: 900;
 
   padding-top: 9px;
+}
+
+.queue.upNext
+{
+  flex-grow: 1;
+}
+
+.queue.clear
+{
+  cursor: pointer;
+}
+
+.queue.clear:hover
+{
+  color: var(--color-7)
+}
+
+.queue.clear.empty
+{
+  cursor: default;
+
+  opacity: 0;
 }
 
 .queue.tracks
@@ -167,7 +188,8 @@
 
 .queueItem.container.played > .index,
 .queueItem.container.played > .artist,
-.queueItem.container.played > .title
+.queueItem.container.played > .title,
+.queue.clear.empty
 {
   color: var(--holder-2);
 }
@@ -186,7 +208,7 @@
   font-size: calc(5px + 0.35vw + 0.4vh);
 }
 
-.queue.text
+.queue.textContainer
 {
   font-size: calc(5px + 0.4vw + 0.2vh);
 }
@@ -210,7 +232,7 @@
     font-size: calc(5px + 0.6vw + 0.4vh);
   }
 
-  .queue.text
+  .queue.textContainer
   {
     font-size: calc(5px + 0.55vw + 0.3vh);
   }
@@ -235,7 +257,7 @@
     font-size: 9px;
   }
 
-  .queue.text
+  .queue.textContainer
   {
     font-size: 9px;
   }
@@ -260,7 +282,7 @@
     font-size: 11px;
   }
 
-  .queue.text
+  .queue.textContainer
   {
     font-size: 11px;
   }

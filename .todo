@@ -3,9 +3,9 @@ main:
      while queue a normal track won't, make queuing consistent and offer a good UX syntax
 
 graphics:
-  ☐ currently you can't remove or clear the queue
   ☐ sketching podcast page interface
 
 playback:
 
 ci:
+  ☐ add pipeline id to build.json using the CI

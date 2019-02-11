@@ -26,6 +26,8 @@ let queueElements = [];
 
 const queueCurrentElement = document.body.querySelector('.queue.card');
 
+const queueClearElement = document.body.querySelector('.queue.clear');
+
 /** @type { HTMLDivElement }
 */
 const queueContainer = document.body.querySelector('.queue.tracks');
@@ -62,10 +64,9 @@ export function initPlayback()
   shuffleMode = settings.get('shuffleMode', 'shuffled');
   repeatMode = settings.get('repeatMode', 'looping');
 
-  // loading the queue will take those settings into account
+  queueClearElement.onclick = clearQueue;
 
-  // if there is a saved queue
-  clearQueue();
+  // loading the queue will take those settings into account
 
   /** @type { string[] }
   */
@@ -99,7 +100,15 @@ export function getDuration()
 export function getSeekTime()
 {
   if (playingIndex > -1 && currentHowl)
-    return currentHowl.seek();
+  {
+    const seekTime = currentHowl.seek();
+    if (typeof seekTime === 'number')
+      return seekTime;
+    else if (currentHowl.seekTimeProgress)
+      return currentHowl.seekTimeProgress / 1000;
+    else
+      return 0;
+  }
   else
     return 0;
 }
@@ -125,6 +134,10 @@ export function setSeekTime(time, visual)
       currentHowl.seekTimeProgress = time * 1000;
     }
 
+    return true;
+  }
+  else if (time === 0)
+  {
     return true;
   }
 
@@ -203,16 +216,25 @@ export function getPlayingMode()
 */
 export function setPlayingMode(mode)
 {
-  if (mode !== playingMode && playingIndex > -1)
+  if (mode !== playingMode)
   {
-    playingMode = mode;
+    if (playingIndex > -1)
+    {
+      playingMode = mode;
 
-    if (playingMode === 'paused')
-      currentHowl.pause();
-    else
-      currentHowl.play();
+      if (playingMode === 'paused')
+        currentHowl.pause();
+      else
+        currentHowl.play();
+  
+      return true;
+    }
+    else if (mode === 'paused')
+    {
+      playingMode = mode;
 
-    return true;
+      return true;
+    }
   }
 
   return false;
@@ -375,7 +397,7 @@ function shuffleArray(array)
   return array;
 }
 
-/** @param { string } url
+/** @param { number } index
 */
 function updateCurrentCard(index)
 {
@@ -595,16 +617,26 @@ function shuffleQueue()
 */
 function resortQueue(fromIndex)
 {
-  if (fromIndex === undefined && playingIndex <= -1)
+  if (queue.length <= 0 || (fromIndex === undefined && playingIndex <= -1))
     return;
+
+  // update the playing index
+  if (fromIndex !== undefined)
+    playingIndex = fromIndex;
+
+  // update the current track card
+  updateCurrentCard(playingIndex);
+
+  // if the queue was empty then remove the queue is empty element
+  const clearElement = queueContainer.querySelector('.queueItem.clear');
   
-  const clearElement = queueContainer.querySelector('.clear');
-
-  playingIndex = fromIndex;
-  updateCurrentCard(fromIndex);
-
   if (clearElement)
+  {
+    // make the clear queue button visible again
+    queueClearElement.classList.remove('empty');
+    
     queueContainer.removeChild(clearElement);
+  }
 
   for (let i = 0; i < queue.length; i++)
   {
@@ -632,29 +664,21 @@ function resortQueue(fromIndex)
   }
 }
 
-// TEST clearing the queue in multiple cases
 function clearQueue()
 {
-  // reset to the default picture
-  const img = new Image();
-
-  img.src = missingPicture;
-
-  img.onload = () =>
-  {
-    queueCurrentElement.querySelector('.cover').style.backgroundImage =
-    playingBackground.style.backgroundImage = `url(${img.src})`;
-  };
-
   // stop playback
   playingIndex = -1;
 
   // if there is a current howl, stop it too
+  // saves the playing index as -1
   changeQueue();
 
   // empty queue array
   queue = [];
   queueElements = [];
+
+  // save the queue as empty
+  saveQueue();
 
   // empty the seek-bar ui
   seekTimeControl(0);
@@ -666,14 +690,18 @@ function clearQueue()
   // hide the current card ui
   queueCurrentElement.setAttribute('style', 'display: none;');
 
-  // reset the queue list ui
+  // hide the clear queue button
+  queueClearElement.classList.add('empty');
+
+  // remove all the tracks from the queue ui
   removeAllChildren(queueContainer);
 
-  const clear = appendQueueItem();
+  // add element to notify the user that the queue is empty
+  const queueEmptyElement = appendQueueItem();
 
   // set the title and make it less visible
-  clear.children[2].innerText = 'Nothing is queued to play.';
-  clear.classList.add('played', 'clear');
+  queueEmptyElement.children[2].innerText = 'Nothing is queued to play.';
+  queueEmptyElement.classList.add('played', 'clear');
 }
 
 function saveQueue()
@@ -683,8 +711,7 @@ function saveQueue()
 
 function savePlayingIndex()
 {
-  if (playingIndex > -1)
-    settings.set('playingIndex', playingIndex);
+  settings.set('playingIndex', playingIndex);
 }
 
 function loadQueue()
@@ -772,7 +799,11 @@ function changeQueue(quiet, seekTime)
 
     // if playing index is -1, this is a clear, not a change
     if (playingIndex === -1)
+    {
+      currentHowl = undefined;
+
       return;
+    }
   }
 
   const url = queue[playingIndex].url;
