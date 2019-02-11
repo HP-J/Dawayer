@@ -91,7 +91,7 @@ export function initPlayback()
 
 export function getDuration()
 {
-  if (playingIndex > -1)
+  if (playingIndex > -1 && currentHowl && currentHowl.state() === 'loaded')
     return queue[playingIndex].duration;
   else
     return -1;
@@ -99,7 +99,7 @@ export function getDuration()
 
 export function getSeekTime()
 {
-  if (playingIndex > -1 && currentHowl)
+  if (playingIndex > -1 && currentHowl && currentHowl.state() === 'loaded')
   {
     const seekTime = currentHowl.seek();
     if (typeof seekTime === 'number')
@@ -125,7 +125,7 @@ export function setPlayingIndex(index)
 */
 export function setSeekTime(time, visual)
 {
-  if (playingIndex > -1)
+  if (playingIndex > -1 && currentHowl && currentHowl.state() === 'loaded')
   {
     if (!visual)
     {
@@ -297,7 +297,7 @@ export function rewindBackwards()
 
   const duration = queue[playingIndex].duration;
 
-  const seekTime = Math.max(duration - rewindTime, 0);
+  const seekTime = Math.max(getSeekTime() - rewindTime, 0);
 
   seekTimeControl(seekTime / duration);
 }
@@ -309,8 +309,8 @@ export function skipForward()
 
   const duration = queue[playingIndex].duration;
 
-  const seekTime = Math.min(duration + skipTime, duration);
-
+  const seekTime = Math.min(getSeekTime() + skipTime, duration);
+  
   seekTimeControl(seekTime / duration);
 }
 
@@ -478,13 +478,16 @@ function appendQueueItem()
   return queueContainer.appendChild(queueItem);
 }
 
-/** @param { Storage } storage
+/** the main way to handle queuing tracks in dawayer, using the storage object to obtain the required metadata
+* @param { Storage } storage
 * @param { string } tracks
 */
-export function queueStorageTracks(storage, ...tracks)
+export function queueStorageTracks(storage, clear, ...tracks)
 {
   return new Promise((resolve) =>
   {
+    if (clear)
+      partialClearQueue();
     
     const promises = [];
 
@@ -534,7 +537,8 @@ export function queueStorageTracks(storage, ...tracks)
   });
 }
 
-/** @param { string[] } urls
+/** should be used to load track from urls, used to load saved queues or files that are not stored
+* @param { string[] } urls
 */
 function queueTracks(quiet, ...urls)
 {
@@ -664,6 +668,8 @@ function resortQueue(fromIndex)
   }
 }
 
+/** clears everything about the queue definitely
+*/
 function clearQueue()
 {
   // stop playback
@@ -702,6 +708,28 @@ function clearQueue()
   // set the title and make it less visible
   queueEmptyElement.children[2].innerText = 'Nothing is queued to play.';
   queueEmptyElement.classList.add('played', 'clear');
+}
+
+/** partially clears the queue to allow a new queue to take the spotlight
+*/
+function partialClearQueue()
+{
+  // stop playback
+  playingIndex = -1;
+
+  // if there is a current howl, stop it too
+  // saves the playing index as -1
+  changeQueue();
+
+  // empty queue array
+  queue = [];
+  queueElements = [];
+
+  // empty the seek-bar ui
+  seekTimeControl(0);
+
+  // remove all the tracks from the queue ui
+  removeAllChildren(queueContainer);
 }
 
 function saveQueue()
@@ -750,9 +778,8 @@ function loadQueue()
 }
 
 /** @param { boolean } quiet
-* @param { number } seekTime
 */
-function changeQueue(quiet, seekTime)
+function changeQueue(quiet)
 {
   // save the playing index
   savePlayingIndex();
@@ -767,10 +794,7 @@ function changeQueue(quiet, seekTime)
     if (playingIndex > -1 && currentHowl.url === queue[playingIndex].url)
     {
       // change the track to the beginning
-      if (seekTime)
-        seekTimeControl(seekTime / getDuration());
-      else
-        seekTimeControl(0, true);
+      seekTimeControl(0, quiet);
 
       if (!quiet)
       {
@@ -884,11 +908,22 @@ function changeQueue(quiet, seekTime)
       // then reset the queue to the first track and continue playback
       else
       {
-        // reset the queue to the first track
-        playingIndex = 0;
+        // if the queue is 1 track long then just repeat it
+        if (queue.length === 1)
+        {
+          seekTimeControl(0, true);
 
-        // start playing the first track in the queue
-        changeQueue();
+          howl.play();
+        }
+        // else play the first track
+        else
+        {
+          // reset the queue to the first track
+          playingIndex = 0;
+
+          // start playing the first track in the queue
+          changeQueue();
+        }
       }
     }
     // queue has more track to play before it ends
@@ -910,10 +945,7 @@ function changeQueue(quiet, seekTime)
   currentHowl = howl;
 
   // set the seek-bar ui
-  if (seekTime)
-    seekTimeControl(seekTime / getDuration());
-  else
-    seekTimeControl(0, true);
+  seekTimeControl(0, quiet);
 
   // start playback
   if (!quiet)

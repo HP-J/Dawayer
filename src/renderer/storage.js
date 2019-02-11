@@ -986,7 +986,7 @@ function storageNavigation(storage, target)
 {
   const keys = target.split('/');
 
-  // open the artist's overlay
+  // toggle the artist's overlay
   if (keys[0] === 'artists')
   {
     storage.artists[keys[1]].element.classList.toggle('activeOverlay');
@@ -994,13 +994,13 @@ function storageNavigation(storage, target)
   // queue the track
   else if (keys[0] === 'play-track')
   {
-    queueStorageTracks(storage, keys[1]);
+    queueStorageTracks(storage, true, keys[1]);
   }
   // queue the album, but start playing from a selected track
   else if (keys[0] === 'play-album-track')
   {
     // queue the entire album
-    queueStorageTracks(storage, ...storage.albums[keys[1]].tracks);
+    queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks);
 
     // but start from the selected track
     setPlayingIndex(parseInt(keys[2]));
@@ -1008,7 +1008,7 @@ function storageNavigation(storage, target)
   // queue the album
   else if (keys[0] === 'play-album')
   {
-    queueStorageTracks(storage, ...storage.albums[keys[1]].tracks);
+    queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks);
   }
   // queue the artist's tracks and/or albums
   else if (keys[0] === 'play-artist')
@@ -1024,7 +1024,7 @@ function storageNavigation(storage, target)
     // push the individual tracks
     tracks.push(...storage.artists[keys[1]].tracks);
 
-    queueStorageTracks(storage, ...tracks);
+    queueStorageTracks(storage, true, ...tracks);
   }
 }
 
