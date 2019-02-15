@@ -169,7 +169,7 @@
 {
   opacity: 0;
 
-  width: 100%;
+  width: max-content;
   height: auto;
 
   color: unset;

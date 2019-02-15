@@ -136,7 +136,7 @@ export function initStorage()
   // TEST the default music dir on windows
   // console.log(getDefaultMusicDir());
 
-  // if now audio directories are saved, then use the OS default directory for music
+  // if now audio directories are saved then use the OS default directory for music
   if (!savedAudioDirectories || savedAudioDirectories.length <= 0)
     addNewDirectories([ getDefaultMusicDir() ]);
   else
@@ -171,7 +171,7 @@ export function initStorage()
         }
       });
   }
-  // if not, then scan the audio directories for the audio files,
+  // if not then scan the audio directories for the audio files,
   // load them and then create a new cache for them
   else
   {
@@ -338,7 +338,7 @@ function scanCacheAudioFiles()
           }
 
           // when all files are parsed and added to the storage object
-          // fill the storage info, then cache them,
+          // fill the storage info then cache them,
           // then resolve this promise
           Promise.all(promises).then(() =>
           {

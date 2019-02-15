@@ -20,7 +20,7 @@ import { getRewindTiming, setRewindTiming, getSkipTiming, setSkipTiming } from '
 * @property { string } package
 */
 
-/** @type {{ download: (win: Electron.BrowserWindow, url: string, options: { saveAs: boolean, directory: string, filename: string, openFolderWhenDone: boolean, showBadge: boolean, onStarted: (item: Electron.DownloadItem) => void, onProgress: (percentage: number) => void, onCancel: () => void }) => Promise<Electron.DownloadItem> }}
+/** @type { import('electron-dl') }
 */
 const { download: dl  } = remote.require('electron-dl');
 

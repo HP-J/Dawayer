@@ -1,11 +1,7 @@
 main:
-  ☐ since play-album-track was added, queue something new from album will always play it
-     while queue a normal track won't, make queuing consistent and offer a good UX syntax
 
 graphics:
   ☐ sketching podcast page interface
-
-playback:
 
 ci:
   ☐ add pipeline id to build.json using the CI

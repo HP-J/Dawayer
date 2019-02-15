@@ -90,6 +90,9 @@ function createWindow()
 
   mainWindow = new BrowserWindow(
     {
+      webPreferences: {
+        nodeIntegration: true
+      },
       title: 'Dawayer',
       show: true,
       frame: true,

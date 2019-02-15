@@ -8,8 +8,8 @@ import { union } from 'lodash';
 
 import * as settings from '../settings.js';
 
-import { createElement, seekTimeControl, switchPlayingMode } from './renderer.js';
-import { missingPicture, artistsRegex, toBase64, removeAllChildren, audioExtensionsRegex } from './storage.js';
+import { createElement, createContextMenu, seekTimeControl, switchPlayingMode } from './renderer.js';
+import { artistsRegex, toBase64, removeAllChildren, audioExtensionsRegex } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -30,7 +30,7 @@ const queueClearElement = document.body.querySelector('.queue.clear');
 
 /** @type { HTMLDivElement }
 */
-const queueContainer = document.body.querySelector('.queue.tracks');
+const queueContainer = document.body.querySelector('.queue.itemsContainer');
 
 const playingBackground = document.body.querySelector('.playing.background');
 
@@ -633,17 +633,95 @@ function resortQueue(fromIndex)
 
   // if the queue was empty then remove the queue is empty element
   const clearElement = queueContainer.querySelector('.queueItem.clear');
-  
+
   if (clearElement)
-  {
-    // make the clear queue button visible again
-    queueClearElement.classList.remove('empty');
-    
     queueContainer.removeChild(clearElement);
-  }
+
+  // if the clear queue button is invisible then make it visible
+  if (queueClearElement.classList.contains('empty'))
+    queueClearElement.classList.remove('empty');
 
   for (let i = 0; i < queue.length; i++)
   {
+    // if a queue item is clicked
+    // it should play its track
+    queueElements[i].onclick = () =>
+    {
+      playingIndex = i;
+
+      resortQueue(playingIndex);
+      changeQueue();
+    };
+
+    // create a context menu for the queue item
+    createContextMenu(queueElements[i], {
+      'Play': () =>
+      {
+        playingIndex = i;
+
+        resortQueue(playingIndex);
+        changeQueue();
+      },
+      'Remove from Queue': () =>
+      {
+        // if removing last track in queue
+        // then trigger clear queue
+        if (queue.length === 1)
+        {
+          clearQueue();
+
+          return;
+        }
+
+        // else remove the track from the queue
+
+        // stop playback events using playing index and getting a different track
+        if (currentHowl && playingMode === 'playing')
+        {
+          cancelAnimationFrame(currentHowl.updateSeekTimeHandle);
+
+          currentHowl.eventCanceled = true;
+        }
+
+        queue.splice(i, 1);
+        queueContainer.removeChild(queueElements.splice(i, 1)[0]);
+
+        // save the queue after the removal of the track
+        saveQueue();
+
+        // if queue ended, call the end event so it can handle
+        // the repeat mode
+        if (playingIndex === i && i === queue.length)
+        {
+          playingIndex = queue.length - 1;
+
+          endEvent();
+        }
+        // else if the removed track is lower then the current
+        else if (playingIndex > i)
+        {
+          playingIndex = playingIndex - 1;
+
+          resortQueue(playingIndex);
+          changeQueue();
+        }
+        // if the removed track is higher then the current
+        else
+        {
+          resortQueue(playingIndex);
+          changeQueue();
+        }
+
+        // if the event was canceled
+        if (currentHowl && currentHowl.eventCanceled)
+        {
+          currentHowl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTimeEvent);
+
+          currentHowl.eventCanceled = undefined;
+        }
+      }
+    }, queueContainer.parentElement);
+
     if (playingIndex > i)
     {
       queueElements[i].children[0].innerText = -(playingIndex - i);
@@ -695,6 +773,9 @@ function clearQueue()
 
   // hide the current card ui
   queueCurrentElement.setAttribute('style', 'display: none;');
+
+  // set the playing background picture as default
+  playingBackground.setAttribute('style', '');
 
   // hide the clear queue button
   queueClearElement.classList.add('empty');
@@ -793,9 +874,6 @@ function changeQueue(quiet)
     // if nothing changed, don't do anything
     if (playingIndex > -1 && currentHowl.url === queue[playingIndex].url)
     {
-      // change the track to the beginning
-      seekTimeControl(0, quiet);
-
       if (!quiet)
       {
         // if pause then start playing
@@ -804,7 +882,7 @@ function changeQueue(quiet)
       }
       else
       {
-        // if playing mode is set to playing, then set it to paused
+        // if playing mode is set to playing then set it to paused
         if (playingMode === 'playing')
           switchPlayingMode();
       }
@@ -836,113 +914,14 @@ function changeQueue(quiet)
     src: url,
   });
 
-  function updateSeekTime()
-  {
-    const now = Date.now();
-
-    if (howl.last === undefined)
-      howl.last = now;
-
-    const delta = now - howl.last;
-
-    howl.last = now;
-
-    howl.seekTimeProgress = howl.seekTimeProgress + delta;
-
-    seekTimeControl(
-      Math.min(
-        (howl.seekTimeProgress / 1000) / queue[playingIndex].duration,
-        queue[playingIndex].duration
-      ), true);
-
-    howl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTime);
-  }
-
-  howl.on('play', () =>
-  {
-    howl.seekTimeProgress = howl.seek() * 1000;
-    howl.last = undefined;
-
-    howl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTime);
-  });
-
-  howl.on('pause', () =>
-  {
-    // stop updating the seek-bar ui
-    cancelAnimationFrame(howl.updateSeekTimeHandle);
-  });
-
-  howl.on('end', () =>
-  {
-    // stop updating the seek-bar ui
-    cancelAnimationFrame(howl.updateSeekTimeHandle);
-
-    // empty the seek-bar ui
-    seekTimeControl(0, true);
-
-    // repeating the same track
-    if (getRepeatMode() === 'repeating')
-    {
-      // reset the track to the beginning
-      seekTimeControl(0);
-
-      // howl stops when the track ends and needs to be re-played
-      howl.play();
-    }
-    // queue ended
-    else if (queue.length <= playingIndex + 1)
-    {
-      // if repeat mode is once
-      // then reset the queue to the first track and stop playback
-      if ((getRepeatMode() === 'once'))
-      {
-        // reset the queue to the first track
-        playingIndex = 0;
-
-        // change the queue to playback the first track in the queue
-        // but in paused mode, won't start until the user switch
-        // the mode back to playing
-        changeQueue(true);
-      }
-      // else if repeat mode is looping
-      // then reset the queue to the first track and continue playback
-      else
-      {
-        // if the queue is 1 track long then just repeat it
-        if (queue.length === 1)
-        {
-          seekTimeControl(0, true);
-
-          howl.play();
-        }
-        // else play the first track
-        else
-        {
-          // reset the queue to the first track
-          playingIndex = 0;
-
-          // start playing the first track in the queue
-          changeQueue();
-        }
-      }
-    }
-    // queue has more track to play before it ends
-    // start playing the next track
-    else
-    {
-      // switch the next track in the queue
-      playingIndex = playingIndex + 1;
-
-      // start playing the next track in the queue
-      changeQueue();
-    }
-
-    // update the queue ui to show the current state of itself
-    resortQueue(playingIndex);
-  });
-
   howl.url = url;
   currentHowl = howl;
+
+  howl.on('play', playEvent);
+
+  howl.on('pause', pauseEvent);
+
+  howl.on('end', endEvent);
 
   // set the seek-bar ui
   seekTimeControl(0, quiet);
@@ -950,7 +929,7 @@ function changeQueue(quiet)
   // start playback
   if (!quiet)
   {
-    // if playing mode is set to paused, then set it to playing
+    // if playing mode is set to paused then set it to playing
     if (playingMode === 'paused')
       switchPlayingMode();
 
@@ -958,8 +937,113 @@ function changeQueue(quiet)
   }
   else
   {
-    // if playing mode is set to playing, then set it to paused
+    // if playing mode is set to playing then set it to paused
     if (playingMode === 'playing')
       switchPlayingMode();
   }
+}
+
+function playEvent()
+{
+  currentHowl.seekTimeProgress = currentHowl.seek() * 1000;
+  currentHowl.last = undefined;
+
+  currentHowl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTimeEvent);
+}
+
+function pauseEvent()
+{
+  // stop updating the seek-bar ui
+  cancelAnimationFrame(currentHowl.updateSeekTimeHandle);
+}
+
+function updateSeekTimeEvent()
+{
+  const now = Date.now();
+
+  if (currentHowl.last === undefined)
+    currentHowl.last = now;
+
+  const delta = now - currentHowl.last;
+
+  currentHowl.last = now;
+
+  currentHowl.seekTimeProgress = currentHowl.seekTimeProgress + delta;
+
+  seekTimeControl(
+    Math.min(
+      (currentHowl.seekTimeProgress / 1000) / queue[playingIndex].duration,
+      queue[playingIndex].duration
+    ), true);
+
+  currentHowl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTimeEvent);
+}
+
+function endEvent()
+{
+  // stop updating the seek-bar ui
+  cancelAnimationFrame(currentHowl.updateSeekTimeHandle);
+
+  // empty the seek-bar ui
+  seekTimeControl(0, true);
+
+  // repeating the same track
+  if (getRepeatMode() === 'repeating')
+  {
+    // reset the track to the beginning
+    seekTimeControl(0);
+
+    // howl stops when the track ends and needs to be re-played
+    currentHowl.play();
+  }
+  // queue ended
+  else if (queue.length <= playingIndex + 1)
+  {
+    // if repeat mode is once
+    // then reset the queue to the first track and stop playback
+    if ((getRepeatMode() === 'once'))
+    {
+      // reset the queue to the first track
+      playingIndex = 0;
+
+      // change the queue to playback the first track in the queue
+      // but in paused mode, won't start until the user switch
+      // the mode back to playing
+      changeQueue(true);
+    }
+    // else if repeat mode is looping
+    // then reset the queue to the first track and continue playback
+    else
+    {
+      // if the queue is 1 track long then just repeat it
+      if (queue.length === 1)
+      {
+        seekTimeControl(0, true);
+
+        currentHowl.play();
+      }
+      // else play the first track
+      else
+      {
+        // reset the queue to the first track
+        playingIndex = 0;
+
+        // start playing the first track in the queue
+        changeQueue();
+      }
+    }
+  }
+  // queue has more track to play before it ends
+  // start playing the next track
+  else
+  {
+    // switch the next track in the queue
+    playingIndex = playingIndex + 1;
+
+    // start playing the next track in the queue
+    changeQueue();
+  }
+
+  // update the queue ui to show the current state of itself
+  resortQueue(playingIndex);
 }

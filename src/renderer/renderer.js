@@ -2,7 +2,7 @@ import tippy from 'tippy.js';
 
 import scroll from './scroll.js';
 
-import { initStorage, secondsToDuration } from './storage.js';
+import { initStorage, secondsToDuration, removeAllChildren } from './storage.js';
 import { initOptions } from './options.js';
 
 import {
@@ -268,21 +268,21 @@ function initTippy()
     placement: 'bottom',
     interactive: true,
     arrow: true
-  }).instances[0];
+  });
 
   tippy(localButton, {
     content: document.body.querySelector('.submenuContainer.local'),
     placement: 'bottom',
     interactive: true,
     arrow: true
-  }).instances[0];
+  });
 
   tippy(optionsButton, {
     content: document.body.querySelector('.submenuContainer.options'),
     placement: 'bottom',
     interactive: true,
     arrow: true
-  }).instances[0];
+  });
 
   seekTooltip = tippy(seekBar, {
     duration: 0,
@@ -291,10 +291,10 @@ function initTippy()
     placement: 'top',
     followCursor: 'horizontal',
     arrow: true
-  }).instances[0];
+  });
 
-  rewindTimeTooltip = tippy(rewindButton).instances[0];
-  skipTimeTooltip = tippy(skipButton).instances[0];
+  rewindTimeTooltip = tippy(rewindButton);
+  skipTimeTooltip = tippy(skipButton);
 
   tippy(volumeButton, {
     content: volumeBar,
@@ -584,6 +584,127 @@ export function createIcon(name, classes)
   svg.appendChild(use);
 
   return svg;
+}
+
+/** @param { HTMLElement } element
+* @param { Object<string, () => void> } menuItems
+* @param { HTMLElement } parentElement
+*/
+export function createContextMenu(element, menuItems, parentElement)
+{
+  let contextMenuWrapper = element.querySelector('.contextMenu.wrapper');
+  let contextMenuElement;
+
+  if (contextMenuWrapper)
+  {
+    if (!contextMenuWrapper.classList.contains('hidden'))
+      contextMenuWrapper.classList.add('hidden');
+    
+    contextMenuElement = contextMenuWrapper.children[0];
+
+    removeAllChildren(contextMenuElement);
+  }
+  else
+  {
+    contextMenuWrapper = createElement('.contextMenu.wrapper.hidden');
+    contextMenuElement = createElement('.contextMenu.container');
+
+    contextMenuWrapper.appendChild(contextMenuElement);
+    
+    element.appendChild(contextMenuWrapper);
+  }
+
+  // add the menu items to the context menu
+  for (const title in menuItems)
+  {
+    const itemElement = createElement('.contextMenu.item');
+
+    itemElement.innerText = title;
+    itemElement.onclick = (event) =>
+    {
+      // stop propagation to the parent element event
+      event.stopPropagation();
+
+      // call the item's function
+      menuItems[title].call(contextMenuElement);
+
+      // hide the menu
+      if (!contextMenuWrapper.classList.contains('hidden'))
+        contextMenuWrapper.classList.add('hidden');
+    };
+
+    contextMenuElement.appendChild(itemElement);
+  }
+
+  // shows the context menu when the user right-clicks
+  // on a pre-selected element
+  element.oncontextmenu = (event) =>
+  {
+    // stop propagation to the window event
+    event.stopPropagation();
+
+    // if there's any other opened context menu then hide it
+    if (global.openedMenu)
+    {
+      if (!global.openedMenu.classList.contains('hidden'))
+        global.openedMenu.classList.add('hidden');
+    }
+
+    // set this menu as the current opened menu
+    global.openedMenu = contextMenuWrapper;
+    
+    // wait for an animation frame to get the correct size of the menu
+    requestAnimationFrame(() =>
+    {
+      // make sure the entire menu is visible inside the app
+      const size = contextMenuWrapper.getBoundingClientRect();
+
+      // if the menu won't fit then subtract the menu from the position
+      if (event.pageX + size.width > window.innerWidth)
+        contextMenuWrapper.style.left = (event.pageX - size.width) + 'px';
+      // if it can fit then set the position as is
+      else
+        contextMenuWrapper.style.left = event.pageX + 'px';
+
+      // if the menu won't fit then subtract the menu from the position
+      if (event.pageY + size.height > window.innerHeight)
+        contextMenuWrapper.style.top = (event.pageY - size.height) + 'px';
+      // if it can fit then set the position as is
+      else
+        contextMenuWrapper.style.top = event.pageY + 'px';
+
+      global.openedMenu.classList.remove('hidden');
+    });
+  };
+
+  // gets called when the user right-clicks
+  // on empty space
+  window.addEventListener('contextmenu', () =>
+  {
+    // hide the menu
+    if (!contextMenuWrapper.classList.contains('hidden'))
+      contextMenuWrapper.classList.add('hidden');
+  });
+
+  // gets called when the user left-clicks
+  // on empty space
+  window.addEventListener('click', () =>
+  {
+    // hide the menu
+    if (!contextMenuWrapper.classList.contains('hidden'))
+      contextMenuWrapper.classList.add('hidden');
+  });
+
+  // auto hide the menu when the mouse leaves the parent (or the parent gets blurred)
+  if (parentElement)
+  {
+    parentElement.addEventListener('mouseleave', () =>
+    {
+      // hide the menu
+      if (!contextMenuWrapper.classList.contains('hidden'))
+        contextMenuWrapper.classList.add('hidden');
+    });
+  }
 }
 
 // initialize the app
