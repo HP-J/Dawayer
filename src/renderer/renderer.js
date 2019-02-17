@@ -2,7 +2,7 @@ import tippy from 'tippy.js';
 
 import scroll from './scroll.js';
 
-import { initStorage, secondsToDuration, removeAllChildren } from './storage.js';
+import { initStorage, secondsToDuration } from './storage.js';
 import { initOptions } from './options.js';
 
 import {
@@ -556,10 +556,13 @@ export function createElement(classes, tagName)
 {
   const element = document.createElement(tagName || 'div');
 
-  const classesArray = classes.split('.');
-  classesArray.shift();
-
-  element.classList.add(...classesArray);
+  if (classes)
+  {
+    const classesArray = classes.split('.');
+    classesArray.shift();
+  
+    element.classList.add(...classesArray);
+  }
 
   return element;
 }
@@ -592,13 +595,11 @@ export function createIcon(name, classes)
 */
 export function createContextMenu(element, menuItems, parentElement)
 {
-  let contextMenuWrapper = element.querySelector('.contextMenu.wrapper');
+  // if the element has a context menu already then remove it
+  if (element.lastElementChild && element.lastElementChild.classList.contains('contextMenu'))
+    element.removeChild(element.lastChild);
 
-  if (element.contains(contextMenuWrapper))
-    contextMenuWrapper.remove();
-
-  contextMenuWrapper = createElement('.contextMenu.wrapper.hidden');
-
+  const contextMenuWrapper = createElement('.contextMenu.wrapper.hidden');
   const contextMenuElement = createElement('.contextMenu.container');
 
   contextMenuWrapper.appendChild(contextMenuElement);

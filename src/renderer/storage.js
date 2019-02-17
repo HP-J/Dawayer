@@ -720,9 +720,7 @@ function updateArtistElement(placeholder, options)
   {
     placeholder.classList.remove('placeholder');
 
-    placeholder.querySelector('.artist.container').onclick =
-    placeholder.querySelector('.artistOverlay.hide').onclick =
-    () => placeholder.classList.toggle('activeOverlay');
+    placeholder.querySelector('.artistOverlay.hide').onclick = hideActiveArtistOverlay;
   }
 
   if (options.picture)
@@ -733,6 +731,8 @@ function updateArtistElement(placeholder, options)
 
   if (options.title)
   {
+    placeholder.querySelector('.artist.container').onclick = () => navigation('artists', options.title);
+
     placeholder.querySelector('.artist.title').innerText =
     placeholder.querySelector('.artistOverlay.title').innerText = options.title;
 
@@ -752,72 +752,35 @@ function updateArtistElement(placeholder, options)
     const stats = placeholder.querySelector('.artist.stats');
 
     const albumsText = placeholder.querySelector('.text.albums');
-    const albumsContainer = placeholder.querySelector('.albums.container');
-
     const tracksText = placeholder.querySelector('.text.tracks');
-    const tracksContainer = placeholder.querySelector('.tracks.container');
 
+    // clear the text for albums and track outside the overlay
     stats.innerText = '';
 
+    // clear the text for albums and track inside the overlay
     albumsText.innerText = '';
     tracksText.innerText = '';
 
+    // if their is albums for the artist then
+    // add the number of them to the outside of the overlay
+    // and add the albums title inside of the overlay
     if (options.albums && options.albums.length > 0)
     {
-      removeAllChildren(albumsContainer);
-
       stats.innerText =
       `${options.albums.length} Album${(options.albums.length > 1) ? 's' : ''}`;
 
       albumsText.innerText = 'Albums';
-
-      // for (let i = 0; i < options.albums.length; i++)
-      // {
-      //   const album = options.storage.albums[options.albums[i]];
-      //   const clone = document.importNode(album.element, true);
-
-      //   clone.onclick = album.element.onclick;
-      //   useContextMenu(clone, [ options.albums[i] ], 'album', clone);
-
-      //   album.element.addEventListener('albumItemUpdate', () =>
-      //   {
-      //     clone.innerHTML = album.element.innerHTML;
-      //     clone.onclick = album.element.onclick;
-          
-      //     useContextMenu(clone, [ options.albums[i] ], 'album', clone);
-      //   });
-
-      //   albumsContainer.appendChild(clone);
-      // }
     }
 
+    // if their is tracks for the artist then
+    // add the number of them to the outside of the overlay
+    // and add the tracks title inside of the overlay
     if (options.tracks && options.tracks.length > 0)
     {
-      removeAllChildren(tracksContainer);
-
       stats.innerText = stats.innerText + ((stats.innerText.length > 0) ? ', ' : '') +
       `${options.tracks.length} Track${(options.tracks.length > 1) ? 's' : ''}`;
 
       tracksText.innerText = 'Tracks';
-
-      // for (let i = 0; i < options.tracks.length; i++)
-      // {
-      //   const track = options.storage.tracks[options.tracks[i]];
-      //   const clone = document.importNode(track.element, true);
-
-      //   clone.onclick = track.element.onclick;
-      //   useContextMenu(clone, [ options.tracks[i] ], 'track', clone);
-
-      //   track.element.addEventListener('trackItemUpdate', () =>
-      //   {
-      //     clone.innerHTML = track.element.innerHTML;
-      //     clone.onclick = track.element.onclick;
-
-      //     useContextMenu(clone, [ options.tracks[i] ], 'track', clone);
-      //   });
-
-      //   tracksContainer.appendChild(clone);
-      // }
     }
   }
 }
@@ -862,16 +825,6 @@ function appendArtistsPageItems(storage)
         img.src = artistPicture;
     });
   }
-}
-
-function showArtistOverlay()
-{
-
-}
-
-function hideArtistOverlay()
-{
-
 }
 
 function appendTracksPlaceholder()
@@ -1014,14 +967,10 @@ export function removeAllChildren(element)
 */
 function storageNavigation(storage, ...keys)
 {
-  console.log(keys);
-
   // toggle the artist's overlay
   if (keys[0] === 'artists')
   {
-    storage.artists[keys[1]].element.classList.toggle('activeOverlay');
-
-    // TODO the new overlay clone elements
+    showArtistOverlay(storage, storage.artists[keys[1]].element);
   }
   // play the track
   else if (keys[0] === 'play-track' || keys[0] === 'add-track')
@@ -1089,6 +1038,97 @@ function storageNavigation(storage, ...keys)
     else
       queueStorageTracks(storage, false, ...tracks);
   }
+}
+
+/** @param { Storage } storage
+* @param { HTMLElement } element
+*/
+function showArtistOverlay(storage, element)
+{
+  // only one overlay is to be shown at once
+  // TODO hide the opened one, and open the new one
+  if (window.activeArtistOverlay)
+    return;
+
+  // the artist name
+  const artist = element.querySelector('.title').innerText;
+
+  // set the overlay as active
+  window.activeArtistOverlay = {
+    element: element,
+    albumPlaceholders: [],
+    trackPlaceholders: []
+  };
+
+  const albums = storage.artists[artist].albums;
+  const tracks = storage.artists[artist].tracks;
+
+  const overlayAlbumsContainer = element.querySelector('.albums.container');
+  const overlayTracksContainer = element.querySelector('.tracks.container');
+
+  for (let i = 0; i < albums.length; i++)
+  {
+    const placeholder = createElement();
+    const albumElement = storage.albums[albums[i]].element;
+
+    window.activeArtistOverlay.albumPlaceholders.push(placeholder);
+
+    albumsContainer.replaceChild(placeholder, albumElement);
+    overlayAlbumsContainer.appendChild(albumElement);
+  }
+
+  for (let i = 0; i < tracks.length; i++)
+  {
+    const placeholder = createElement();
+    const trackElement = storage.tracks[tracks[i]].element;
+
+    window.activeArtistOverlay.trackPlaceholders.push(placeholder);
+
+    tracksContainer.replaceChild(placeholder, trackElement);
+    overlayTracksContainer.appendChild(trackElement);
+  }
+
+  element.classList.add('activeOverlay');
+}
+
+function hideActiveArtistOverlay()
+{
+  /** @type { { element: HTMLElement, albumPlaceholders: HTMLElement[], trackPlaceholders: HTMLElement[] } }
+  */
+  const activeOverlayObject = window.activeArtistOverlay;
+
+  // if no overlay is currently active then return
+  if (!activeOverlayObject)
+    return;
+  
+  // hide the overlay from the user
+  activeOverlayObject.element.classList.remove('activeOverlay');
+
+  // const artist = element.querySelector('.title').innerText;
+
+  // wait the transaction time (0.35s)
+  // then return the rented element to their original places
+  setTimeout(() =>
+  {
+    const overlayAlbumsContainer = activeOverlayObject.element.querySelector('.albums.container');
+    const overlayTracksContainer = activeOverlayObject.element.querySelector('.tracks.container');
+
+    const albumPlaceholders = activeOverlayObject.albumPlaceholders;
+    const trackPlaceholders = activeOverlayObject.trackPlaceholders;
+
+    for (let i = 0; i < albumPlaceholders.length; i++)
+    {
+      albumsContainer.replaceChild(overlayAlbumsContainer.firstChild, albumPlaceholders[i]);
+    }
+
+    for (let i = 0; i < trackPlaceholders.length; i++)
+    {
+      tracksContainer.replaceChild(overlayTracksContainer.firstChild, trackPlaceholders[i]);
+    }
+
+    // set the active overlay as null
+    window.activeArtistOverlay = undefined;
+  }, 350);
 }
 
 /** @param { HTMLElement } element

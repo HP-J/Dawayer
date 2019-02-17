@@ -1,6 +1,7 @@
 main:
   ☐ test if two artist share the same name
   ☐ test if two albums share the same name
+  ☐ MPRIS service support
 
 graphics:
   ☐ sketching podcast page interface
