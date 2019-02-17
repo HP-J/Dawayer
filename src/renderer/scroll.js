@@ -16,7 +16,7 @@ export default function(element, options)
   options.direction = options.direction || 'horizontal';
 
   if (options.duration === undefined)
-    options.duration = 50;
+    options.duration = 250;
 
   if (options.delay)
   {
@@ -49,7 +49,7 @@ function scrollTo(element, options)
 {
   if (element.parentElement._cancelScroll)
   {
-    clearInterval(element.parentElement._cancelScroll);
+    cancelAnimationFrame(element.parentElement._cancelScroll);
   
     element.parentElement._cancelScroll = undefined;
   }
@@ -86,18 +86,22 @@ function scrollTo(element, options)
   }
   
   let elapsedTime = 0;
+  let last = Date.now();
   
-  // loop every millisecond
-  element.parentElement._cancelScroll = setInterval(scroll, 1);
-  
-  scroll();
+  // start animation
+  requestAnimationFrame(scroll);
   
   function scroll()
   {
-    elapsedTime += 1;
+    const now = Date.now();
+
+    const delta = now - last;
+
+    last = now;
+    elapsedTime += delta;
 
     const lerpConst = lerp(scrollStartPosition, scrollEndPosition, elapsedTime / options.duration);
-  
+
     if (options.direction === 'horizontal')
       element.parentElement.scrollLeft = lerpConst;
     else
@@ -108,12 +112,14 @@ function scrollTo(element, options)
 
     if (scrollEndPosition === lerpConst)
     {
-      clearInterval(element.parentElement._cancelScroll);
-    
       element.parentElement._cancelScroll = undefined;
   
       if (options.callback)
         options.callback();
+    }
+    else
+    {
+      element.parentElement._cancelScroll = requestAnimationFrame(scroll);
     }
   }
 }
