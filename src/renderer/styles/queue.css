@@ -209,6 +209,11 @@
   margin-top: 9px;
 }
 
+.queue.itemsContainer:last-child
+{
+  margin-bottom: 9px;
+}
+
 .queueItem.index
 {
   grid-area: index;

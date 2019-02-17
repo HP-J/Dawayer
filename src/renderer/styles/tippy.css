@@ -1,7 +1,7 @@
 .contextMenu.wrapper
 {
   z-index: 99;
-  position: fixed;
+  position: absolute;
 
   max-width: 114px;
   width: max-content;
@@ -10,13 +10,6 @@
   border-radius: 5px;
 
   padding: 10px;
-}
-
-.contextMenu.wrapper.hidden
-{
-  opacity: 0;
-
-  pointer-events: none;
 }
 
 .contextMenu.container

@@ -596,15 +596,23 @@ export function createIcon(name, classes)
 export function createContextMenu(element, menuItems, parentElement)
 {
   // if the element has a context menu already then remove it
-  if (element.lastElementChild && element.lastElementChild.classList.contains('contextMenu'))
-    element.removeChild(element.lastChild);
+  let contextMenuWrapper;
+  let contextMenuElement;
 
-  const contextMenuWrapper = createElement('.contextMenu.wrapper.hidden');
-  const contextMenuElement = createElement('.contextMenu.container');
+  if (element._contextMenu)
+  {
+    contextMenuWrapper = element._contextMenu;
+    contextMenuElement = element._contextMenu.children[0];
+  }
+  else
+  {
+    contextMenuWrapper = createElement('.contextMenu.wrapper');
+    contextMenuElement = createElement('.contextMenu.container');
 
-  contextMenuWrapper.appendChild(contextMenuElement);
-  
-  element.appendChild(contextMenuWrapper);
+    contextMenuWrapper.appendChild(contextMenuElement);
+
+    contextMenuWrapper.hidden = true;
+  }
 
   // add the menu items to the context menu
   for (const title in menuItems)
@@ -620,9 +628,13 @@ export function createContextMenu(element, menuItems, parentElement)
       // call the item's function
       menuItems[title].call(contextMenuElement);
 
-      // hide the menu
-      if (!contextMenuWrapper.classList.contains('hidden'))
-        contextMenuWrapper.classList.add('hidden');
+      // remove the menu
+      if (!contextMenuWrapper.hidden)
+      {
+        document.body.removeChild(contextMenuWrapper);
+
+        contextMenuWrapper.hidden = true;
+      }
     };
 
     contextMenuElement.appendChild(itemElement);
@@ -635,11 +647,12 @@ export function createContextMenu(element, menuItems, parentElement)
     // stop propagation to the window event
     event.stopPropagation();
 
-    // if there's any other opened context menu then hide it
-    if (global.openedMenu)
+    // if there's any other opened context menu then remove it
+    if (global.openedMenu && !global.openedMenu.hidden)
     {
-      if (!global.openedMenu.classList.contains('hidden'))
-        global.openedMenu.classList.add('hidden');
+      document.body.removeChild(global.openedMenu);
+
+      global.openedMenu.hidden = true;
     }
 
     // set this menu as the current opened menu
@@ -665,7 +678,13 @@ export function createContextMenu(element, menuItems, parentElement)
       else
         contextMenuWrapper.style.top = event.pageY + 'px';
 
-      global.openedMenu.classList.remove('hidden');
+      // append the menu
+      if (contextMenuWrapper.hidden)
+      {
+        document.body.appendChild(contextMenuWrapper);
+
+        contextMenuWrapper.hidden = false;
+      }
     });
   };
 
@@ -673,28 +692,40 @@ export function createContextMenu(element, menuItems, parentElement)
   // on empty space
   window.addEventListener('contextmenu', () =>
   {
-    // hide the menu
-    if (!contextMenuWrapper.classList.contains('hidden'))
-      contextMenuWrapper.classList.add('hidden');
+    // remove the menu
+    if (!contextMenuWrapper.hidden)
+    {
+      document.body.removeChild(contextMenuWrapper);
+
+      contextMenuWrapper.hidden = true;
+    }
   });
 
   // gets called when the user left-clicks
   // on empty space
   window.addEventListener('click', () =>
   {
-    // hide the menu
-    if (!contextMenuWrapper.classList.contains('hidden'))
-      contextMenuWrapper.classList.add('hidden');
+    // remove the menu
+    if (!contextMenuWrapper.hidden)
+    {
+      document.body.removeChild(contextMenuWrapper);
+
+      contextMenuWrapper.hidden = true;
+    }
   });
 
-  // auto hide the menu when the mouse leaves the parent (or the parent gets blurred)
+  // auto remove the menu when the mouse leaves the parent (or the parent gets blurred)
   if (parentElement)
   {
     parentElement.addEventListener('mouseleave', () =>
     {
-      // hide the menu
-      if (!contextMenuWrapper.classList.contains('hidden'))
-        contextMenuWrapper.classList.add('hidden');
+      // remove the menu
+      if (!contextMenuWrapper.hidden)
+      {
+        document.body.removeChild(contextMenuWrapper);
+
+        contextMenuWrapper.hidden = true;
+      }
     });
   }
 }
