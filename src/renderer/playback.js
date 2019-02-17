@@ -68,6 +68,17 @@ export function initPlayback()
 
   // loading the queue will take those settings into account
 
+  // space button switches the playing mode
+  window.addEventListener('keydown', (event) =>
+  {
+    if (event.key === ' ')
+    {
+      event.preventDefault();
+
+      switchPlayingMode();
+    }
+  });
+
   /** @type { string[] }
   */
   let args = remote.getGlobal('argv');

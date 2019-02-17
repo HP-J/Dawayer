@@ -136,6 +136,17 @@ export function initStorage()
   // TEST the default music dir on windows
   // console.log(getDefaultMusicDir());
 
+  // skip button hides any active artist overlay
+  window.addEventListener('keydown', (event) =>
+  {
+    if (event.key === 'Escape')
+    {
+      event.preventDefault();
+
+      hideActiveArtistOverlay();
+    }
+  });
+
   // if now audio directories are saved then use the OS default directory for music
   if (!savedAudioDirectories || savedAudioDirectories.length <= 0)
     addNewDirectories([ getDefaultMusicDir() ]);
