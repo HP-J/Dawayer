@@ -305,6 +305,25 @@
   {
     font-size: calc(5px + 0.85vw + 0.7vh);
   }
+
+  .queue.container
+  {
+    position: absolute;
+
+    max-width: 450px;
+    bottom: -190%;
+    width: 75%;
+  }
+
+  .controlBar.container.extended > .queue.container
+  {
+    bottom: -190%;
+  }
+
+  .controlBar.container.extended > .queue.container:hover
+  {
+    bottom: 0;
+  }
 }
 
 @media screen and (max-width: 600px)

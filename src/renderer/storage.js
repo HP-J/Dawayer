@@ -13,7 +13,7 @@ import download from 'download';
 import { parseFile as getMetadata } from 'music-metadata';
 import getWiki from 'wikijs';
 
-import { createElement, createIcon } from './renderer.js';
+import { createElement, createIcon, createContextMenu } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
 import { queueStorageTracks, setPlayingIndex } from './playback.js';
 
@@ -29,7 +29,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 /** @typedef { Object } Storage
 * @property { Object<string, {  artist: string[], tracks: string[], duration: number, element: HTMLDivElement }> } albums
 * @property { Object<string, { tracks: string[], albums: string[], bio: string, element: HTMLDivElement }> } artists
-* @property { Object<string, { url: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
+* @property { Object<string, { title: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
 
 export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
@@ -157,7 +157,7 @@ export function initStorage()
       {
         appendItems(storage);
 
-        navigation = (target) => storageNavigation(storage, target);
+        navigation = (...keys) => storageNavigation(storage, ...keys);
 
         // update the cache if it's older than 2 days
         // take effect when the app is re-opened
@@ -260,8 +260,8 @@ function scanCacheAudioFiles()
                   albumArtist = albumArtist.split(artistsRegex);
 
                   // store the track important metadata
-                  storage.tracks[title] = {
-                    url: file,
+                  storage.tracks[file] = {
+                    title: title,
                     artists: artists,
                     duration: duration
                   };
@@ -288,9 +288,9 @@ function scanCacheAudioFiles()
                       if (!storage.artists[artists[i]].albums.includes(albumTitle))
                         storage.artists[artists[i]].albums.push(albumTitle);
                     }
-                    else if (!storage.artists[artists[i]].tracks.includes(title))
+                    else if (!storage.artists[artists[i]].tracks.includes(file))
                     {
-                      storage.artists[artists[i]].tracks.push(title);
+                      storage.artists[artists[i]].tracks.push(file);
                     }
                   }
 
@@ -299,7 +299,7 @@ function scanCacheAudioFiles()
                   if (storage.albums[albumTitle])
                   {
                     // push the new track to the album's list
-                    storage.albums[albumTitle].tracks.push(title);
+                    storage.albums[albumTitle].tracks.push(file);
 
                     // add the track's duration to the overall album duration
                     storage.albums[albumTitle].duration =
@@ -310,7 +310,7 @@ function scanCacheAudioFiles()
                     // add the album to the storage object
                     storage.albums[albumTitle] = {
                       artist: albumArtist,
-                      tracks: [ title ],
+                      tracks: [ file ],
                       duration: duration
                     };
                   }
@@ -513,8 +513,9 @@ function appendAlbumPlaceholder()
 
 /** @param { HTMLDivElement } placeholder
 * @param { { picture: string, title: string, artist: string[], tracks: string[], duration: string } } options
+* @param { Storage } storage
 */
-function updateAlbumElement(placeholder, options)
+function updateAlbumElement(placeholder, options, storage)
 {
   if (placeholder.classList.contains('placeholder'))
     placeholder.classList.remove('placeholder');
@@ -528,7 +529,9 @@ function updateAlbumElement(placeholder, options)
   {
     placeholder.querySelector('.album.title').innerText = options.title;
 
-    placeholder.onclick = () => navigation(`play-album/${options.title}`);
+    placeholder.onclick = () => navigation('play-album', options.title);
+
+    useContextMenu(placeholder, [ options.title ], 'album', placeholder);
   }
 
   if (options.duration)
@@ -549,7 +552,7 @@ function updateAlbumElement(placeholder, options)
       {
         event.stopPropagation();
 
-        navigation(`artists/${options.artist[i]}`);
+        navigation('artists', options.artist[i]);
       };
 
       if (i > 0)
@@ -570,32 +573,34 @@ function updateAlbumElement(placeholder, options)
       // if updating the album's tracks
       if (tracksContainer.children.length - 1 >= i)
       {
-        tracksContainer.children[i].innerText = options.tracks[i];
+        tracksContainer.children[i].innerText = storage.tracks[options.tracks[i]].title;
         tracksContainer.children[i].onclick = (event) =>
         {
           event.stopPropagation();
 
-          navigation(`play-album-track/${options.title}/${i}`);
+          navigation('play-album-track', options.title, i);
         };
+
+        useContextMenu(tracksContainer.children[i], [ options.title, i ], 'album-track', placeholder);
       }
       else
       {
         const track = createElement('.album.track');
 
-        track.innerText = options.tracks[i];
+        track.innerText = storage.tracks[options.tracks[i]].title;
         track.onclick = (event) =>
         {
           event.stopPropagation();
 
-          navigation(`play-album-track/${options.title}/${i}`);
+          navigation('play-album-track', options.title, i);
         };
+
+        useContextMenu(track, [ options.title, i ], 'album-track', placeholder);
 
         tracksContainer.appendChild(track);
       }
     }
   }
-
-  placeholder.dispatchEvent(new Event('albumItemUpdate'));
 }
 
 /** @param { Storage } storage
@@ -628,12 +633,12 @@ function appendAlbumsPageItems(storage)
         artist: albumArtist,
         tracks: albumTracks,
         duration: secondsToDuration(storage.albums[albums[i]].duration)
-      });
+      }, storage);
     };
 
-    const track = storage.tracks[storage.albums[albums[i]].tracks[0]];
+    const trackUrl = storage.albums[albums[i]].tracks[0];
 
-    getMetadata(track.url)
+    getMetadata(trackUrl)
       .then(metadata =>
       {
         if (metadata.common.picture && metadata.common.picture.length > 0)
@@ -734,7 +739,9 @@ function updateArtistElement(placeholder, options)
     const playElement = placeholder.querySelector('.artistOverlay.button');
 
     playElement.innerText = 'Play';
-    playElement.onclick = () => navigation(`play-artist/${options.title}`);
+    playElement.onclick = () => navigation('play-artist', options.title);
+
+    useContextMenu(placeholder, [ options.title ], 'artist', placeholder);
   }
 
   if (options.bio)
@@ -764,18 +771,24 @@ function updateArtistElement(placeholder, options)
 
       albumsText.innerText = 'Albums';
 
-      for (let i = 0; i < options.albums.length; i++)
-      {
-        const album = options.storage.albums[options.albums[i]];
-        const clone = album.element.cloneNode(true);
+      // for (let i = 0; i < options.albums.length; i++)
+      // {
+      //   const album = options.storage.albums[options.albums[i]];
+      //   const clone = document.importNode(album.element, true);
 
-        albumsContainer.appendChild(clone);
+      //   clone.onclick = album.element.onclick;
+      //   useContextMenu(clone, [ options.albums[i] ], 'album', clone);
 
-        album.element.addEventListener('albumItemUpdate', () =>
-        {
-          clone.innerHTML = album.element.innerHTML;
-        });
-      }
+      //   album.element.addEventListener('albumItemUpdate', () =>
+      //   {
+      //     clone.innerHTML = album.element.innerHTML;
+      //     clone.onclick = album.element.onclick;
+          
+      //     useContextMenu(clone, [ options.albums[i] ], 'album', clone);
+      //   });
+
+      //   albumsContainer.appendChild(clone);
+      // }
     }
 
     if (options.tracks && options.tracks.length > 0)
@@ -787,23 +800,29 @@ function updateArtistElement(placeholder, options)
 
       tracksText.innerText = 'Tracks';
 
-      for (let i = 0; i < options.tracks.length; i++)
-      {
-        const track = options.storage.tracks[options.tracks[i]];
-        const clone = track.element.cloneNode(true);
+      // for (let i = 0; i < options.tracks.length; i++)
+      // {
+      //   const track = options.storage.tracks[options.tracks[i]];
+      //   const clone = document.importNode(track.element, true);
 
-        tracksContainer.appendChild(clone);
+      //   clone.onclick = track.element.onclick;
+      //   useContextMenu(clone, [ options.tracks[i] ], 'track', clone);
 
-        track.element.addEventListener('trackItemUpdate', () =>
-        {
-          clone.innerHTML = track.element.innerHTML;
-        });
-      }
+      //   track.element.addEventListener('trackItemUpdate', () =>
+      //   {
+      //     clone.innerHTML = track.element.innerHTML;
+      //     clone.onclick = track.element.onclick;
+
+      //     useContextMenu(clone, [ options.tracks[i] ], 'track', clone);
+      //   });
+
+      //   tracksContainer.appendChild(clone);
+      // }
     }
   }
 }
 
-/** @param  { Storage } storage
+/** @param { Storage } storage
 */
 function appendArtistsPageItems(storage)
 {
@@ -845,6 +864,16 @@ function appendArtistsPageItems(storage)
   }
 }
 
+function showArtistOverlay()
+{
+
+}
+
+function hideArtistOverlay()
+{
+
+}
+
 function appendTracksPlaceholder()
 {
   const placeholderWrapper = createElement('.track.wrapper.placeholder');
@@ -872,7 +901,7 @@ function appendTracksPlaceholder()
 }
 
 /** @param { HTMLDivElement } placeholder
-* @param { { picture: string, artist: string[], title: string, duration: string } } options
+* @param { { picture: string, artist: string[], title: string, url: string, duration: string } } options
 */
 function updateTracksElement(placeholder, options)
 {
@@ -897,7 +926,7 @@ function updateTracksElement(placeholder, options)
       {
         event.stopPropagation();
 
-        navigation(`artists/${options.artist[i]}`);
+        navigation('artists', options.artist[i]);
       };
 
       if (i > 0)
@@ -911,13 +940,13 @@ function updateTracksElement(placeholder, options)
   {
     placeholder.querySelector('.track.title').innerText = options.title;
 
-    placeholder.onclick = () => navigation(`play-track/${options.title}`);
+    placeholder.onclick = () => navigation('play-track', options.url);
+
+    useContextMenu(placeholder, [ options.url ], 'track', placeholder);
   }
 
   if (options.duration)
     placeholder.querySelector('.track.duration').innerText = options.duration;
-
-  placeholder.dispatchEvent(new Event('trackItemUpdate'));
 }
 
 /** @param  { Storage } storage
@@ -945,12 +974,13 @@ function appendTracksPageItems(storage)
       updateTracksElement(placeholder, {
         picture: img.src,
         artist: track.artists,
-        title: tracks[i],
+        title: track.title,
+        url: tracks[i],
         duration: secondsToDuration(track.duration)
       });
     };
 
-    getMetadata(track.url)
+    getMetadata(tracks[i])
       .then(metadata =>
       {
         if (metadata.common.picture && metadata.common.picture.length > 0)
@@ -982,36 +1012,64 @@ export function removeAllChildren(element)
 * @param { Storage } storage
 * @param { string } target
 */
-function storageNavigation(storage, target)
+function storageNavigation(storage, ...keys)
 {
-  const keys = target.split('/');
+  console.log(keys);
 
   // toggle the artist's overlay
   if (keys[0] === 'artists')
   {
     storage.artists[keys[1]].element.classList.toggle('activeOverlay');
-  }
-  // queue the track
-  else if (keys[0] === 'play-track')
-  {
-    queueStorageTracks(storage, true, keys[1]);
-  }
-  // queue the album, but start playing from a selected track
-  else if (keys[0] === 'play-album-track')
-  {
-    // queue the entire album
-    queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks);
 
-    // but start from the selected track
-    setPlayingIndex(parseInt(keys[2]));
+    // TODO the new overlay clone elements
   }
-  // queue the album
-  else if (keys[0] === 'play-album')
+  // play the track
+  else if (keys[0] === 'play-track' || keys[0] === 'add-track')
   {
-    queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks);
+    // clear the queue then play the track
+    if (keys[0] === 'play-track')
+      queueStorageTracks(storage, true, keys[1]);
+    // queue the track at bottom
+    else
+      queueStorageTracks(storage, false, keys[1]);
   }
-  // queue the artist's tracks and/or albums
-  else if (keys[0] === 'play-artist')
+  // play the album from a selected track
+  else if (keys[0] === 'play-album-track' || keys[0] === 'add-album-track')
+  {
+    // clear the queue then play the album
+    if (keys[0] === 'play-album-track')
+    {
+      queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks).then(() =>
+      {
+        // start playback from a selected track
+        setPlayingIndex(parseInt(keys[2]));
+      });
+    }
+    // queue the album at bottom
+    else
+    {
+      queueStorageTracks(storage, false, ...storage.albums[keys[1]].tracks).then((queue) =>
+      {
+        const trackUrl = storage.albums[keys[1]].tracks[parseInt(keys[2])];
+        const trackQueueIndex = queue.findIndex((value) => value.url === trackUrl);
+
+        // start playback from a selected track
+        setPlayingIndex(trackQueueIndex);
+      });
+    }
+  }
+  // play the album
+  else if (keys[0] === 'play-album' || keys[0] === 'add-album')
+  {
+    // clear the queue then play the album
+    if (keys[0] === 'play-album')
+      queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks);
+    // queue the album at bottom
+    else
+      queueStorageTracks(storage, false, ...storage.albums[keys[1]].tracks);
+  }
+  // play the artist's tracks and/or albums
+  else if (keys[0] === 'play-artist' || keys[0] === 'add-artist')
   {
     const tracks = [];
 
@@ -1024,8 +1082,33 @@ function storageNavigation(storage, target)
     // push the individual tracks
     tracks.push(...storage.artists[keys[1]].tracks);
 
-    queueStorageTracks(storage, true, ...tracks);
+    // clear the queue then play the tracks
+    if (keys[0] === 'play-artist')
+      queueStorageTracks(storage, true, ...tracks);
+    // queue the tracks at bottom
+    else
+      queueStorageTracks(storage, false, ...tracks);
   }
+}
+
+/** @param { HTMLElement } element
+* @param { string } title
+* @param { string[] } navigationKeys
+* @param { 'track' | 'album-track' | 'album' | 'artist' } type
+* @param { HTMLElement } parentElement
+*/
+function useContextMenu(element, navigationKeys, type, parentElement)
+{
+  createContextMenu(element, {
+    'Play': () =>
+    {
+      navigation(`play-${type}`, ...navigationKeys);
+    },
+    'Add to Queue': () =>
+    {
+      navigation(`add-${type}`, ...navigationKeys);
+    }
+  }, parentElement);
 }
 
 export function rescanStorage()
@@ -1037,7 +1120,7 @@ export function rescanStorage()
     appendItems(scan.storage);
     cacheArtists(scan.storage);
     
-    navigation = (target) => storageNavigation(scan.storage, target);
+    navigation = (...keys) => storageNavigation(scan.storage, ...keys);
   });
 }
 

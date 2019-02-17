@@ -117,7 +117,13 @@ export function getSeekTime()
 */
 export function setPlayingIndex(index)
 {
-  playingIndex = index;
+  if (playingIndex !== index)
+  {
+    playingIndex = index;
+
+    resortQueue(playingIndex);
+    changeQueue();
+  }
 }
 
 /** @param { number } time
@@ -415,21 +421,21 @@ function updateCurrentCard(index)
 * @param { string } url
 * @returns { Promise<{ title: string, artist: string, picture: string, duration: number }> }
 */
-function getTrackMetadata(storage, title, url)
+function getTrackMetadata(storage, url)
 {
   if (
     storage &&
-    storage.tracks[title] &&
-    storage.tracks[title].element.querySelector('.cover').style.backgroundImage
+    storage.tracks[url] &&
+    storage.tracks[url].element.querySelector('.cover').style.backgroundImage
   )
   {
     return new Promise((resolve) =>
     {
       resolve({
-        title: title,
-        artist: storage.tracks[title].artists.join(', '),
-        picture: storage.tracks[title].element.querySelector('.cover').style.backgroundImage,
-        duration: storage.tracks[title].duration
+        title: storage.tracks[url].title,
+        artist: storage.tracks[url].artists.join(', '),
+        picture: storage.tracks[url].element.querySelector('.cover').style.backgroundImage,
+        duration: storage.tracks[url].duration
       });
     });
   }
@@ -493,9 +499,7 @@ export function queueStorageTracks(storage, clear, ...tracks)
 
     for (let i = 0; i < tracks.length; i++)
     {
-      const url = storage.tracks[tracks[i]].url;
-
-      const exists = queue.find((obj) => obj.url === url);
+      const exists = queue.find((obj) => obj.url === tracks[i]);
 
       // if the same track already exists in the queue
       if (exists && tracks.length === 1)
@@ -504,10 +508,10 @@ export function queueStorageTracks(storage, clear, ...tracks)
       }
       else if (!exists)
       {
-        promises.push(getTrackMetadata(storage, tracks[i], url).then((obj) =>
+        promises.push(getTrackMetadata(storage, tracks[i]).then((obj) =>
         {
           queue.push({
-            url: url,
+            url: tracks[i],
             index: queue.length,
             title: obj.title,
             artist: obj.artist,
@@ -532,7 +536,7 @@ export function queueStorageTracks(storage, clear, ...tracks)
       shuffleQueue();
       changeQueue();
 
-      resolve();
+      resolve(queue);
     });
   });
 }

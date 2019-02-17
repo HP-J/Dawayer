@@ -1,8 +1,9 @@
 .contextMenu.wrapper
 {
+  z-index: 99;
   position: fixed;
 
-  max-width: 105px;
+  max-width: 114px;
   width: max-content;
 
   opacity: 1;

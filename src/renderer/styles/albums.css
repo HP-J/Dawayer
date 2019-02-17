@@ -102,7 +102,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.album.container:hover:after
+.album.wrapper:not(.placeholder):hover > .container:after
 {
   opacity: 0.825;
 }

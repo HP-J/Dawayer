@@ -593,26 +593,17 @@ export function createIcon(name, classes)
 export function createContextMenu(element, menuItems, parentElement)
 {
   let contextMenuWrapper = element.querySelector('.contextMenu.wrapper');
-  let contextMenuElement;
 
-  if (contextMenuWrapper)
-  {
-    if (!contextMenuWrapper.classList.contains('hidden'))
-      contextMenuWrapper.classList.add('hidden');
-    
-    contextMenuElement = contextMenuWrapper.children[0];
+  if (element.contains(contextMenuWrapper))
+    contextMenuWrapper.remove();
 
-    removeAllChildren(contextMenuElement);
-  }
-  else
-  {
-    contextMenuWrapper = createElement('.contextMenu.wrapper.hidden');
-    contextMenuElement = createElement('.contextMenu.container');
+  contextMenuWrapper = createElement('.contextMenu.wrapper.hidden');
 
-    contextMenuWrapper.appendChild(contextMenuElement);
-    
-    element.appendChild(contextMenuWrapper);
-  }
+  const contextMenuElement = createElement('.contextMenu.container');
+
+  contextMenuWrapper.appendChild(contextMenuElement);
+  
+  element.appendChild(contextMenuWrapper);
 
   // add the menu items to the context menu
   for (const title in menuItems)

@@ -81,23 +81,4 @@
     width: 100%;
     height: 50%;
   }
-
-  .queue.container
-  {
-    position: absolute;
-
-    max-width: 450px;
-    bottom: -190%;
-    width: 75%;
-  }
-
-  .controlBar.container.extended > .queue.container.queue.container
-  {
-    bottom: -190%;
-  }
-
-  .controlBar.container.extended > .queue.container.queue.container:hover
-  {
-    bottom: 0;
-  }
 }
