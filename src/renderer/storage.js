@@ -461,33 +461,43 @@ function cacheArtist(artist, storage)
         {
           promises.push(page.summary().then((summary) =>
           {
+            // if the artist name refers to more than one thing
+            // then ignore it
+            if (summary.replace(/\s+/g, ' ').trim().startsWith(`${artist} may refer to:`))
+              return;
+
             storage.artists[artist].bio = summary;
 
             updateArtistElement(storage.artists[artist].element, {
               bio: summary
             });
-          }));
-          
-          promises.push(page.mainImage().then(pictureUrl =>
-          {
-            const picturePath = join(configDir, 'ArtistsCache', artist);
 
-            download(pictureUrl).then((data) => writeFile(picturePath, data)).then(() =>
+            // download the artist's picture
+            page.mainImage().then(pictureUrl =>
             {
-              const img = new Image();
-
-              img.src = picturePath;
-
-              img.onload = () =>
+              if (!pictureUrl)
+                return;
+              
+              const picturePath = join(configDir, 'ArtistsCache', artist);
+  
+              download(pictureUrl).then((data) => writeFile(picturePath, data)).then(() =>
               {
-                updateArtistElement(storage.artists[artist].element, {
-                  picture: img.src
-                });
-              };
+                const img = new Image();
+  
+                img.src = picturePath;
+  
+                img.onload = () =>
+                {
+                  updateArtistElement(storage.artists[artist].element, {
+                    picture: img.src
+                  });
+                };
+              });
             });
           }));
         }
 
+        // wait for all summaries to be collected then cache them
         Promise.all(promises).then(resolve);
       });
   });
