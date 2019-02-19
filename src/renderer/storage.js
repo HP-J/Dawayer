@@ -11,7 +11,7 @@ import * as settings from '../settings.js';
 import download from 'download';
 
 import { parseFile as getMetadata } from 'music-metadata';
-import getWiki from 'wikijs';
+import getLastFm from 'last-fm';
 
 import { createElement, createIcon, createContextMenu } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
@@ -29,7 +29,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 /** @typedef { Object } Storage
 * @property { Object<string, {  artist: string[], tracks: string[], duration: number, element: HTMLDivElement }> } albums
 * @property { Object<string, { tracks: string[], albums: string[], bio: string, element: HTMLDivElement }> } artists
-* @property { Object<string, { title: string, artists: string[], duration: number, element: HTMLDivElement }> } tracks
+* @property { Object<string, { title: string, picture: boolean, artists: string[], duration: number, element: HTMLDivElement }> } tracks
 */
 
 export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
@@ -44,7 +44,7 @@ export const artistsRegex = /,\s+|\s+ft.?\s+|\s+feat.?\s+/g;
 */
 export const missingPicture = join(__dirname, '../../missing.png');
 
-const wiki = getWiki();
+const lastfm = new getLastFm('f7bad3bd904131752e9bf050562a00ee');
 
 /**  @type { HTMLDivElement }
 */
@@ -273,6 +273,7 @@ function scanCacheAudioFiles()
                   // store the track important metadata
                   storage.tracks[file] = {
                     title: title,
+                    picture: (metadata.common.picture && metadata.common.picture.length > 0),
                     artists: artists,
                     duration: duration
                   };
@@ -442,64 +443,78 @@ function cacheArtist(artist, storage)
     }
 
     const regex = /[^a-zA-Z0-9]+/g;
-    const promises = [];
-
-    wiki.search(artist, 5)
-      .then(search =>
+    
+    lastfm.artistSearch({
+      q: artist,
+      limit: 3
+    }, (err, data) =>
+    {
+      if (err)
       {
-        const artistForSearch = artist.replace(regex, ' ');
+        resolve();
 
-        for (let i = 0; i < search.results.length; i++)
-        {
-          if (search.results[i].replace(regex, ' ').indexOf(artistForSearch) > -1)
-            return wiki.page(search.results[i]);
-        }
-      })
-      .then(page =>
+        return;
+      }
+
+      const artistForSearch = artist.replace(regex, ' ');
+
+      for (let i = 0; i < data.result.length; i++)
       {
-        if (page)
+        if (data.result[i].name.replace(regex, ' ').indexOf(artistForSearch) > -1)
         {
-          promises.push(page.summary().then((summary) =>
-          {
-            // if the artist name refers to more than one thing
-            // then ignore it
-            if (summary.replace(/\s+/g, ' ').trim().startsWith(`${artist} may refer to:`))
-              return;
+          // the array is different sizes of the same picture
+          // the third picture size is large
+          if (data.result[i].images.length > 3)
+            cacheImage(data.result[i].images[3]);
 
-            storage.artists[artist].bio = summary;
-
-            updateArtistElement(storage.artists[artist].element, {
-              bio: summary
-            });
-
-            // download the artist's picture
-            page.mainImage().then(pictureUrl =>
-            {
-              if (!pictureUrl)
-                return;
-              
-              const picturePath = join(configDir, 'ArtistsCache', artist);
-  
-              download(pictureUrl).then((data) => writeFile(picturePath, data)).then(() =>
-              {
-                const img = new Image();
-  
-                img.src = picturePath;
-  
-                img.onload = () =>
-                {
-                  updateArtistElement(storage.artists[artist].element, {
-                    picture: img.src
-                  });
-                };
-              });
-            });
-          }));
+          cacheSummary(data.result[i].name);
+          
+          break;
         }
+      }
+    });
 
-        // wait for all summaries to be collected then cache them
-        Promise.all(promises).then(resolve);
+    function cacheImage(pictureUrl)
+    {
+      const picturePath = join(configDir, 'ArtistsCache', artist);
+
+      download(pictureUrl).then((data) => writeFile(picturePath, data)).then(() =>
+      {
+        const img = new Image();
+
+        img.src = picturePath;
+
+        img.onload = () =>
+        {
+          updateArtistElement(storage.artists[artist].element, {
+            picture: img.src
+          });
+        };
       });
+    }
+
+    function cacheSummary(name)
+    {
+      lastfm.artistInfo({
+        name: name
+      }, (err, data) =>
+      {
+        if (err || !data.summary)
+        {
+          resolve();
+
+          return;
+        }
+
+        storage.artists[artist].bio = data.summary;
+
+        updateArtistElement(storage.artists[artist].element, {
+          bio: data.summary
+        });
+
+        resolve();
+      });
+    }
   });
 }
 
@@ -657,14 +672,27 @@ function appendAlbumsPageItems(storage)
       }, storage);
     };
 
-    const trackUrl = storage.albums[albums[i]].tracks[0];
+    for (let x = 0; x < storage.albums[albums[i]].tracks.length; x++)
+    {
+      const trackUrl = storage.albums[albums[i]].tracks[x];
 
-    getMetadata(trackUrl)
-      .then(metadata =>
+      if (storage.tracks[trackUrl].picture)
       {
-        if (metadata.common.picture && metadata.common.picture.length > 0)
-          img.src = toBase64(metadata.common.picture[0]);
-      });
+        if (storage.tracks[trackUrl].picture)
+        {
+          getMetadata(trackUrl)
+            .then(metadata =>
+            {
+              if (metadata.common.picture && metadata.common.picture.length > 0)
+              {
+                img.src = toBase64(metadata.common.picture[0]);
+              }
+            });
+
+          break;
+        }
+      }
+    }
   }
 }
 
