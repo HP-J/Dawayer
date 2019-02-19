@@ -36,7 +36,9 @@
 
 .artist.container
 {
-  width: 250px;
+  min-width: 205px;
+  max-width: 250px;
+  width: calc(27.5vw + 3vh);
   height: fit-content;
 
   border-radius: 6px;
