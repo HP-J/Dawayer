@@ -76,7 +76,7 @@ body
 
   display: grid;
   grid-template-rows: 100%;
-  grid-template-columns: 100vw 100vw 100vw;
+  grid-template-columns: auto auto auto;
   grid-template-areas: "playing local options";
 
   top: 0;
@@ -150,16 +150,22 @@ body
 .page.playing
 {
   grid-area: playing;
+
+  width: 100vw;
 }
 
 .page.local
 {
   grid-area: local;
+
+  width: 100vw;
 }
 
 .page.options
 {
   grid-area: options;
+
+  width: 100vw;
 }
 
 .page.extended.local

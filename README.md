@@ -22,4 +22,4 @@ All icons inside the [icons](https://gitlab.com/herpproject/Dawayer/tree/develop
 # Acknowledgments
 Dawayer's design is inspired by [Phonograph](https://play.google.com/store/apps/details?id=com.kabouzeid.gramophone).  
 the Album design is inspired by this [dribble](https://dribbble.com/shots/4579038-Foodiefit-Interaction-studio-included) created by [Kreativa Studio](https://dribbble.com/KreativaStudio).  
-Dawayer uses [Wikipedia](https://www.wikipedia.org/) to fetch some information about artists.
+Dawayer uses [Last.fm API](https://www.last.fm/api) to fetch some information about artists.

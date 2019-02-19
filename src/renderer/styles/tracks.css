@@ -18,10 +18,10 @@
   flex-wrap: wrap;
   justify-content: center;
 
-  width: 90%;
+  width: 100%;
   height: auto;
 
-  margin: 0% 5%;
+  margin-bottom: 10px;
 }
 
 .track.wrapper

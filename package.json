@@ -94,11 +94,11 @@
     "electron-dl": "^1.13.0",
     "fs-extra": "^7.0.1",
     "howler": "^2.1.1",
+    "last-fm": "^5.2.2",
     "lodash": "^4.17.11",
     "music-metadata": "^3.5.2",
     "request-promise-native": "^1.0.5",
-    "tippy.js": "^4.0.1",
-    "wikijs": "^4.11.2"
+    "tippy.js": "^4.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
