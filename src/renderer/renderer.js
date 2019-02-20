@@ -371,10 +371,15 @@ function init()
 
 function initPages()
 {
+  // set the default pages
+  // the pages the user first sees when they starts the application
+
   selectedPage = pagesContainer.children.item(1);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
+  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical' });
+  scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
   scroll(selectedPage, { duration: 0 });
 }
 
@@ -507,15 +512,6 @@ function volumeControl(percentage, ignoreLock)
 
 // Callbacks
 
-/** scroll coordinates break on resizing the containers and need to be reset every time
-*/
-function resetPagesScroll()
-{
-  scroll(selectedLocalIcon, { duration: 0, direction: 'vertical', delay: 200 });
-  scroll(selectedLocalSubPage, { duration: 0, direction: 'vertical' });
-  scroll(selectedPage, { duration: 0 });
-}
-
 function resizeEnd()
 {
   // remove no-motion class
@@ -535,9 +531,6 @@ function onresize()
   // clear old resize-end timeout event
   if (resizeEndTimeout)
     clearTimeout(resizeEndTimeout);
-
-  // reset scroll
-  resetPagesScroll();
 
   // add no-motion class
   if (!document.body.classList.contains('fastforward'))
@@ -714,18 +707,47 @@ export function createContextMenu(element, menuItems, parentElement)
     }
   });
 
-  // auto remove the menu when the mouse leaves the parent (or the parent gets blurred)
-  if (parentElement)
+  function waitThenHide()
   {
-    parentElement.addEventListener('mouseleave', () =>
+    setTimeout(() =>
     {
-      // remove the menu
-      if (!contextMenuWrapper.hidden)
+      if (!contextMenuWrapper.hidden &&
+        !contextMenuWrapper.inside &&
+        !contextMenuWrapper.insideParent
+      )
       {
         document.body.removeChild(contextMenuWrapper);
 
         contextMenuWrapper.hidden = true;
       }
+    }, 100);
+  }
+
+  // auto remove the menu when the mouse leaves the parent (or the parent gets blurred)
+  if (parentElement)
+  {
+    contextMenuWrapper.onmouseenter = () =>
+    {
+      contextMenuWrapper.inside = true;
+    };
+
+    parentElement.addEventListener('mouseenter', () =>
+    {
+      contextMenuWrapper.insideParent = true;
+    });
+
+    contextMenuWrapper.onmouseleave = () =>
+    {
+      contextMenuWrapper.inside = false;
+
+      waitThenHide();
+    };
+
+    parentElement.addEventListener('mouseleave', () =>
+    {
+      contextMenuWrapper.insideParent = false;
+
+      waitThenHide();
     });
   }
 }

@@ -76,6 +76,8 @@
   background-size: cover;
   background-position: center;
 
+  transform: scale(1.05);
+
   width: 100%;
 
   transition-property: width;
@@ -122,7 +124,7 @@
   grid-template-areas: "artist duration" "title duration";
 
   grid-column-gap: 3px;
-  grid-row-gap: 3px;
+  grid-row-gap: 1px;
 
   left: 0;
   width: 97%;
@@ -202,15 +204,17 @@
   animation-iteration-count: infinite;
 }
 
+.track.placeholder > .container > .cover
+{
+  background-image: url(../../../missing.png);
+}
+
 .track.placeholder > .container > .card > .artist,
 .track.placeholder > .container > .card > .title,
 .track.placeholder > .container > .card > .duration
 {
-  position: relative;
-
-  top: 10%;
   width: 45%;
-  height: 60%;
+  height: 2vh;
 
   padding: 0;
   margin: 0;
@@ -218,24 +222,17 @@
 
 .track.placeholder > .container > .card > .title
 {
-  top: 5%;
   width: 70%;
+  margin-top: 3px;
 }
 
 .track.placeholder > .container > .card > .duration
 {
-  top: 30%;
   width: 32px;
-  height: 40%;
 }
 
 .track.placeholder > .container
 {
-  grid-template-columns: 20% 67% 10%;
-
-  width: 100%;
-  padding-right: 0;
-
   cursor: default;
 }
 
@@ -253,26 +250,9 @@
   height: 100%;
 }
 
-/* Styles Inside Artist Overlay */
-
-.artistOverlay.container > .tracks.container
-{
-  width: 100%;
-  margin: 0;
-}
-
-.artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder)
-{
-  box-shadow: 0px 0px 40px -8px var(--color-5);
-}
-
 /* Font Sizes */
 
-.track.artist
-{
-  font-size: calc(4px + 0.4vw + 0.2vh);
-}
-
+.track.artist,
 .track.title,
 .track.duration
 {
@@ -281,11 +261,7 @@
 
 @media screen and (max-width: 800px)
 {
-  .track.artist
-  {
-    font-size: 9px;
-  }
-
+  .track.artist,
   .track.title,
   .track.duration
   {
@@ -295,11 +271,7 @@
 
 @media screen and (min-width: 1020px)
 {
-  .track.artist
-  {
-    font-size: 10px;
-  }
-
+  .track.artist,
   .track.title,
   .track.duration
   {

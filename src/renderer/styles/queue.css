@@ -67,6 +67,8 @@
   background-size: cover;
   background-position: center;
 
+  transform: scale(1.05);
+
   transition-property: background-image;
   transition-duration: 0.25s;
   transition-timing-function: ease-in-out;
