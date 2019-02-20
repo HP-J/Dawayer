@@ -204,39 +204,36 @@ function appendTray()
   const enabled = settings.get('trayIcon', true);
   const color = settings.get('trayIconColor', 'dark');
 
-  trayContainer.querySelector(`.${enabled}`).classList.add('highlight');
-  trayContainer.querySelector(`.${color}`).classList.add('highlight');
+  const trueElement = trayContainer.querySelector('.true');
+  const falseElement = trayContainer.querySelector('.false');
 
-  trayContainer.querySelector('.true').onclick = () =>
+  const darkElement = trayContainer.querySelector('.dark');
+  const blackElement = trayContainer.querySelector('.black');
+  const lightElement = trayContainer.querySelector('.light');
+
+  trayContainer.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
+  trayContainer.querySelector(`.${color}`).classList.add('highlight', 'currentColor');
+
+  trueElement.onclick =
+  falseElement.onclick = () =>
   {
-    event.srcElement.classList.add('highlight');
-    trayContainer.querySelector('.false').classList.remove('highlight');
+    trayContainer.querySelector('.currentState').classList.remove('highlight', 'currentState');
+    event.srcElement.classList.add('highlight', 'currentState');
     
-    settings.set('trayIcon', true);
+    if (event.srcElement.isSameNode(trueElement))
+      settings.set('trayIcon', true);
+    else
+      settings.set('trayIcon', false);
   };
 
-  trayContainer.querySelector('.false').onclick = (event) =>
+  darkElement.onclick =
+  blackElement.onclick =
+  lightElement.onclick = () =>
   {
-    event.srcElement.classList.add('highlight');
-    trayContainer.querySelector('.true').classList.remove('highlight');
+    trayContainer.querySelector('.currentColor').classList.remove('highlight', 'currentColor');
+    event.srcElement.classList.add('highlight', 'currentColor');
 
-    settings.set('trayIcon', false);
-  };
-
-  trayContainer.querySelector('.dark').onclick = () =>
-  {
-    event.srcElement.classList.add('highlight');
-    trayContainer.querySelector('.light').classList.remove('highlight');
-
-    settings.set('trayIconColor', 'dark');
-  };
-
-  trayContainer.querySelector('.light').onclick = () =>
-  {
-    event.srcElement.classList.add('highlight');
-    trayContainer.querySelector('.dark').classList.remove('highlight');
-
-    settings.set('trayIconColor', 'light');
+    settings.set('trayIconColor', event.srcElement.classList[3]);
   };
 }
 

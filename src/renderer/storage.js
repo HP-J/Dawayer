@@ -1157,7 +1157,7 @@ function showArtistOverlay(storage, artist)
       tracksContainer.replaceChild(placeholder, trackElement);
       overlayTracksContainer.appendChild(trackElement);
     }
-  }, 150);
+  }, 100);
 }
 
 function hideActiveArtistOverlay()
@@ -1190,7 +1190,7 @@ function hideActiveArtistOverlay()
     {
       tracksContainer.replaceChild(overlayTracksContainer.firstChild, trackPlaceholders[i]);
     }
-  }, 150);
+  }, 100);
   
   // wait the transaction time (0.35s)
   // then return the rented element to their original places
