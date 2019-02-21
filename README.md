@@ -1,5 +1,5 @@
 # Welcome to Dawayer
-#### An ordinary audio player built with Electron
+#### An ordinary audio player built with web technologies
 
 #### Features
 - Play local audio files

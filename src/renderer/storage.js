@@ -215,25 +215,12 @@ function scanCacheAudioFiles()
     {
       // walk through all the listed audio directories
       walk(audioDirectories)
-        // filter and sort files alphabetically
+        // filter files for audio files only
         .then((files) =>
         {
           return files
             // if the file matches any of those supported audio extensions
-            .filter((file) => file.match(audioExtensionsRegex))
-            // sort tracks alphabetically
-            .sort((a, b) =>
-            {
-              a = a.toLowerCase();
-              b = b.toLowerCase();
-
-              if (a < b)
-                return -1;
-              if (a > b)
-                return 1;
-              
-              return 0;
-            });
+            .filter((file) => file.match(audioExtensionsRegex));
         })
         // get metadata
         .then((files) =>
@@ -359,10 +346,58 @@ function scanCacheAudioFiles()
               date: Date.now()
             };
 
+            /** @type { Storage }
+            */
+            const sortedStorage = {
+              albums: {},
+              tracks: {},
+              artists: {}
+            };
+
+            const albums = sort(Object.keys(storage.albums));
+            const tracks = sort(Object.keys(storage.tracks));
+            const artists = sort(Object.keys(storage.artists));
+
+            // sort albums
+            for (let i = 0; i < albums.length; i++)
+            {
+              const key = albums[i];
+
+              sortedStorage.albums[key] = storage.albums[key];
+
+              if (sortedStorage.albums[key].tracks)
+                sortedStorage.albums[key].tracks = sort(sortedStorage.albums[key].tracks);
+            }
+
+            // sort tracks
+            for (let i = 0; i < tracks.length; i++)
+            {
+              const key = tracks[i];
+
+              sortedStorage.tracks[key] = storage.tracks[key];
+            }
+
+            // sort artists
+            for (let i = 0; i < artists.length; i++)
+            {
+              const key = artists[i];
+
+              sortedStorage.artists[key] = storage.artists[key];
+
+              if (sortedStorage.artists[key].albums)
+                sortedStorage.artists[key].albums = sort(sortedStorage.artists[key].albums);
+              
+              if (sortedStorage.artists[key].tracks)
+                sortedStorage.artists[key].tracks = sort(sortedStorage.artists[key].tracks);
+            }
+
             rescanElement.innerText = 'Rescan';
             rescanElement.classList.remove('.clean');
 
-            resolve({ storageInfo, storage });
+            resolve({
+              storageInfo: storageInfo,
+              storage: sortedStorage
+            });
           });
         });
     });
@@ -677,9 +712,11 @@ function appendAlbumsPageItems(storage)
       }, storage);
     };
 
-    for (let x = 0; x < storage.albums[albums[i]].tracks.length; x++)
+    const tracks = storage.albums[albums[i]].tracks;
+
+    for (let x = 0; x < tracks.length; x++)
     {
-      const trackUrl = storage.albums[albums[i]].tracks[x];
+      const trackUrl = tracks[x];
 
       if (storage.tracks[trackUrl].picture)
       {
@@ -1101,6 +1138,25 @@ function storageNavigation(storage, ...keys)
     else
       queueStorageTracks(storage, false, ...tracks);
   }
+}
+
+/** sort tracks alphabetically
+* @param { string[] } array
+*/
+function sort(array)
+{
+  return array.sort((a, b) =>
+  {
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+
+    if (a < b)
+      return -1;
+    if (a > b)
+      return 1;
+    
+    return 0;
+  });
 }
 
 /** @param { Storage } storage
