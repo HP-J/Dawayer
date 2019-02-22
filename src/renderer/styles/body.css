@@ -14,9 +14,8 @@ html
   --color-10: palevioletred;
   --color-11: #5D4037;
   --color-12: #4C3731;
-  --color-13: #101010;
-  --color-14: #381E28;
-  --color-15: #DCD0D0;
+  --color-13: #381E28;
+  --color-14: #DCD0D0;
 
   --holder-1: rgba(0, 0, 0, 0.5);
   --holder-2: rgba(255, 255, 255, 0.5);
@@ -109,7 +108,7 @@ body
   position: absolute;
 
   background-image: url(../../../missing.png);
-  background-color: var(--color-14);
+  background-color: var(--color-13);
   background-position: center;
   background-size: cover;
 
@@ -191,7 +190,7 @@ body
 
   to
   {
-    background-color: var(--color-15);
+    background-color: var(--color-14);
   }
 }
 

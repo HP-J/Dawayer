@@ -1,10 +1,11 @@
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 
 import { existsSync, exists, stat, emptyDir, writeFile, writeJson, readJSON, readdir } from 'fs-extra';
 
-import { union } from 'lodash';
 import { join, dirname, basename, extname } from 'path';
 import { homedir, platform } from 'os';
+
+import { union } from 'lodash';
 
 import * as settings from '../settings.js';
 
@@ -720,19 +721,9 @@ function appendAlbumsPageItems(storage)
 
       if (storage.tracks[trackUrl].picture)
       {
-        if (storage.tracks[trackUrl].picture)
-        {
-          getMetadata(trackUrl)
-            .then(metadata =>
-            {
-              if (metadata.common.picture && metadata.common.picture.length > 0)
-              {
-                img.src = toBase64(metadata.common.picture[0]);
-              }
-            });
+        getTrackPicture(trackUrl).then((picture) => img.src = picture);
 
-          break;
-        }
+        break;
       }
     }
   }
@@ -918,7 +909,7 @@ function appendArtistsPageItems(storage)
         });
     };
 
-    // if it does load it
+    // // if it does load it
     exists(artistPicture).then((exists) =>
     {
       if (exists)
@@ -1033,12 +1024,7 @@ function appendTracksPageItems(storage)
       });
     };
 
-    getMetadata(tracks[i])
-      .then(metadata =>
-      {
-        if (metadata.common.picture && metadata.common.picture.length > 0)
-          img.src = toBase64(metadata.common.picture[0]);
-      });
+    getTrackPicture(tracks[i]).then((picture) => img.src = picture);
   }
 }
 
@@ -1324,11 +1310,22 @@ export function removeDirectory(directory)
   settings.set('audioDirectories', audioDirectories);
 }
 
-/** @param { { format: string, data: Buffer } } picture
+/** turns the pictures info base64 strings on the main process
+* to reduces the lagging on the renderer process
+* @param { string } trackUrl
 */
-export function toBase64(picture)
+export function getTrackPicture(trackUrl)
 {
-  return `data:${picture.format};base64,${picture.data.toString('base64')}`;
+  return new Promise((resolve) =>
+  {
+    ipcRenderer.send('sendTrackPicture', trackUrl);
+
+    ipcRenderer.once(trackUrl, (e, base64Url) =>
+    {
+      if (base64Url)
+        resolve(base64Url);
+    });
+  });
 }
 
 /**@param { number } seconds

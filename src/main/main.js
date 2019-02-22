@@ -1,7 +1,11 @@
 import { BrowserWindow, Menu, app, screen, dialog, ipcMain } from 'electron';
 
+import { encode } from 'base64-async';
+
 import path from 'path';
 import url from 'url';
+
+import { parseFile as getMetadata } from 'music-metadata';
 
 import * as settings from '../settings.js';
 
@@ -136,6 +140,36 @@ function createWindow()
   ipcMain.on('closing', (e, data) =>
   {
     settings.set(data.key, data.value);
+  });
+
+  ipcMain.on('sendTrackPicture', (e, trackUrl) =>
+  {
+    getMetadata(trackUrl)
+      .then(metadata =>
+      {
+        if (metadata.common.picture && metadata.common.picture.length > 0)
+        {
+          encode(metadata.common.picture[0].data)
+            .then((base64) =>
+            {
+              mainWindow.webContents.send(
+                trackUrl,
+                `data:${metadata.common.picture[0].format};base64,${base64}`);
+            })
+            .catch(() =>
+            {
+              mainWindow.webContents.send(trackUrl, undefined);
+            });
+        }
+        else
+        {
+          mainWindow.webContents.send(trackUrl, undefined);
+        }
+      })
+      .catch(() =>
+      {
+        mainWindow.webContents.send(trackUrl, undefined);
+      });
   });
 
   // emits when the window is closed
