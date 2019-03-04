@@ -27,10 +27,33 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 * @property { number } date
 */
 
+/** @typedef { Object } Album
+* @property { string[] } artist
+* @property { string[] } tracks
+* @property { number } duration
+* @property { HTMLDivElement } element
+*/
+
+/** @typedef { Object } Artist
+* @property { string[] } tracks
+* @property { string[] } albums
+* @property { string } summary
+* @property { HTMLDivElement } artistElement
+* @property { HTMLDivElement } overlayElement
+*/
+
+/** @typedef { Object } Track
+* @property { string } title
+* @property { boolean } picture
+* @property { string[] } artists
+* @property { number } duration
+* @property { HTMLDivElement } element
+*/
+
 /** @typedef { Object } Storage
-* @property { Object<string, { artist: string[], tracks: string[], duration: number, element: HTMLDivElement }> } albums
-* @property { Object<string, { tracks: string[], albums: string[], summary: string, artistElement: HTMLDivElement, overlayElement: HTMLDivElement }> } artists
-* @property { Object<string, { title: string, picture: boolean, artists: string[], duration: number, element: HTMLDivElement }> } tracks
+* @property { Object<string, Album> } albums
+* @property { Object<string, Artist> } artists
+* @property { Object<string, Track> } tracks
 */
 
 export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
@@ -59,6 +82,10 @@ const artistsContainer = document.body.querySelector('.artists.container');
 */
 const tracksContainer = document.body.querySelector('.tracks.container');
 
+/**  @type { HTMLDivElement }
+*/
+const tracksCharactersScrollbar = document.body.querySelector('.tracks.charactersContainer');
+
 /** @type { string[] }
 */
 const audioDirectories = [];
@@ -74,6 +101,10 @@ const storageInfoConfig = join(configDir, '/storageInfo.json');
 /** @type { string }
 */
 const storageConfig = join(configDir, '/storage.json');
+
+/** @type { Object<string, { groupContainer: HTMLDivElement, tracks: string[] }> }
+*/
+let tracksPerCharacter = {};
 
 /** @param { string[] } directories
 * @returns { string[] }
@@ -356,7 +387,7 @@ function scanCacheAudioFiles()
             };
 
             const albums = sort(Object.keys(storage.albums));
-            const tracks = sort(Object.keys(storage.tracks));
+            const tracks = sortBasedOnKey(Object.keys(storage.tracks), storage.tracks, 'title');
             const artists = sort(Object.keys(storage.artists));
 
             // sort albums
@@ -469,7 +500,7 @@ function cacheArtist(artist, storage)
   // set a boolean to stop caching for every track from the same artist
   storage.artists[artist].cachedWikiInfo = true;
 
-  return new Promise((resolve) =>
+  return new Promise((resolve, reject) =>
   {
     // don't get info about unknown artists
     if (artist === 'Unknown Artist')
@@ -483,12 +514,12 @@ function cacheArtist(artist, storage)
     
     lastfm.artistSearch({
       q: artist,
-      limit: 3
+      limit: 5
     }, (err, data) =>
     {
       if (err)
       {
-        resolve();
+        reject(err);
 
         return;
       }
@@ -918,7 +949,7 @@ function appendArtistsPageItems(storage)
   }
 }
 
-function appendTracksPlaceholder()
+function getTracksPlaceholder()
 {
   const placeholderWrapper = createElement('.track.wrapper.placeholder');
   const placeholderContainer = createElement('.track.container');
@@ -938,8 +969,6 @@ function appendTracksPlaceholder()
   card.appendChild(artist);
   card.appendChild(title);
   card.appendChild(duration);
-
-  tracksContainer.appendChild(placeholderWrapper);
 
   return placeholderWrapper;
 }
@@ -1000,15 +1029,67 @@ function appendTracksPageItems(storage)
   // remove all children from tracks pages
   removeAllChildren(tracksContainer);
 
+  tracksPerCharacter = [];
+
   const tracks = Object.keys(storage.tracks);
 
   for (let i = 0; i < tracks.length; i++)
   {
-    const placeholder = appendTracksPlaceholder();
-
-    storage.tracks[tracks[i]].element = placeholder;
-
     const track = storage.tracks[tracks[i]];
+    const placeholder = getTracksPlaceholder();
+
+    let firstCharacter = track.title.substring(0, 1).toUpperCase();
+
+    // group all symbols together under group '#'
+    if (firstCharacter.match(/[-!$%^&*()_+|~=`{}@[\]:";'<>?,./]/))
+      firstCharacter = '#';
+
+    // group all numbers together under group '0'
+    if (firstCharacter.match(/[0-9]/))
+      firstCharacter = '0';
+
+    if (!tracksPerCharacter[firstCharacter])
+    {
+      const groupWrapper = createElement(`.tracksGroup.wrapper.${firstCharacter}`);
+      const groupContainer = createElement('.tracksGroup.container');
+
+      const characterNavigator = createElement('.tracks.characterNavigator');
+      const characterObserver = createElement('.tracks.characterObserver');
+
+      characterObserver.innerText = characterNavigator.innerText = firstCharacter;
+
+      tracksCharactersScrollbar.appendChild(characterNavigator);
+
+      groupContainer.appendChild(characterObserver);
+      groupWrapper.appendChild(groupContainer);
+
+      if (i === 0)
+      {
+        characterNavigator.classList.add('selected');
+
+        tracksContainer.appendChild(groupWrapper);
+      }
+
+      tracksPerCharacter[firstCharacter] = {
+        groupContainer: groupContainer,
+        tracks: []
+      };
+
+      characterNavigator.onclick = () =>
+      {
+        tracksCharactersScrollbar.querySelector('.selected').classList.remove('selected');
+        characterNavigator.classList.add('selected');
+
+        tracksContainer.removeChild(tracksContainer.firstChild);
+        tracksContainer.appendChild(groupWrapper);
+      };
+    }
+
+    tracksPerCharacter[firstCharacter].groupContainer.appendChild(placeholder);
+    tracksPerCharacter[firstCharacter].tracks.push(tracks[i]);
+
+    track.element = placeholder;
+
     const img = new Image();
 
     img.src = missingPicture;
@@ -1126,7 +1207,7 @@ function storageNavigation(storage, ...keys)
   }
 }
 
-/** sort tracks alphabetically
+/** sort array of string alphabetically
 * @param { string[] } array
 */
 function sort(array)
@@ -1135,6 +1216,27 @@ function sort(array)
   {
     a = a.toLowerCase();
     b = b.toLowerCase();
+
+    if (a < b)
+      return -1;
+    if (a > b)
+      return 1;
+    
+    return 0;
+  });
+}
+
+/** sort array of string alphabetically based on a string key and an object
+* @param { string[] } array
+* @param { {} } obj
+* @param { string } key
+*/
+function sortBasedOnKey(array, obj, key)
+{
+  return array.sort((a, b) =>
+  {
+    a = obj[a][key].toLowerCase();
+    b = obj[b][key].toLowerCase();
 
     if (a < b)
       return -1;
@@ -1191,12 +1293,12 @@ function showArtistOverlay(storage, artist)
 
     for (let i = 0; i < tracks.length; i++)
     {
-      const placeholder = appendTracksPlaceholder();
+      const placeholder = getTracksPlaceholder();
       const trackElement = storage.tracks[tracks[i]].element;
 
       window.activeArtistOverlay.trackPlaceholders.push(placeholder);
 
-      tracksContainer.replaceChild(placeholder, trackElement);
+      trackElement.parentElement.replaceChild(placeholder, trackElement);
       overlayTracksContainer.appendChild(trackElement);
     }
   }, 100);
@@ -1230,7 +1332,7 @@ function hideActiveArtistOverlay()
 
     for (let i = 0; i < trackPlaceholders.length; i++)
     {
-      tracksContainer.replaceChild(overlayTracksContainer.firstChild, trackPlaceholders[i]);
+      trackPlaceholders[i].parentElement.replaceChild(overlayTracksContainer.firstChild, trackPlaceholders[i]);
     }
   }, 100);
   
