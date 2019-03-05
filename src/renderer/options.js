@@ -7,7 +7,7 @@ import { tmpdir } from 'os';
 import * as settings from '../settings.js';
 
 import request from 'request-promise-native';
-import download from 'download-file-with-progressbar';
+import download from '../dl.js';
 
 import { createElement, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
 

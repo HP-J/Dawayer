@@ -1,9 +1,6 @@
 performance issues and bugs:
-  ☐ do a auto update check on app start
 
 testing:
-  ☐ test loading music from two or more directories
-  ☐ test loading the cached storage with the full music directory
 
 features:
   ☐ MPRIS service support for linux @build-2
@@ -12,4 +9,3 @@ graphics:
   ☐ sketching podcast page interface @build-2
 
 ci:
-  ☐ add pipeline id to build.json using the CI

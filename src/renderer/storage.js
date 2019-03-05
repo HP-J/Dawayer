@@ -1,6 +1,6 @@
 import { remote, ipcRenderer } from 'electron';
 
-import { existsSync, exists, stat, emptyDir, writeFile, writeJson, readJSON, readdir } from 'fs-extra';
+import { existsSync, exists, stat, emptyDir, writeJson, readJSON, readdir } from 'fs-extra';
 
 import { join, dirname, basename, extname } from 'path';
 import { homedir, platform } from 'os';
@@ -9,8 +9,7 @@ import { union } from 'lodash';
 
 import * as settings from '../settings.js';
 
-// import download from 'download';
-import download from 'download-file-with-progressbar';
+import download from '../dl.js';
 
 import { parseFile as getMetadata } from 'music-metadata';
 import getLastFm from 'last-fm';
@@ -128,21 +127,34 @@ function walk(directories)
 
         readdir(dir).then((list) =>
         {
-          list.forEach((file, index) =>
+          if (list.length > 0)
           {
-            file = join(dir, file);
-
-            stat(file).then((statValue) =>
+            list.forEach((file, index) =>
             {
-              if (statValue && statValue.isDirectory())
-                promises.push(walk([ file ]).then((files) => results.push(...files)));
-              else
-                results.push(file);
-
-              if (i === directories.length - 1 && index === list.length - 1)
-                Promise.all(promises).then(() => resolve(results));
+              file = join(dir, file);
+  
+              stat(file).then((statValue) =>
+              {
+                if (statValue && statValue.isDirectory())
+                  promises.push(walk([ file ]).then((files) =>
+                  {
+                    results.push(...files);
+                  }));
+                else
+                {
+                  results.push(file);
+                }
+  
+                if (i === directories.length - 1 && index === list.length - 1)
+                  Promise.all(promises).then(() => resolve(results));
+              });
             });
-          });
+          }
+          else
+          {
+            if (i === directories.length - 1)
+              Promise.all(promises).then(() => resolve(results));
+          }
         });
       });
     }
@@ -473,23 +485,10 @@ function isStorageOld(date)
 */
 function cacheArtists(storage)
 {
-  const promises = [];
-
-  for (const track in storage.tracks)
+  for (const artist in storage.artists)
   {
-    const artists = storage.tracks[track].artists;
-
-    if (!artists)
-      continue;
-    
-    for (let i = 0; i < artists.length; i++)
-    {
-      if (!storage.artists[artists[i]].cachedWikiInfo)
-        promises.push(cacheArtist(artists[i], storage));
-    }
+    cacheArtist(artist, storage);
   }
-
-  Promise.all(promises).then(() => cacheStorage(undefined, storage));
 }
 
 /** adds a summary and a picture url for an artist to the storage object
@@ -498,101 +497,83 @@ function cacheArtists(storage)
 */
 function cacheArtist(artist, storage)
 {
-  // set a boolean to stop caching for every track from the same artist
-  storage.artists[artist].cachedWikiInfo = true;
+  // don't get info about unknown artists
+  if (artist === 'Unknown Artist')
+    return;
 
-  return new Promise((resolve, reject) =>
+  const regex = /[^a-zA-Z0-9]+/g;
+
+  lastfm.artistSearch({
+    q: artist,
+    limit: 5
+  }, (err, data) =>
   {
-    // don't get info about unknown artists
-    if (artist === 'Unknown Artist')
-    {
-      resolve();
-
+    if (err)
       return;
-    }
 
-    const regex = /[^a-zA-Z0-9]+/g;
-    
-    lastfm.artistSearch({
-      q: artist,
-      limit: 5
-    }, (err, data) =>
+    const artistForSearch = artist.replace(regex, ' ');
+
+    for (let i = 0; i < data.result.length; i++)
     {
-      if (err)
+      if (data.result[i].name.replace(regex, ' ').indexOf(artistForSearch) > -1)
       {
-        reject(err);
+        // the array is different sizes of the same picture
+        // the third picture size is large
+        if (data.result[i].images.length > 3)
+          cacheImage(data.result[i].images[3]);
 
-        return;
+        cacheSummary(data.result[i].name);
+     
+        break;
       }
-
-      const artistForSearch = artist.replace(regex, ' ');
-
-      for (let i = 0; i < data.result.length; i++)
-      {
-        if (data.result[i].name.replace(regex, ' ').indexOf(artistForSearch) > -1)
-        {
-          // the array is different sizes of the same picture
-          // the third picture size is large
-          if (data.result[i].images.length > 3)
-            cacheImage(data.result[i].images[3]);
-
-          cacheSummary(data.result[i].name);
-          
-          break;
-        }
-      }
-    });
-
-    function cacheImage(pictureUrl)
-    {
-      const pictureDir = join(configDir, 'ArtistsCache');
-
-      download(pictureUrl, {
-        dir: pictureDir,
-        filename: artist,
-        onDone: () =>
-        {
-          const img = new Image();
-
-          img.src = join(pictureDir, artist);
-
-          img.onload = () =>
-          {
-            updateArtistElement(
-              storage.artists[artist].artistElement,
-              storage.artists[artist].overlayElement, {
-                picture: img.src
-              });
-          };
-        }
-      });
-    }
-
-    function cacheSummary(name)
-    {
-      lastfm.artistInfo({
-        name: name
-      }, (err, data) =>
-      {
-        if (err || !data.summary)
-        {
-          resolve();
-
-          return;
-        }
-
-        storage.artists[artist].summary = data.summary;
-
-        updateArtistElement(
-          storage.artists[artist].artistElement,
-          storage.artists[artist].overlayElement, {
-            summary: data.summary
-          });
-
-        resolve();
-      });
     }
   });
+
+  function cacheImage(pictureUrl)
+  {
+    const pictureDir = join(configDir, 'ArtistsCache');
+
+    download(pictureUrl, {
+      dir: pictureDir,
+      filename: artist,
+      onDone: () =>
+      {
+        const img = new Image();
+
+        img.src = join(pictureDir, artist);
+
+        img.onload = () =>
+        {
+          updateArtistElement(
+            storage.artists[artist].artistElement,
+            storage.artists[artist].overlayElement, {
+              picture: img.src
+            });
+        };
+      }
+    });
+  }
+
+  function cacheSummary(name)
+  {
+    lastfm.artistInfo({
+      name: name
+    }, (err, data) =>
+    {
+      if (err || !data || !data.summary)
+        return;
+
+      storage.artists[artist].summary = data.summary;
+
+      cacheStorage(undefined, storage);
+
+      updateArtistElement(
+        storage.artists[artist].artistElement,
+        storage.artists[artist].overlayElement, {
+          summary: data.summary
+        });
+    });
+  }
 }
 
 function appendAlbumPlaceholder()
