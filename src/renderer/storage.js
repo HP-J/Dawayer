@@ -9,7 +9,8 @@ import { union } from 'lodash';
 
 import * as settings from '../settings.js';
 
-import download from 'download';
+// import download from 'download';
+import download from 'download-file-with-progressbar';
 
 import { parseFile as getMetadata } from 'music-metadata';
 import getLastFm from 'last-fm';
@@ -544,22 +545,26 @@ function cacheArtist(artist, storage)
 
     function cacheImage(pictureUrl)
     {
-      const picturePath = join(configDir, 'ArtistsCache', artist);
+      const pictureDir = join(configDir, 'ArtistsCache');
 
-      download(pictureUrl).then((data) => writeFile(picturePath, data)).then(() =>
-      {
-        const img = new Image();
-
-        img.src = picturePath;
-
-        img.onload = () =>
+      download(pictureUrl, {
+        dir: pictureDir,
+        filename: artist,
+        onDone: () =>
         {
-          updateArtistElement(
-            storage.artists[artist].artistElement,
-            storage.artists[artist].overlayElement, {
-              picture: img.src
-            });
-        };
+          const img = new Image();
+
+          img.src = join(pictureDir, artist);
+
+          img.onload = () =>
+          {
+            updateArtistElement(
+              storage.artists[artist].artistElement,
+              storage.artists[artist].overlayElement, {
+                picture: img.src
+              });
+          };
+        }
       });
     }
 

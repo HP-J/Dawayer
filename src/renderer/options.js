@@ -7,6 +7,7 @@ import { tmpdir } from 'os';
 import * as settings from '../settings.js';
 
 import request from 'request-promise-native';
+import download from 'download-file-with-progressbar';
 
 import { createElement, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
 
@@ -19,10 +20,6 @@ import { getRewindTiming, setRewindTiming, getSkipTiming, setSkipTiming } from '
 * @property { string } date
 * @property { string } package
 */
-
-/** @type { import('electron-dl') }
-*/
-const { download: dl  } = remote.require('electron-dl');
 
 /**  @type { BuildData }
 */
@@ -56,7 +53,7 @@ const rewindOptionInput = controlsContainer.querySelector('input.rewind');
 */
 const skipOptionInput = controlsContainer.querySelector('input.skip');
 
-export const mainWindow = remote.getCurrentWindow();
+const mainWindow = remote.getCurrentWindow();
 
 /** initialize options, like the storage/cache system that loads local albums and tracks
 */
@@ -322,24 +319,39 @@ function checkForUpdates()
 
   checkElement.classList.add('blocked');
 
-  // request the server's build.json, can fail silently
+  // request the server's build.json
   request('https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/' + localData.branch + '/raw/build.json?job=build', {  json: true })
     .then((remoteData) =>
     {
       // if commit id is different, and there's an available package for this platform
       if (remoteData.commit !== localData.commit && remoteData[localData.package])
-        updateDownload(remoteData[localData.package]);
+      {
+        updateDownload(remoteData[localData.package], remoteData.commit);
+      }
       else
+      {
         checkElement.innerText = 'Up-to-date';
-    })
+
+        setTimeout(() =>
+        {
+          checkElement.innerText = 'Check for Updates';
+
+          checkElement.classList.remove('blocked');
+        }, 3000);
+      }
+    }
+    )
     .catch(updateError);
 }
 
-/** @param { number } percentage
+/** @param { number } current
+* @param { number } total
 */
-function updateProgress(percentage)
+function updateProgress(current, total)
 {
-  percentage = Math.floor(percentage * 100);
+  let percentage = current / total;
+
+  percentage = Math.floor(percentage * 100).toFixed(0);
 
   checkElement.innerText = `Downloading ${percentage}%`;
 }
@@ -363,24 +375,32 @@ function updateDownloaded(path)
 }
 
 /** @param { string } url
+* @param { string } commitID
 */
-function updateDownload(url)
+function updateDownload(url, commitID)
 {
   url = new URL(url);
 
-  const filename = 'tmp-' + Date.now() + '-' + url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
+  const filename = 'tmp-dawayer-update-' + commitID;
+  const fullPath = join(tmpdir(), filename);
 
   checkElement.innerText = 'Starting Download';
 
-  dl(
-    mainWindow,
-    url.href,
-    {
-      directory: tmpdir(),
+  if (existsSync(fullPath))
+  {
+    updateDownloaded(fullPath);
+  }
+  else
+  {
+    download(url.href, {
+      dir: tmpdir(),
       filename: filename,
-      showBadge: false,
-      onProgress: updateProgress
-    })
-    .then(() => updateDownloaded(join(tmpdir(), filename)))
-    .catch(updateError);
+      onProgress: updateProgress,
+      onError: updateError,
+      onDone: () =>
+      {
+        updateDownloaded(fullPath);
+      }
+    });
+  }
 }
