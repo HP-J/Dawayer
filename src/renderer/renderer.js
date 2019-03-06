@@ -474,11 +474,11 @@ function showSeekTime(percentage)
 }
 
 /** @param { number } percentage
-* @param { boolean } visual
+* @param { boolean } visualOnly
 */
-export function seekTimeControl(percentage, visual)
+export function seekTimeControl(percentage, visualOnly)
 {
-  if (setSeekTime(percentage * getDuration(), visual))
+  if (setSeekTime(percentage, visualOnly, true))
   {
     updateBarPercentage(seekBar, percentage);
   }

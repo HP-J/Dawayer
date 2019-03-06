@@ -293,13 +293,13 @@ function scanCacheAudioFiles()
 
                   let artists = metadata.common.artists || [ 'Unknown Artist' ];
 
-                  // split artists by comma
+                  // auto split artists by comma
                   artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
 
                   const albumTitle = metadata.common.album || 'Other';
                   let albumArtist = metadata.common.albumartist || 'Unknown Artist';
 
-                  // split artists by comma
+                  // auto split artists by comma
                   albumArtist = albumArtist.split(artistsRegex);
 
                   // store the track important metadata
@@ -672,10 +672,10 @@ function updateAlbumElement(element, options, storage)
         {
           event.stopPropagation();
 
-          navigation('play-album-track', options.title, i);
+          navigation('play-album-track', options.title, options.tracks[i]);
         };
 
-        useContextMenu(tracksContainer.children[i], [ options.title, i ], 'album-track', element);
+        useContextMenu(tracksContainer.children[i], [ options.title, options.tracks[i] ], 'album-track', element);
       }
       else
       {
@@ -686,10 +686,10 @@ function updateAlbumElement(element, options, storage)
         {
           event.stopPropagation();
 
-          navigation('play-album-track', options.title, i);
+          navigation('play-album-track', options.title, options.tracks[i]);
         };
 
-        useContextMenu(track, [ options.title, i ], 'album-track', element);
+        useContextMenu(track, [ options.title, options.tracks[i] ], 'album-track', element);
 
         tracksContainer.appendChild(track);
       }
@@ -1130,45 +1130,29 @@ function storageNavigation(storage, ...keys)
   {
     // clear the queue then play the track
     if (keys[0] === 'play-track')
-      queueStorageTracks(storage, true, keys[1]);
+      queueStorageTracks(storage, undefined, undefined, true, keys[1]);
     // queue the track at bottom
     else
-      queueStorageTracks(storage, false, keys[1]);
+      queueStorageTracks(storage, undefined, undefined, false, keys[1]);
   }
   // play the album from a selected track
   else if (keys[0] === 'play-album-track' || keys[0] === 'add-album-track')
   {
-    // clear the queue then play the album
-    if (keys[0] === 'play-album-track')
-    {
-      queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks).then(() =>
-      {
-        // start playback from a selected track
-        setPlayingIndex(parseInt(keys[2]));
-      });
-    }
-    // queue the album at bottom
-    else
-    {
-      queueStorageTracks(storage, false, ...storage.albums[keys[1]].tracks).then((queue) =>
-      {
-        const trackUrl = storage.albums[keys[1]].tracks[parseInt(keys[2])];
-        const trackQueueIndex = queue.findIndex((value) => value.url === trackUrl);
-
-        // start playback from a selected track
-        setPlayingIndex(trackQueueIndex);
-      });
-    }
+    queueStorageTracks(storage,
+      keys[2],
+      undefined,
+      (keys[0] === 'play-album-track'),
+      ...storage.albums[keys[1]].tracks);
   }
   // play the album
   else if (keys[0] === 'play-album' || keys[0] === 'add-album')
   {
     // clear the queue then play the album
     if (keys[0] === 'play-album')
-      queueStorageTracks(storage, true, ...storage.albums[keys[1]].tracks);
+      queueStorageTracks(storage, undefined, undefined, true, ...storage.albums[keys[1]].tracks);
     // queue the album at bottom
     else
-      queueStorageTracks(storage, false, ...storage.albums[keys[1]].tracks);
+      queueStorageTracks(storage, undefined, undefined, false, ...storage.albums[keys[1]].tracks);
   }
   // play the artist's tracks and/or albums
   else if (keys[0] === 'play-artist' || keys[0] === 'add-artist')
@@ -1186,10 +1170,10 @@ function storageNavigation(storage, ...keys)
 
     // clear the queue then play the tracks
     if (keys[0] === 'play-artist')
-      queueStorageTracks(storage, true, ...tracks);
+      queueStorageTracks(storage, undefined, undefined, true, ...tracks);
     // queue the tracks at bottom
     else
-      queueStorageTracks(storage, false, ...tracks);
+      queueStorageTracks(storage, undefined, undefined, false, ...tracks);
   }
 }
 

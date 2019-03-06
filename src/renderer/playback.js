@@ -1,4 +1,4 @@
-import { remote, ipcRenderer } from 'electron';
+import { remote } from 'electron';
 
 import { parseFile as getMetadata } from 'music-metadata';
 import { Howl, Howler as howler } from 'howler';
@@ -9,7 +9,7 @@ import { union } from 'lodash';
 import * as settings from '../settings.js';
 
 import { createElement, createContextMenu, seekTimeControl, switchPlayingMode } from './renderer.js';
-import { artistsRegex, getTrackPicture, removeAllChildren, audioExtensionsRegex } from './storage.js';
+import { artistsRegex, audioExtensionsRegex, missingPicture, getTrackPicture, removeAllChildren } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -86,18 +86,15 @@ export function initPlayback()
   args = args.filter((arg) => arg.match(audioExtensionsRegex));
   
   if (args.length > 0)
-    queueTracks(false, ...args);
+    queueTracks(false, undefined, undefined, ...args);
   else
     loadQueue();
 
-  // save seek-time on close
-  ipcRenderer.on('close', () =>
+  // save playing percentage on unload
+  window.onbeforeunload = () =>
   {
-    ipcRenderer.send('closing', {
-      key: 'seekTime',
-      value: getSeekTime()
-    });
-  });
+    settings.set('playingPercentage', getSeekTime() / getDuration());
+  };
 }
 
 export function getDuration()
@@ -138,17 +135,35 @@ export function setPlayingIndex(index)
 }
 
 /** @param { number } time
-* @param { boolean } visual
+* @param { boolean } [visualOnly]
+* @param { boolean } [isInPercentage]
 */
-export function setSeekTime(time, visual)
+export function setSeekTime(time, visualOnly, isInPercentage)
 {
-  if (playingIndex > -1 && currentHowl && currentHowl.state() === 'loaded')
+  function set(time)
   {
-    if (!visual)
+    if (isInPercentage)
+      time = time * getDuration();
+  
+    currentHowl.seek(time);
+
+    currentHowl.seekTimeProgress = time * 1000;
+  }
+
+  if (playingIndex > -1 && currentHowl)
+  {
+    if (!visualOnly)
     {
-      currentHowl.seek(time);
-      
-      currentHowl.seekTimeProgress = time * 1000;
+      if (currentHowl.state() !== 'loaded')
+      {
+        currentHowl.setTimeOnLoad = time;
+
+        currentHowl.once('load', () => set(currentHowl.setTimeOnLoad));
+      }
+      else
+      {
+        set(time);
+      }
     }
 
     return true;
@@ -445,7 +460,7 @@ function getTrackMetadata(storage, url)
       resolve({
         title: storage.tracks[url].title,
         artist: storage.tracks[url].artists.join(', '),
-        picture: storage.tracks[url].element.querySelector('.cover').style.backgroundImage,
+        picture: storage.tracks[url].element.querySelector('.cover').style.backgroundImage || `url(${missingPicture})`,
         duration: storage.tracks[url].duration
       });
     });
@@ -458,7 +473,7 @@ function getTrackMetadata(storage, url)
         const title = metadata.common.title || basename(url, extname(url));
         let artists = metadata.common.artists || [ 'Unknown Artist' ];
 
-        // split artists by comma
+        // auto split artists by comma
         artists = union(...[].concat(artists).map((v) => v.split(artistsRegex))).join(', ');
 
         if (metadata.common.picture && metadata.common.picture.length > 0)
@@ -483,6 +498,7 @@ function getTrackMetadata(storage, url)
             resolve({
               title: title,
               artist: artists,
+              picture: `url(${missingPicture})`,
               duration: metadata.format.duration
             });
           });
@@ -512,9 +528,12 @@ function appendQueueItem()
 
 /** the main way to handle queuing tracks in dawayer, using the storage object to obtain the required metadata
 * @param { Storage } storage
+* @param { string } playingTrackUrl
+* @param { number } urls
+* @param { boolean } clear
 * @param { string } tracks
 */
-export function queueStorageTracks(storage, clear, ...tracks)
+export function queueStorageTracks(storage, playingTrackUrl, seekTime, clear, ...tracks)
 {
   return new Promise((resolve) =>
   {
@@ -552,25 +571,38 @@ export function queueStorageTracks(storage, clear, ...tracks)
 
     Promise.all(promises).then(() =>
     {
-      if (playingIndex < 0)
-        resortQueue(0);
+      if (playingTrackUrl)
+      {
+        resortQueue(queue.findIndex((item) => item.url === playingTrackUrl));
+      }
       else
-        resortQueue(playingIndex);
+      {
+        if (playingIndex < 0)
+          resortQueue(0);
+        else
+          resortQueue(playingIndex);
+      }
 
       saveQueue();
-    
+      
       shuffleQueue();
       changeQueue();
 
-      resolve(queue);
+      if (seekTime)
+        seekTimeControl(seekTime / getDuration());
+
+      resolve();
     });
   });
 }
 
 /** should be used to load track from urls, used to load saved queues or files that are not stored
-* @param { string[] } urls
+* @param { boolean } quiet
+* @param { string } playingTrackUrl
+* @param { number } urls
+* @param { string[] } seekTime
 */
-function queueTracks(quiet, ...urls)
+function queueTracks(quiet, playingTrackUrl, playingPercentage, ...urls)
 {
   return new Promise((resolve) =>
   {
@@ -595,15 +627,25 @@ function queueTracks(quiet, ...urls)
   
     Promise.all(promises).then(() =>
     {
-      if (playingIndex < 0)
-        resortQueue(0);
+      if (playingTrackUrl)
+      {
+        resortQueue(queue.findIndex((item) => item.url === playingTrackUrl));
+      }
       else
-        resortQueue(playingIndex);
+      {
+        if (playingIndex < 0)
+          resortQueue(0);
+        else
+          resortQueue(playingIndex);
+      }
   
       saveQueue();
       
       shuffleQueue();
       changeQueue(quiet);
+
+      if (playingPercentage)
+        seekTimeControl(playingPercentage);
 
       resolve();
     });
@@ -848,9 +890,12 @@ function saveQueue()
   settings.set('queueTracks', queue.map(item => item.url));
 }
 
-function savePlayingIndex()
+function savePlayingTrack()
 {
-  settings.set('playingIndex', playingIndex);
+  if (playingIndex > 0)
+    settings.set('playingTrack', queue[playingIndex].url);
+  else
+    settings.remove('playingTrack');
 }
 
 function loadQueue()
@@ -864,27 +909,11 @@ function loadQueue()
   if (tracks.length > 0)
   {
     // queue the saved queue
-    queueTracks(true, ...tracks).then(() =>
-    {
-      // make sure that at least one track was queued
-      if (queue.length > 0)
-      {
-        playingIndex = settings.get('playingIndex', 0);
-
-        // make sure that the playing index is valid
-        if (playingIndex > queue.length)
-          playingIndex = 0;
-
-        let seekTime = settings.get('seekTime', 0);
-
-        // make sure that the seek-time is valid
-        if (seekTime > getDuration())
-          seekTime = 0;
-
-        resortQueue(playingIndex);
-        seekTimeControl(seekTime / getDuration());
-      }
-    });
+    queueTracks(
+      true,
+      settings.get('playingTrack'),
+      settings.get('playingPercentage', 0),
+      ...tracks);
   }
 }
 
@@ -893,7 +922,7 @@ function loadQueue()
 function changeQueue(quiet)
 {
   // save the playing index
-  savePlayingIndex();
+  savePlayingTrack();
 
   // if playing index is -1, this is a clear, not a change
   if (playingIndex === -1 && !currentHowl)

@@ -131,15 +131,8 @@ function createWindow()
 
   mainWindow.on('close', () =>
   {
-    mainWindow.webContents.send('close');
-
     settings.set('size', mainWindow.getSize());
     settings.set('position', mainWindow.getPosition());
-  });
-
-  ipcMain.on('closing', (e, data) =>
-  {
-    settings.set(data.key, data.value);
   });
 
   ipcMain.on('sendTrackPicture', (e, trackUrl) =>
