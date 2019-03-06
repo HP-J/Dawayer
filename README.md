@@ -17,7 +17,7 @@ Snap will be available soon
 
 # Licenses
 This project is licensed under the [MIT](https://gitlab.com/herpproject/Dawayer/blob/development/LICENSE) License.  
-All icons inside the [icons](https://gitlab.com/herpproject/Dawayer/tree/development/icons) folder are made by us and are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+All icons inside the [icons](https://gitlab.com/herpproject/Dawayer/tree/development/res) folder are made by us and are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 # Acknowledgments
 Dawayer's design is inspired by [Phonograph](https://play.google.com/store/apps/details?id=com.kabouzeid.gramophone).  
