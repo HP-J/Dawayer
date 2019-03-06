@@ -58,7 +58,7 @@ function loadTrayIcon()
   {
     const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
 
-    const color = settings.get('trayIconColor', 'dark');
+    const color = settings.get('trayIconColor', 'light');
     const iconPath = join(__dirname, `../../tray-${color}.png`);
 
     if (!existsSync(iconPath))
