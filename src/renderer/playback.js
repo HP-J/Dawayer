@@ -9,7 +9,7 @@ import { union } from 'lodash';
 import * as settings from '../settings.js';
 
 import { createElement, createContextMenu, seekTimeControl, switchPlayingMode } from './renderer.js';
-import { artistsRegex, toBase64, removeAllChildren, audioExtensionsRegex } from './storage.js';
+import { artistsRegex, getTrackPicture, removeAllChildren, audioExtensionsRegex } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -82,11 +82,11 @@ export function initPlayback()
   /** @type { string[] }
   */
   let args = remote.getGlobal('argv');
-
+  
   args = args.filter((arg) => arg.match(audioExtensionsRegex));
-
+  
   if (args.length > 0)
-    queueTracks(true, ...args);
+    queueTracks(false, ...args);
   else
     loadQueue();
 
@@ -458,20 +458,35 @@ function getTrackMetadata(storage, url)
         const title = metadata.common.title || basename(url, extname(url));
         let artists = metadata.common.artists || [ 'Unknown Artist' ];
 
-        let picture;
-
         // split artists by comma
         artists = union(...[].concat(artists).map((v) => v.split(artistsRegex))).join(', ');
 
         if (metadata.common.picture && metadata.common.picture.length > 0)
-          picture = `url(${toBase64(metadata.common.picture[0])})`;
-
-        return {
-          title: title,
-          artist: artists,
-          picture: picture,
-          duration: metadata.format.duration
-        };
+        {
+          return new Promise((resolve) =>
+          {
+            getTrackPicture(url).then((picture) =>
+            {
+              resolve({
+                title: title,
+                artist: artists,
+                picture: `url(${picture})`,
+                duration: metadata.format.duration
+              });
+            });
+          });
+        }
+        else
+        {
+          return new Promise((resolve) =>
+          {
+            resolve({
+              title: title,
+              artist: artists,
+              duration: metadata.format.duration
+            });
+          });
+        }
       });
   }
 }
@@ -563,7 +578,7 @@ function queueTracks(quiet, ...urls)
 
     for (let i = 0; i < urls.length; i++)
     {
-      promises.push(getTrackMetadata(undefined, undefined, urls[i]).then((obj) =>
+      promises.push(getTrackMetadata(undefined, urls[i]).then((obj) =>
       {
         queue.push({
           url: urls[i],
