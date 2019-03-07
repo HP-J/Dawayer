@@ -35,3 +35,6 @@ package() {
   install -d "${pkgdir}/usr/share/pixmaps"
   cp "${srcdir}/icon.png" "${pkgdir}/usr/share/pixmaps/Dawayer.png"
 }
+pkgver=0.1.0
+source=('' '' '')
+md5sums=('' '' '')

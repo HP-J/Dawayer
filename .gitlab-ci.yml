@@ -11,7 +11,7 @@ variables: {
 
 stages:
   - build
-  # - arch
+  - arch
 
 build:
   stage: build
@@ -19,17 +19,15 @@ build:
   image: electronuserland/builder:wine
   script:
     # BUILD_JSON_EVAL variables
-    - "VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
     - "DATE=$(date -u +%a', '%d' '%b' '%Y' '%T' GMT')"
 
-    # URLS are used to tell auto-updaters the correct file for the that specified version
+    # URLS are used to tell auto-updaters the correct file for the that specified build
     # - "NSIS_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME-Setup.exe?job=build"
     - "DEB_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.deb?job=build"
     - "TAR_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.tar.xz?job=build"
 
     # the builds supported by the app builtin update system
-    # - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
-    - "DOWNLOAD_URLS=\"$DEB_URL\""
+    - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
 
     # install dependencies & compile the code
     - "npm install"
@@ -61,39 +59,47 @@ build:
   only:
     - development
 
-# arch:
-#   stage: arch
-#   image: whynothugo/makepkg:latest
-#   script:
-#     # set variables
-#     - "VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]')"
+arch:
+  stage: arch
+  image: whynothugo/makepkg:latest
+  script:
+    # set variables
+    - "VERSION=$(echo $(($(date +%s%N)/1000000)).0.0-1)"
 
-#     # set access
-#     - "echo \"$AUR_SSH_PRIVATE_KEY\" > ~/.ssh/id_rsa"
-#     - "ssh-add -K ~/.ssh/id_rsa"
-#     - "git config user.name \"$GIT_USERNAME\""
-#     - "git config user.email \"$GIT_EMAIL\""
+    # set access
+    - "echo \"$AUR_SSH_PRIVATE_KEY\" > ~/.ssh/id_rsa"
+    - "ssh-add -K ~/.ssh/id_rsa"
+    - "git config user.name \"$GIT_USERNAME\""
+    - "git config user.email \"$GIT_EMAIL\""
 
-#     # pull the current package info 
-#     - "cd aur"
-#     - "git fetch"
-#     - "git pull"
+    # pull the current package info 
+    # TODO might need to clone the repo everytime because /aur/.git won't be uploaded to the main app repo
+    # then add the aur remote to the cloned repo
+    # - "cd aur"
+    # - "git fetch"
+    # - "git pull"
 
-#     # update the package info
-#     - "echo \"$(head -n -3 PKGBUILD)\" > PKGBUILD"
-#     - "echo \"pkgver=$VERSION\" >> PKGBUILD"
-#     - "echo \"source=('icon.png' 'sulaiman.desktop' '$TAR_URL')\" >> PKGBUILD"
-#     - "echo \"md5sums=('$(md5sum icon.png | awk '{print $1}')' '$(md5sum sulaiman.desktop | awk '{print $1}')' '$(md5sum ../public/Sulaiman.tar.xz | awk '{print $1}')')\" >> PKGBUILD"
-#     - "makepkg --printsrcinfo > .SRCINFO"
+    # update the package info
+    # removes the last 3 lines then adds them back with new vaules
+    - "echo \"$(head -n -3 PKGBUILD)\" > PKGBUILD"
+    - "echo \"pkgver=$VERSION\" >> PKGBUILD"
+    - "echo \"source=('icon.png' 'Dawayer.desktop' '$TAR_URL')\" >> PKGBUILD"
+    - "echo \"md5sums=('$(md5sum icon.png | awk '{print $1}')' '$(md5sum Dawayer.desktop | awk '{print $1}')' '$(md5sum ../public/Dawayer.tar.xz | awk '{print $1}')')\" >> PKGBUILD"
+    
+    # prints .SRCINFO file
+    # https://wiki.archlinux.org/index.php/.SRCINFO
+    # to upload or update a package add at least PKGBUILD and .SRCINFO 
+    - "makepkg --printsrcinfo > .SRCINFO"
 
-#     - "echo \"-----------------------------now Reading PKGBUILD-----------------------\""
-#     - "echo \"$(head -n -0 PKGBUILD)\""
-#     - "echo \"-----------------------------now Reading .SRCINFO-----------------------\""
-#     - "echo \"$(head -n -0 .SRCINFO)\""
+    - "echo \"-----------------------------now Reading PKGBUILD-----------------------\""
+    - "echo \"$(head -n -0 PKGBUILD)\""
+    
+    - "echo \"-----------------------------now Reading .SRCINFO-----------------------\""
+    - "echo \"$(head -n -0 .SRCINFO)\""
 
-#     # release a new AUR package
-#     # - "git add PKGBUILD .SRCINFO"
-#     # - "git commit -m \"$VERSION\""
-#     # - "git push"
-#   only:
-#     - release
+    # release a new AUR package
+    # - "git add PKGBUILD .SRCINFO"
+    # - "git commit -m \"$VERSION\""
+    # - "git push"
+  only:
+    - development
