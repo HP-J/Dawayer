@@ -81,6 +81,9 @@
       "allowToChangeInstallationDirectory": true,
       "uninstallDisplayName": "Dawayer",
       "shortcutName": "Dawayer"
+    },
+    "electronDownload": {
+      "cache": ".electron-cache"
     }
   },
   "homepage": "https://gitlab.com/herpproject/Dawayer",
