@@ -66,9 +66,24 @@ arch:
     # set variables
     - "VERSION=$(echo $(($(date +%s%N)/1000000)).0.0-1)"
 
-    # set access
-    - "echo \"$AUR_SSH_PRIVATE_KEY\" > ~/.ssh/id_rsa"
-    - "ssh-add -K ~/.ssh/id_rsa"
+    # set to access the aur
+
+    # install ssh-agent if not already installed
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    
+    # run ssh-agent (inside the build environment)
+    - eval $(ssh-agent -s)
+
+    # add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    - echo "$AUR_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+
+    # create the SSH directory and give it the right permissions
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+
+    # - "echo \"$AUR_SSH_PRIVATE_KEY\" > /share/homes/$user_variable/.ssh/id_rsa"
+    # - "ssh-add -K ~/.ssh/id_rsa"
+
     - "git config user.name \"$GIT_USERNAME\""
     - "git config user.email \"$GIT_EMAIL\""
 
