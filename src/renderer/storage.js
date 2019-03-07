@@ -16,7 +16,7 @@ import getLastFm from 'last-fm';
 
 import { createElement, createIcon, createContextMenu } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
-import { queueStorageTracks, setPlayingIndex } from './playback.js';
+import { queueStorageTracks } from './playback.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 

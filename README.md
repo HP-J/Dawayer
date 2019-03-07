@@ -4,16 +4,23 @@
 #### Features
 - Play local audio files
 - Play podcasts (Soon)
+- All the other modern audio player features like saving your seek-time and queue between sessions and etc...
 - TBA
 
+#### Screenshots
+![Albums Page](pictures/albums.png)
+![Tracks Page](pictures/tracks.png)
+![Artists Page](pictures/artists.png)
+![Now Playing Page](pictures/playing.png)
+![Artist's Page](pictures/artistOverlay.png)
+
 # Download
-#### Dawayer is a new software it may be slow and buggy
+#### Dawayer is a new software it may be buggy
 
 - **Linux:**
 [AUR](https://aur.archlinux.org/packages/dawayer) |
 [deb](https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.deb?job=build) |
-[tar.xz](https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build) |
-Snap will be available soon
+[tar.xz](https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build)
 
 # Licenses
 This project is licensed under the [MIT](https://gitlab.com/herpproject/Dawayer/blob/development/LICENSE) License.  
