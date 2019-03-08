@@ -69,7 +69,7 @@ arch:
     # set to access the aur
 
     # install ssh-agent if not already installed
-    - 'which ssh-agent || ( sudo pacman -Syy && sudo pacman -Sy openssh && sudo systemctl start sshd service && sudo systemctl enable sshd.service )'
+    - 'which ssh-agent || ( sudo pacman -Syy && sudo pacman --noconfirm -Sy openssh && sudo systemctl start sshd service && sudo systemctl enable sshd.service )'
     
     # run ssh-agent (inside the build environment)
     - eval $(ssh-agent -s)
