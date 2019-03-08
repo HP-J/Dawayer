@@ -61,16 +61,13 @@ stages:
 
 arch:
   stage: arch
-  image: whynothugo/makepkg:latest
+  image: antergos/archlinux-systemd:latest
   script:
     # set variables
     - "VERSION=$(echo $(($(date +%s%N)/1000000)).0.0-1)"
 
-    # set to access the aur
+    # set to access the arch user repository
 
-    # install ssh-agent if not already installed
-    - 'which ssh-agent || ( sudo pacman -Syy && sudo pacman --noconfirm -Sy openssh && sudo systemctl start sshd service && sudo systemctl enable sshd.service )'
-    
     # run ssh-agent (inside the build environment)
     - eval $(ssh-agent -s)
 
@@ -87,8 +84,10 @@ arch:
     - "git config user.name \"$GIT_USERNAME\""
     - "git config user.email \"$GIT_EMAIL\""
 
+    # TODO cd to /arch
+
     # pull the current package info 
-    # TODO might need to clone the repo everytime because /aur/.git won't be uploaded to the main app repo
+    # TODO might need to clone the repo everytime because /arch/.git won't be uploaded to the main app repo
     # then add the aur remote to the cloned repo
     # - "cd aur"
     # - "git fetch"
