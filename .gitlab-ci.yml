@@ -10,7 +10,7 @@ variables: {
 }
 
 stages:
-  - build
+  # - build
   - arch
 
 build:
@@ -69,7 +69,7 @@ arch:
     # set to access the aur
 
     # install ssh-agent if not already installed
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - 'which ssh-agent || ( pacman -Sy openssh && systemctl start sshd service && systemctl enable sshd.service )'
     
     # run ssh-agent (inside the build environment)
     - eval $(ssh-agent -s)
@@ -94,23 +94,23 @@ arch:
     # - "git fetch"
     # - "git pull"
 
-    # update the package info
-    # removes the last 3 lines then adds them back with new vaules
-    - "echo \"$(head -n -3 PKGBUILD)\" > PKGBUILD"
-    - "echo \"pkgver=$VERSION\" >> PKGBUILD"
-    - "echo \"source=('icon.png' 'Dawayer.desktop' '$TAR_URL')\" >> PKGBUILD"
-    - "echo \"md5sums=('$(md5sum icon.png | awk '{print $1}')' '$(md5sum Dawayer.desktop | awk '{print $1}')' '$(md5sum ../public/Dawayer.tar.xz | awk '{print $1}')')\" >> PKGBUILD"
+    # # update the package info
+    # # removes the last 3 lines then adds them back with new vaules
+    # - "echo \"$(head -n -3 PKGBUILD)\" > PKGBUILD"
+    # - "echo \"pkgver=$VERSION\" >> PKGBUILD"
+    # - "echo \"source=('icon.png' 'Dawayer.desktop' '$TAR_URL')\" >> PKGBUILD"
+    # - "echo \"md5sums=('$(md5sum icon.png | awk '{print $1}')' '$(md5sum Dawayer.desktop | awk '{print $1}')' '$(md5sum ../public/Dawayer.tar.xz | awk '{print $1}')')\" >> PKGBUILD"
     
-    # prints .SRCINFO file
-    # https://wiki.archlinux.org/index.php/.SRCINFO
-    # to upload or update a package add at least PKGBUILD and .SRCINFO 
-    - "makepkg --printsrcinfo > .SRCINFO"
+    # # prints .SRCINFO file
+    # # https://wiki.archlinux.org/index.php/.SRCINFO
+    # # to upload or update a package add at least PKGBUILD and .SRCINFO 
+    # - "makepkg --printsrcinfo > .SRCINFO"
 
-    - "echo \"-----------------------------now Reading PKGBUILD-----------------------\""
-    - "echo \"$(head -n -0 PKGBUILD)\""
+    # - "echo \"-----------------------------now Reading PKGBUILD-----------------------\""
+    # - "echo \"$(head -n -0 PKGBUILD)\""
     
-    - "echo \"-----------------------------now Reading .SRCINFO-----------------------\""
-    - "echo \"$(head -n -0 .SRCINFO)\""
+    # - "echo \"-----------------------------now Reading .SRCINFO-----------------------\""
+    # - "echo \"$(head -n -0 .SRCINFO)\""
 
     # release a new AUR package
     # - "git add PKGBUILD .SRCINFO"
