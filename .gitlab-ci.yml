@@ -10,54 +10,54 @@ variables: {
 }
 
 stages:
-  # - build
   - arch
+  # - build
 
-build:
-  stage: build
-  # wine is used to create the windows build
-  image: electronuserland/builder:wine
-  script:
-    # BUILD_JSON_EVAL variables
-    - "DATE=$(date -u +%a', '%d' '%b' '%Y' '%T' GMT')"
+# build:
+#   stage: build
+#   # wine is used to create the windows build
+#   image: electronuserland/builder:wine
+#   script:
+#     # BUILD_JSON_EVAL variables
+#     - "DATE=$(date -u +%a', '%d' '%b' '%Y' '%T' GMT')"
 
-    # URLS are used to tell auto-updaters the correct file for the that specified build
-    # - "NSIS_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME-Setup.exe?job=build"
-    - "DEB_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.deb?job=build"
-    - "TAR_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.tar.xz?job=build"
+#     # URLS are used to tell auto-updaters the correct file for the that specified build
+#     # - "NSIS_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME-Setup.exe?job=build"
+#     - "DEB_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.deb?job=build"
+#     - "TAR_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.tar.xz?job=build"
 
-    # the builds supported by the app builtin update system
-    - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
+#     # the builds supported by the app builtin update system
+#     - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
 
-    # install dependencies & compile the code
-    - "npm install"
-    - "npm run compile"
+#     # install dependencies & compile the code
+#     - "npm install"
+#     - "npm run compile"
 
-    # build nsis installer for windows
-    # - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"nsis\") > build.json"
-    # - "npx electron-builder --win NSIS"
+#     # build nsis installer for windows
+#     # - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"nsis\") > build.json"
+#     # - "npx electron-builder --win NSIS"
 
-    # build debian package for linux
-    - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"deb\") > build.json"
-    - "npx electron-builder --linux deb"
+#     # build debian package for linux
+#     - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"deb\") > build.json"
+#     - "npx electron-builder --linux deb"
 
-    # build tar.xz package for linux
-    - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\") > build.json"
-    - "npx electron-builder --linux tar.xz"
+#     # build tar.xz package for linux
+#     - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\") > build.json"
+#     - "npx electron-builder --linux tar.xz"
 
-    # create the build.json that will be kept in the artifacts for the app builtin update system to use
-    - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"\" \"\" $DOWNLOAD_URLS) > build.json"
-  artifacts:
-    # a year without a new builds would mean that the app is properly dead, and you properly shouldn't download it anyway
-    expire_in: 12 mos
-    paths:
-      # - public/$CI_PROJECT_NAME-Setup.exe
-      - public/$CI_PROJECT_NAME.deb
-      - public/$CI_PROJECT_NAME.tar.xz
-      - build.json
-  # the branches that are valid for builds
-  only:
-    - development
+#     # create the build.json that will be kept in the artifacts for the app builtin update system to use
+#     - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"\" \"\" $DOWNLOAD_URLS) > build.json"
+#   artifacts:
+#     # a year without a new builds would mean that the app is properly dead, and you properly shouldn't download it anyway
+#     expire_in: 12 mos
+#     paths:
+#       # - public/$CI_PROJECT_NAME-Setup.exe
+#       - public/$CI_PROJECT_NAME.deb
+#       - public/$CI_PROJECT_NAME.tar.xz
+#       - build.json
+#   # the branches that are valid for builds
+#   only:
+#     - development
 
 arch:
   stage: arch
