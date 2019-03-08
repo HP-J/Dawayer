@@ -10,113 +10,50 @@ variables: {
 }
 
 stages:
-  - arch
-  # - build
+  - build
 
-# build:
-#   stage: build
-#   # wine is used to create the windows build
-#   image: electronuserland/builder:wine
-#   script:
-#     # BUILD_JSON_EVAL variables
-#     - "DATE=$(date -u +%a', '%d' '%b' '%Y' '%T' GMT')"
-
-#     # URLS are used to tell auto-updaters the correct file for the that specified build
-#     # - "NSIS_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME-Setup.exe?job=build"
-#     - "DEB_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.deb?job=build"
-#     - "TAR_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.tar.xz?job=build"
-
-#     # the builds supported by the app builtin update system
-#     - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
-
-#     # install dependencies & compile the code
-#     - "npm install"
-#     - "npm run compile"
-
-#     # build nsis installer for windows
-#     # - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"nsis\") > build.json"
-#     # - "npx electron-builder --win NSIS"
-
-#     # build debian package for linux
-#     - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"deb\") > build.json"
-#     - "npx electron-builder --linux deb"
-
-#     # build tar.xz package for linux
-#     - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\") > build.json"
-#     - "npx electron-builder --linux tar.xz"
-
-#     # create the build.json that will be kept in the artifacts for the app builtin update system to use
-#     - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"\" \"\" $DOWNLOAD_URLS) > build.json"
-#   artifacts:
-#     # a year without a new builds would mean that the app is properly dead, and you properly shouldn't download it anyway
-#     expire_in: 12 mos
-#     paths:
-#       # - public/$CI_PROJECT_NAME-Setup.exe
-#       - public/$CI_PROJECT_NAME.deb
-#       - public/$CI_PROJECT_NAME.tar.xz
-#       - build.json
-#   # the branches that are valid for builds
-#   only:
-#     - development
-
-arch:
-  stage: arch
-  image: antergos/archlinux-systemd:latest
+build:
+  stage: build
+  # wine is used to create the windows build
+  image: electronuserland/builder:wine
   script:
-    # set variables
-    - "VERSION=$(echo $(($(date +%s%N)/1000000)).0.0-1)"
+    # BUILD_JSON_EVAL variables
+    - "DATE=$(date -u +%a', '%d' '%b' '%Y' '%T' GMT')"
 
-    # set to access the arch user repository
+    # URLS are used to tell auto-updaters the correct file for the that specified build
+    # - "NSIS_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME-Setup.exe?job=build"
+    - "DEB_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.deb?job=build"
+    - "TAR_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.tar.xz?job=build"
 
-    - sudo pacman -S archlinux-keyring && sudo pacman -Syu && sudo pacman -Sy --noconfirm openssh
-    - sudo systemctl start sshd service && sudo systemctl enable sshd.service
+    # the builds supported by the app builtin update system
+    - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
 
-    # run ssh-agent (inside the build environment)
-    - eval $(ssh-agent -s)
+    # install dependencies & compile the code
+    - "npm install"
+    - "npm run compile"
 
-    # add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
-    - echo "$AUR_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    # build nsis installer for windows
+    # - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"nsis\") > build.json"
+    # - "npx electron-builder --win NSIS"
 
-    # create the SSH directory and give it the right permissions
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
+    # build debian package for linux
+    - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"deb\") > build.json"
+    - "npx electron-builder --linux deb"
 
-    # - "echo \"$AUR_SSH_PRIVATE_KEY\" > /share/homes/$user_variable/.ssh/id_rsa"
-    # - "ssh-add -K ~/.ssh/id_rsa"
+    # build tar.xz package for linux
+    - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\") > build.json"
+    - "npx electron-builder --linux tar.xz"
 
-    - "git config user.name \"$GIT_USERNAME\""
-    - "git config user.email \"$GIT_EMAIL\""
-
-    # TODO cd to /arch
-
-    # pull the current package info 
-    # TODO might need to clone the repo everytime because /arch/.git won't be uploaded to the main app repo
-    # then add the aur remote to the cloned repo
-    # - "cd aur"
-    # - "git fetch"
-    # - "git pull"
-
-    # # update the package info
-    # # removes the last 3 lines then adds them back with new vaules
-    # - "echo \"$(head -n -3 PKGBUILD)\" > PKGBUILD"
-    # - "echo \"pkgver=$VERSION\" >> PKGBUILD"
-    # - "echo \"source=('icon.png' 'Dawayer.desktop' '$TAR_URL')\" >> PKGBUILD"
-    # - "echo \"md5sums=('$(md5sum icon.png | awk '{print $1}')' '$(md5sum Dawayer.desktop | awk '{print $1}')' '$(md5sum ../public/Dawayer.tar.xz | awk '{print $1}')')\" >> PKGBUILD"
-    
-    # # prints .SRCINFO file
-    # # https://wiki.archlinux.org/index.php/.SRCINFO
-    # # to upload or update a package add at least PKGBUILD and .SRCINFO 
-    # - "makepkg --printsrcinfo > .SRCINFO"
-
-    # - "echo \"-----------------------------now Reading PKGBUILD-----------------------\""
-    # - "echo \"$(head -n -0 PKGBUILD)\""
-    
-    # - "echo \"-----------------------------now Reading .SRCINFO-----------------------\""
-    # - "echo \"$(head -n -0 .SRCINFO)\""
-
-    # release a new AUR package
-    # - "git add PKGBUILD .SRCINFO"
-    # - "git commit -m \"$VERSION\""
-    # - "git push"
+    # create the build.json that will be kept in the artifacts for the app builtin update system to use
+    - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"\" \"\" $DOWNLOAD_URLS) > build.json"
+  artifacts:
+    # a year without a new builds would mean that the app is properly dead, and you properly shouldn't download it anyway
+    expire_in: 12 mos
+    paths:
+      # - public/$CI_PROJECT_NAME-Setup.exe
+      - public/$CI_PROJECT_NAME.deb
+      - public/$CI_PROJECT_NAME.tar.xz
+      - build.json
+  # the branches that are valid for builds
   only:
-    - development
+    - release
