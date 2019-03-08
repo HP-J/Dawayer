@@ -68,6 +68,9 @@ arch:
 
     # set to access the arch user repository
 
+    - sudo pacman -Sy --noconfirm openssh
+    - sudo systemctl start sshd service && sudo systemctl enable sshd.service
+
     # run ssh-agent (inside the build environment)
     - eval $(ssh-agent -s)
 
