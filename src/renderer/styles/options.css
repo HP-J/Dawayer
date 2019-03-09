@@ -66,14 +66,7 @@
   grid-template-rows: auto auto;
   grid-template-areas: ". .";
 
-
   margin-bottom: 2%;
-}
-
-.option.directory.text
-{
-  user-select: text;
-  word-break: break-all;
 }
 
 .option.buttons
@@ -99,13 +92,6 @@ input.option.controls
 
   font-weight: 900;
   text-transform: uppercase;
-}
-
-.option.about.check
-{
-  justify-content: flex-start;
-
-  margin-top: 2%;
 }
 
 input.option.controls
@@ -146,6 +132,11 @@ input.option.controls
   color: var(--color-7);
 }
 
+.option.about.button
+{
+  margin-top: 2%;
+}
+
 .option.button,
 .option.directories.title,
 .option.directory.text
@@ -153,15 +144,11 @@ input.option.controls
   white-space: pre-line;
 }
 
-.option.about.check.blocked
-{
-  color: var(--holder-2);
-  pointer-events: none;
-}
-
-.about > .option.text
+.option.directory.container > .option.text,
+.optionsItem.about > .option.text
 {
   user-select: text;
+  word-break: break-all;
 }
 
 @media screen and (max-width: 800px)

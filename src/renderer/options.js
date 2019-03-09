@@ -1,7 +1,7 @@
 import { remote } from 'electron';
 
 import { join } from 'path';
-import { readJSON, existsSync } from 'fs-extra';
+import { readJSON, readFile, pathExists } from 'fs-extra';
 import { tmpdir } from 'os';
 
 import * as settings from '../settings.js';
@@ -11,7 +11,7 @@ import download from '../dl.js';
 
 import { createElement, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
 
-import { addNewDirectories, removeDirectory, rescanStorage } from './storage.js';
+import { addNewDirectories, removeDirectory, rescanStorage, removeAllChildren } from './storage.js';
 import { getRewindTiming, setRewindTiming, getSkipTiming, setSkipTiming } from './playback.js';
 
 /** @typedef { Object } BuildData
@@ -28,6 +28,10 @@ let localData;
 /**  @type { HTMLDivElement }
 */
 let checkElement;
+
+/**  @type { HTMLDivElement }
+*/
+let changeLogElement;
 
 /**  @type { HTMLDivElement }
 */
@@ -61,7 +65,7 @@ const rewindOptionInput = controlsSection.querySelector('input.rewind');
 */
 const skipOptionInput = controlsSection.querySelector('input.skip');
 
-const mainWindow = remote.getCurrentWindow();
+const { mainWindow } = remote.require(join(__dirname, '../main/window.js'));
 
 /** initialize options, like the storage/cache system that loads local albums and tracks
 */
@@ -71,19 +75,21 @@ export function initOptions()
 
   // read build.json
   // then append about section in the options page
-  if (existsSync(buildDataPath))
+
+  pathExists(buildDataPath).then((exists) =>
   {
+    if (!exists)
+      return;
+    
     readJSON(buildDataPath).then((data) =>
     {
       localData = data;
 
       appendAbout();
     });
-  }
-  else
-  {
-    appendAbout();
-  }
+  });
+  
+  appendAbout();
 
   appendDirectories();
 
@@ -167,8 +173,11 @@ function appendDirectories()
 
 function appendAbout()
 {
-  // create the check for updates button
-  checkElement = createElement('.option.about.button.check');
+  const aboutButtonsElement = createElement('.option.about.buttons');
+  const changeLogPath = join(__dirname, '../../CHANGELOG.md');
+
+  // clear the about section
+  removeAllChildren(aboutSection, 1);
 
   if (localData)
   {
@@ -182,7 +191,7 @@ function appendAbout()
       aboutSection.appendChild(createAboutText('Pipeline: ' + localData.pipeline));
 
     if (localData.package)
-      aboutSection.appendChild(createAboutText(`Package (${localData.package})`));
+      aboutSection.appendChild(createAboutText('Package: ' + localData.package));
 
     if (localData.date)
       aboutSection.appendChild(createAboutText('Release Date: ' + localData.date));
@@ -200,15 +209,55 @@ function appendAbout()
   if (process.versions.v8)
     aboutSection.appendChild(createAboutText('V8: ' + process.versions.v8));
 
+  aboutSection.appendChild(aboutButtonsElement);
+
+  pathExists(changeLogPath)
+    .then((exists) =>
+    {
+      if (exists)
+        return readFile(changeLogPath, { encoding: 'utf8' });
+      else
+        return undefined;
+    })
+    .then((data) =>
+    {
+      if (data)
+      {
+        if (!changeLogElement)
+        {
+          changeLogElement = createElement('.option.about.button.log');
+
+          changeLogElement.innerText = 'Changelog';
+    
+          changeLogElement.onclick = () =>
+          {
+            remote.dialog.showMessageBox(mainWindow, {
+              type: 'none',
+              title: 'Changelog',
+              detail: data,
+              buttons: [ 'Ok' ]
+            });
+          };
+        }
+      
+        aboutButtonsElement.appendChild(changeLogElement);
+      }
+    });
+
   // if there's enough data to support the auto-update system,
   // then add a check for updates button
   if (localData && localData.branch && localData.commit && localData.package)
   {
-    checkElement.innerText = 'Check for Updates';
+    if (!checkElement)
+    {
+      checkElement = createElement('.option.about.button.check');
 
-    aboutSection.appendChild(checkElement);
+      checkElement.innerText = 'Check for Updates';
 
-    checkElement.onclick = checkForUpdates;
+      checkElement.onclick = checkForUpdates;
+    }
+    
+    aboutButtonsElement.appendChild(checkElement);
   }
 }
 
@@ -333,7 +382,7 @@ function checkForUpdates()
 {
   checkElement.innerText = 'Checking...';
 
-  checkElement.classList.add('blocked');
+  checkElement.classList.add('clean');
 
   // request the server's build.json
   request('https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/' + localData.branch + '/raw/build.json?job=build', {  json: true })
@@ -366,7 +415,7 @@ function resetUpdateElement()
 {
   checkElement.innerText = 'Check for Updates';
 
-  checkElement.classList.remove('blocked');
+  checkElement.classList.remove('clean');
 }
 
 /** @param { number } current
@@ -385,7 +434,7 @@ function updateError()
 {
   checkElement.innerText = 'Check for Updates';
 
-  checkElement.classList.remove('blocked');
+  checkElement.classList.remove('clean');
 }
 
 /** @param { string } path
@@ -394,7 +443,7 @@ function updateDownloaded(path)
 {
   checkElement.innerText = 'Install Update';
 
-  checkElement.classList.remove('blocked');
+  checkElement.classList.remove('clean');
 
   checkElement.onclick = () => remote.shell.openItem(path);
 }
@@ -411,21 +460,24 @@ function updateDownload(url, commitID)
 
   checkElement.innerText = 'Starting Download';
 
-  if (existsSync(fullPath))
+  pathExists(fullPath).then((exists) =>
   {
-    updateDownloaded(fullPath);
-  }
-  else
-  {
-    download(url.href, {
-      dir: tmpdir(),
-      filename: filename,
-      onProgress: updateProgress,
-      onError: updateError,
-      onDone: () =>
-      {
-        updateDownloaded(fullPath);
-      }
-    });
-  }
+    if (exists)
+    {
+      updateDownloaded(fullPath);
+    }
+    else
+    {
+      download(url.href, {
+        dir: tmpdir(),
+        filename: filename,
+        onProgress: updateProgress,
+        onError: updateError,
+        onDone: () =>
+        {
+          updateDownloaded(fullPath);
+        }
+      });
+    }
+  });
 }

@@ -1,0 +1,5 @@
+- fixed an issue where scanning a deleted audio directory breaks the scan button.
+- fixed an issue where scanning without any audio directories breaks the scan button.
+- you can't remove your last audio directory from the ui anymore.
+- added a changelog button.
+- 'An update exists but is not available for your package' message now appears if that happens aka AUR packages.

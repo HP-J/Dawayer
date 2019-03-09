@@ -1122,14 +1122,31 @@ function appendItems(storage)
   appendArtistsPageItems(storage);
 }
 
-/** @param { HTMLElement } element
+/** @param { HTMLElement } parent
 */
-export function removeAllChildren(element)
+export function removeAllChildren(parent, fromIndex)
 {
-  while (element.lastChild)
+  if (fromIndex !== undefined)
   {
-    element.removeChild(element.lastChild);
+    const children = [ ...parent.children ];
+
+    children.slice(fromIndex);
+
+    for (let i = fromIndex; i < children.length; i++)
+    {
+      const child = children[i];
+  
+      parent.removeChild(child);
+    }
   }
+  else
+  {
+    while (parent.lastChild)
+    {
+      parent.removeChild(parent.lastChild);
+    }
+  }
+
 }
 
 /** because clicking an artist name should take you to them
