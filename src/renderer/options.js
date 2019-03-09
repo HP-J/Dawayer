@@ -31,27 +31,35 @@ let checkElement;
 
 /**  @type { HTMLDivElement }
 */
-const directoriesContainer = document.body.querySelector('.optionsItem.directories');
+const optionsPageElement = document.body.querySelector('.page.options');
 
 /**  @type { HTMLDivElement }
 */
-const aboutContainer = document.body.querySelector('.optionsItem.about');
+const directoriesSection = optionsPageElement.querySelector('.optionsItem.directories');
 
 /**  @type { HTMLDivElement }
 */
-const trayContainer = document.body.querySelector('.optionsItem.tray');
+const directoriesContainer = directoriesSection.querySelector('.option.directories.container');
 
 /**  @type { HTMLDivElement }
 */
-const controlsContainer = document.body.querySelector('.optionsItem.controls');
+const aboutSection = optionsPageElement.querySelector('.optionsItem.about');
+
+/**  @type { HTMLDivElement }
+*/
+const traySection = optionsPageElement.querySelector('.optionsItem.tray');
+
+/**  @type { HTMLDivElement }
+*/
+const controlsSection = optionsPageElement.querySelector('.optionsItem.controls');
 
 /** @type { HTMLInputElement }
 */
-const rewindOptionInput = controlsContainer.querySelector('input.rewind');
+const rewindOptionInput = controlsSection.querySelector('input.rewind');
 
 /** @type { HTMLInputElement }
 */
-const skipOptionInput = controlsContainer.querySelector('input.skip');
+const skipOptionInput = controlsSection.querySelector('input.skip');
 
 const mainWindow = remote.getCurrentWindow();
 
@@ -89,18 +97,29 @@ export function initOptions()
 */
 export function appendDirectoryNode(directory)
 {
-  const container = createElement('.option.container.directories');
+  const container = createElement('.option.directory.container');
 
-  const directoryText = createElement('.option.directories.directory');
+  const directoryText = createElement('.option.directory.text');
   directoryText.innerText = directory;
 
-  const removeButton = createElement('.option.directories.button.remove');
+  const removeButton = createElement('.option.button');
   removeButton.innerText = 'X';
 
+  // don't remove the last directory
+  if (directoriesContainer.children.length <= 0)
+    removeButton.classList.add('clean');
+  // it's not the last directory anymore
+  else if (directoriesContainer.children.length === 1)
+    directoriesContainer.children[0].querySelector('.option.button').classList.remove('clean');
+  
   removeButton.onclick = () =>
   {
     // remove from dom
     directoriesContainer.removeChild(container);
+
+    // don't remove the last directory
+    if (directoriesContainer.children.length === 1)
+      directoriesContainer.children[0].querySelector('.option.button').classList.add('clean');
 
     // remove it from the save file
     removeDirectory(directory);
@@ -109,10 +128,7 @@ export function appendDirectoryNode(directory)
   container.appendChild(directoryText);
   container.appendChild(removeButton);
 
-  // append to dom
-  directoriesContainer.insertBefore(
-    container,
-    directoriesContainer.children[1]);
+  directoriesContainer.appendChild(container);
 
   return container;
 }
@@ -132,7 +148,7 @@ function createAboutText(text)
 
 function appendDirectories()
 {
-  document.body.querySelector('.option.directories.add').onclick = () =>
+  directoriesSection.querySelector('.option.add').onclick = () =>
   {
     remote.dialog.showOpenDialog(
       mainWindow, {
@@ -143,7 +159,7 @@ function appendDirectories()
     );
   };
 
-  document.body.querySelector('.option.directories.rescan').onclick = () =>
+  directoriesSection.querySelector('.option.rescan').onclick = () =>
   {
     rescanStorage();
   };
@@ -157,32 +173,32 @@ function appendAbout()
   if (localData)
   {
     if (localData.branch)
-      aboutContainer.appendChild(createAboutText('Branch: ' + localData.branch));
+      aboutSection.appendChild(createAboutText('Branch: ' + localData.branch));
 
     if (localData.commit)
-      aboutContainer.appendChild(createAboutText('Commit: ' + localData.commit));
+      aboutSection.appendChild(createAboutText('Commit: ' + localData.commit));
 
     if (localData.pipeline)
-      aboutContainer.appendChild(createAboutText('Pipeline: ' + localData.pipeline));
+      aboutSection.appendChild(createAboutText('Pipeline: ' + localData.pipeline));
 
     if (localData.package)
-      aboutContainer.appendChild(createAboutText(`Package (${localData.package})`));
+      aboutSection.appendChild(createAboutText(`Package (${localData.package})`));
 
     if (localData.date)
-      aboutContainer.appendChild(createAboutText('Release Date: ' + localData.date));
+      aboutSection.appendChild(createAboutText('Release Date: ' + localData.date));
   }
 
   if (process.versions.electron)
-    aboutContainer.appendChild(createAboutText('Electron: ' + process.versions.electron));
+    aboutSection.appendChild(createAboutText('Electron: ' + process.versions.electron));
 
   if (process.versions.chrome)
-    aboutContainer.appendChild(createAboutText('Chrome: ' + process.versions.chrome));
+    aboutSection.appendChild(createAboutText('Chrome: ' + process.versions.chrome));
 
   if (process.versions.node)
-    aboutContainer.appendChild(createAboutText('Node.js: ' + process.versions.node));
+    aboutSection.appendChild(createAboutText('Node.js: ' + process.versions.node));
 
   if (process.versions.v8)
-    aboutContainer.appendChild(createAboutText('V8: ' + process.versions.v8));
+    aboutSection.appendChild(createAboutText('V8: ' + process.versions.v8));
 
   // if there's enough data to support the auto-update system,
   // then add a check for updates button
@@ -190,7 +206,7 @@ function appendAbout()
   {
     checkElement.innerText = 'Check for Updates';
 
-    aboutContainer.appendChild(checkElement);
+    aboutSection.appendChild(checkElement);
 
     checkElement.onclick = checkForUpdates;
   }
@@ -201,20 +217,20 @@ function appendTray()
   const enabled = settings.get('trayIcon', true);
   const color = settings.get('trayIconColor', 'dark');
 
-  const trueElement = trayContainer.querySelector('.true');
-  const falseElement = trayContainer.querySelector('.false');
+  const trueElement = traySection.querySelector('.true');
+  const falseElement = traySection.querySelector('.false');
 
-  const darkElement = trayContainer.querySelector('.dark');
-  const blackElement = trayContainer.querySelector('.black');
-  const lightElement = trayContainer.querySelector('.light');
+  const darkElement = traySection.querySelector('.dark');
+  const blackElement = traySection.querySelector('.black');
+  const lightElement = traySection.querySelector('.light');
 
-  trayContainer.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
-  trayContainer.querySelector(`.${color}`).classList.add('highlight', 'currentColor');
+  traySection.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
+  traySection.querySelector(`.${color}`).classList.add('highlight', 'currentColor');
 
   trueElement.onclick =
   falseElement.onclick = () =>
   {
-    trayContainer.querySelector('.currentState').classList.remove('highlight', 'currentState');
+    traySection.querySelector('.currentState').classList.remove('highlight', 'currentState');
     event.srcElement.classList.add('highlight', 'currentState');
     
     if (event.srcElement.isSameNode(trueElement))
@@ -227,7 +243,7 @@ function appendTray()
   blackElement.onclick =
   lightElement.onclick = () =>
   {
-    trayContainer.querySelector('.currentColor').classList.remove('highlight', 'currentColor');
+    traySection.querySelector('.currentColor').classList.remove('highlight', 'currentColor');
     event.srcElement.classList.add('highlight', 'currentColor');
 
     settings.set('trayIconColor', event.srcElement.classList[3]);
@@ -236,7 +252,7 @@ function appendTray()
 
 function appendControls()
 {
-  const applyElement = controlsContainer.querySelector('.apply');
+  const applyElement = controlsSection.querySelector('.apply');
 
   const rewind = getRewindTiming();
 

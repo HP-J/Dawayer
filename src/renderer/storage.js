@@ -113,8 +113,18 @@ function walk(directories)
 {
   return new Promise((resolve) =>
   {
+    // return empty array if directories array is empty
+    if (directories.length <= 0)
+    {
+      resolve([]);
+
+      return;
+    }
+
     const results = [];
     const promises = [];
+
+    let nonExisting = 0;
 
     for (let i = 0; i < directories.length; i++)
     {
@@ -123,7 +133,15 @@ function walk(directories)
       exists(dir).then((existsValue) =>
       {
         if (!existsValue)
+        {
+          nonExisting = nonExisting + 1;
+ 
+          // return empty array if all directories don't exists
+          if (nonExisting === directories.length)
+            resolve([]);
+
           return;
+        }
 
         readdir(dir).then((list) =>
         {
@@ -251,7 +269,7 @@ function scanCacheAudioFiles()
   const rescanElement = document.body.querySelector('.option.rescan');
 
   rescanElement.innerText = 'Scanning';
-  rescanElement.classList.add('.clean');
+  rescanElement.classList.add('clean');
 
   return new Promise((resolve) =>
   {
@@ -437,7 +455,7 @@ function scanCacheAudioFiles()
             }
 
             rescanElement.innerText = 'Rescan';
-            rescanElement.classList.remove('.clean');
+            rescanElement.classList.remove('clean');
 
             resolve({
               storageInfo: storageInfo,
@@ -1357,6 +1375,9 @@ export function rescanStorage()
 */
 export function addNewDirectories(directories)
 {
+  if (!directories || directories.length <= 0)
+    return;
+
   // add the new directories to the array
   audioDirectories.push(...directories);
 

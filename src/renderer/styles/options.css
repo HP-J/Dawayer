@@ -58,7 +58,7 @@
   justify-content: flex-end;
 }
 
-.option.container.directories
+.option.directory.container
 {
   display: grid;
 
@@ -66,17 +66,17 @@
   grid-template-rows: auto auto;
   grid-template-areas: ". .";
 
+
   margin-bottom: 2%;
 }
 
-.option.directories.directory
+.option.directory.text
 {
   user-select: text;
   word-break: break-all;
 }
 
-.option.directories.buttons,
-.option.tray.buttons
+.option.buttons
 {
   display: flex;
 }
@@ -148,7 +148,7 @@ input.option.controls
 
 .option.button,
 .option.directories.title,
-.option.directories.directory
+.option.directory.text
 {
   white-space: pre-line;
 }

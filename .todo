@@ -1,10 +1,6 @@
 performance issues and bugs: 
- ☐ scanning without any music directories breaks the button
- ☐ AUR packages have Check for Updates button that shouldn't be there
 
 testing:
- ☐ test re-scanning on a deleted directory 
- ☐ test loading the cached storage of a deleted directory 
 
 features:
   ☐ MPRIS service support for linux @next-build
