@@ -324,24 +324,33 @@ function checkForUpdates()
     .then((remoteData) =>
     {
       // if commit id is different, and there's an available package for this platform
-      if (remoteData.commit !== localData.commit && remoteData[localData.package])
+      if (remoteData.commit !== localData.commit)
       {
-        updateDownload(remoteData[localData.package], remoteData.commit);
+        if (remoteData[localData.package])
+        {
+          updateDownload(remoteData[localData.package], remoteData.commit);
+        }
+        else
+        {
+          checkElement.innerText = 'An update exists but is not available for your package';
+
+          setTimeout(resetUpdateElement, 4000);
+        }
       }
       else
       {
         checkElement.innerText = 'Up-to-date';
 
-        setTimeout(() =>
-        {
-          checkElement.innerText = 'Check for Updates';
-
-          checkElement.classList.remove('blocked');
-        }, 3000);
+        setTimeout(resetUpdateElement, 3000);
       }
-    }
-    )
-    .catch(updateError);
+    }).catch(updateError);
+}
+
+function resetUpdateElement()
+{
+  checkElement.innerText = 'Check for Updates';
+
+  checkElement.classList.remove('blocked');
 }
 
 /** @param { number } current
