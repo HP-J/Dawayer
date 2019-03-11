@@ -35,7 +35,10 @@ function empty()
 
 function download(url, filepath, onError, onDone, onProgress)
 {
-  const out = fs.createWriteStream(filepath);
+  // the file will have a temporary path during downloading
+  const temppath = filepath + Date.now();
+
+  const out = fs.createWriteStream(temppath);
   const req = request.get(url);
 
   let isAbort = false;
@@ -60,13 +63,27 @@ function download(url, filepath, onError, onDone, onProgress)
       }
       else
       {
-        if (onProgress)
-          onProgress(totalSize, totalSize);
-                    
-        onDone({
-          path: filepath,
-          url: url,
-          size: totalSize
+        // rename/move the file to the correct place
+        fs.rename(temppath, filepath, (err) =>
+        {
+          if (err)
+          {
+            onError({
+              msg: 'The download was incomplete.',
+              errcode: 'err_dlincomplete'
+            });
+          }
+          else
+          {
+            if (onProgress)
+              onProgress(totalSize, totalSize);
+                        
+            onDone({
+              path: filepath,
+              url: url,
+              size: totalSize
+            });
+          }
         });
       }
     });
@@ -101,7 +118,7 @@ function download(url, filepath, onError, onDone, onProgress)
     {
       isAbort = true;
 
-      this.request.abort();
+      req.abort();
     }
   };
 }

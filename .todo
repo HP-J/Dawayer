@@ -1,12 +1,12 @@
-performance issues and bugs: 
+Performance Issues and Bugs: 
 
-testing:
+Testing:
 
-features:
+Features:
   ☐ MPRIS service support for linux @next-build
   ☐ add a change log to the about section in options @next-build
 
-graphics:
+UI/UX:
   ☐ sketching podcast page interface @next-build
 
-ci:
+CI/CD:

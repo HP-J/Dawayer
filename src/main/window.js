@@ -22,6 +22,8 @@ export function setApp(_app)
   app = _app;
 }
 
+/** if the app is in debug mode
+*/
 export function isDebug()
 {
   if (process.argv.includes('--debug'))
@@ -30,13 +32,15 @@ export function isDebug()
   return debugMode;
 }
 
-/** reloads the electron browser window
+/** reloads the main browser window
 */
 export function reload()
 {
   mainWindow.reload();
 }
 
+/** focus on the main window
+*/
 export function focus()
 {
   mainWindow.restore();
@@ -46,6 +50,8 @@ export function focus()
   mainWindow.focus();
 }
 
+/** quit the app
+*/
 export function quit()
 {
   app.quit();
@@ -74,6 +80,8 @@ export function showHide()
   }
 }
 
+/** show or hide the icon in the taskbar
+*/
 export function setSkipTaskbar(state)
 {
   mainWindow.setSkipTaskbar(state);

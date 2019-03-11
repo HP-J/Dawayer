@@ -26,7 +26,7 @@
       "webRoot": "${workspaceRoot}",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
       "runtimeArgs": [
-        "${workspaceRoot}",
+        "${workspaceRoot}/compiled/main/main.js"",
         "--debug"
       ]
     }

@@ -4,9 +4,9 @@ import { join } from 'path';
 import { readJSON, readFile, pathExists } from 'fs-extra';
 import { tmpdir } from 'os';
 
-import * as settings from '../settings.js';
-
 import request from 'request-promise-native';
+
+import * as settings from '../settings.js';
 import download from '../dl.js';
 
 import { createElement, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
@@ -408,7 +408,7 @@ function checkForUpdates()
 
         setTimeout(resetUpdateElement, 3000);
       }
-    }).catch(updateError);
+    }).catch(resetUpdateElement);
 }
 
 function resetUpdateElement()
@@ -422,19 +422,10 @@ function resetUpdateElement()
 * @param { number } total
 */
 function updateProgress(current, total)
-{
-  let percentage = current / total;
-
-  percentage = Math.floor(percentage * 100).toFixed(0);
+{  
+  const percentage = ((current / total) * 100).toFixed(1);
 
   checkElement.innerText = `Downloading ${percentage}%`;
-}
-
-function updateError()
-{
-  checkElement.innerText = 'Check for Updates';
-
-  checkElement.classList.remove('clean');
 }
 
 /** @param { string } path
@@ -455,11 +446,12 @@ function updateDownload(url, commitID)
 {
   url = new URL(url);
 
-  const filename = 'tmp-dawayer-update-' + commitID;
+  const filename = `tmp-dawayer-update-${commitID}`;
   const fullPath = join(tmpdir(), filename);
 
   checkElement.innerText = 'Starting Download';
 
+  // if the update file was already downloaded
   pathExists(fullPath).then((exists) =>
   {
     if (exists)
@@ -472,11 +464,8 @@ function updateDownload(url, commitID)
         dir: tmpdir(),
         filename: filename,
         onProgress: updateProgress,
-        onError: updateError,
-        onDone: () =>
-        {
-          updateDownloaded(fullPath);
-        }
+        onError: resetUpdateElement,
+        onDone: () => updateDownloaded(fullPath)
       });
     }
   });

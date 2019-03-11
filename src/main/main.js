@@ -172,7 +172,7 @@ function createWindow()
   });
 }
 
-if (!app.requestSingleInstanceLock())
+if (!isDebug() && !app.requestSingleInstanceLock())
 {
   app.quit();
 }
