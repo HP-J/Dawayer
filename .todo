@@ -4,9 +4,10 @@ Testing:
 
 Features:
   ☐ MPRIS service support for linux @next-build
-  ☐ add a change log to the about section in options @next-build
 
 UI/UX:
-  ☐ sketching podcast page interface @next-build
+  ☐ sketching the podcasts page @next-build
 
 CI/CD:
+  ☐ release a Windows build after testing @help-needed
+  ☐ release a macOS build after testing @help-needed

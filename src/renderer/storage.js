@@ -192,12 +192,9 @@ function getDefaultMusicDir()
 */
 export function initStorage()
 {
-  // loaded the saved audio directories
+  // load the saved audio directories
 
   const savedAudioDirectories = settings.get('audioDirectories');
-
-  // TEST the default music dir on windows
-  // console.log(getDefaultMusicDir());
 
   // skip button hides any active artist overlay
   window.addEventListener('keydown', (event) =>
@@ -233,8 +230,8 @@ export function initStorage()
 
         navigation = (...keys) => storageNavigation(storage, ...keys);
 
-        // update the cache if it's older than 2 days
-        // take effect when the app is re-opened
+        // update the cache if it's older than [X] days
+        // takes effect when the app is re-opened
         if (isStorageOld(storageInfo.date))
         {
           scanCacheAudioFiles().then((scan) =>
