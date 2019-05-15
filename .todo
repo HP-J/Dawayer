@@ -3,10 +3,11 @@ Performance Issues and Bugs:
 Testing:
 
 Features:
-  ☐ MPRIS service support for linux @next-build
+  ☐ support multiple instances (just send the args from the event to the same function that handels them on start-up)
+  ☐ MPRIS service support for linux
 
 UI/UX:
-  ☐ sketching the podcasts page @next-build
+  ☐ sketching the podcasts page
 
 CI/CD:
   ☐ release a Windows build after testing @help-needed

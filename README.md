@@ -19,12 +19,12 @@
 
 - **Linux:**
 [AUR](https://aur.archlinux.org/packages/dawayer) |
-[deb](https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.deb?job=build) |
-[tar.xz](https://gitlab.com/herpproject/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build)
+[deb](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.deb?job=build) |
+[tar.xz](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build)
 
 # Licenses
-This project is licensed under the [MIT](https://gitlab.com/herpproject/Dawayer/blob/development/LICENSE) License.  
-All icons inside the [icons](https://gitlab.com/herpproject/Dawayer/tree/development/res) folder are made by us and are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+This project is licensed under the [MIT](https://gitlab.com/hpj/Dawayer/blob/development/LICENSE) License.  
+All icons inside the [icons](https://gitlab.com/hpj/Dawayer/tree/development/res) folder are made by us and are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 # Acknowledgments
 Dawayer's design is inspired by [Phonograph](https://play.google.com/store/apps/details?id=com.kabouzeid.gramophone).  

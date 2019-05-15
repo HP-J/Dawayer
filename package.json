@@ -70,7 +70,7 @@
     "linux": {
       "artifactName": "Dawayer.${ext}",
       "executableName": "Dawayer",
-      "category": "Audio"
+      "category": "Audio;AudioVideo"
     },
     "nsis": {
       "artifactName": "Dawayer-Setup.exe",
@@ -84,13 +84,13 @@
       "cache": ".electron-cache"
     }
   },
-  "homepage": "https://gitlab.com/herpproject/Dawayer#readme",
+  "homepage": "https://gitlab.com/hpj/Dawayer#readme",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/herpproject/Dawayer.git"
+    "url": "git+ssh://git@gitlab.com/hpj/Dawayer.git"
   },
   "bugs": {
-    "url": "https://gitlab.com/herpproject/Dawayer/issues"
+    "url": "https://gitlab.com/hpj/Dawayer/issues"
   },
   "author": "Herp Project <herpproject0@gmail.com>",
   "license": "MIT",

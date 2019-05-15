@@ -1,6 +1,6 @@
 import { remote, ipcRenderer } from 'electron';
 
-import { existsSync, exists, stat, emptyDir, writeJson, readJSON, readdir } from 'fs-extra';
+import { existsSync, pathExists, stat, emptyDir, writeJson, readJSON, readdir } from 'fs-extra';
 
 import { join, dirname, basename, extname } from 'path';
 import { homedir, platform } from 'os';
@@ -107,7 +107,7 @@ const storageConfig = join(configDir, '/storage.json');
 let tracksPerCharacter = {};
 
 /** @param { string[] } directories
-* @returns { string[] }
+* @returns { Promise<string[]> }
 */
 function walk(directories)
 {
@@ -130,7 +130,7 @@ function walk(directories)
     {
       const dir = directories[i];
 
-      exists(dir).then((existsValue) =>
+      pathExists(dir).then((existsValue) =>
       {
         if (!existsValue)
         {
@@ -138,9 +138,19 @@ function walk(directories)
  
           // return empty array if all directories don't exists
           if (nonExisting === directories.length)
+          {
             resolve([]);
-
-          return;
+            
+            return;
+          }
+          
+          // TODO it was like this, I think it's bugged and will exit the function if just one directory dosn't exists
+          // TEST it both ways
+          // it should maybe be continue?
+          //  if (nonExisting === directories.length)          
+          //    resolve([]);
+          
+          //  return;
         }
 
         readdir(dir).then((list) =>
@@ -154,10 +164,12 @@ function walk(directories)
               stat(file).then((statValue) =>
               {
                 if (statValue && statValue.isDirectory())
+                {
                   promises.push(walk([ file ]).then((files) =>
                   {
                     results.push(...files);
                   }));
+                }
                 else
                 {
                   results.push(file);
@@ -942,7 +954,7 @@ function appendArtistsPageItems(storage)
     };
 
     // // if it does load it
-    exists(artistPicture).then((exists) =>
+    pathExists(artistPicture).then((exists) =>
     {
       if (exists)
         img.src = artistPicture;
