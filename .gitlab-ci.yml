@@ -21,9 +21,9 @@ build:
     - "DATE=$(date -u +%a', '%d' '%b' '%Y' '%T' GMT')"
 
     # URLS are used to tell auto-updaters the correct file for the that specified build
-    - "NSIS_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME-Setup.exe?job=build"
-    - "DEB_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.deb?job=build"
-    - "TAR_URL=https://gitlab.com/herpproject/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.tar.xz?job=build"
+    - "NSIS_URL=https://gitlab.com/hpj/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME-Setup.exe?job=build"
+    - "DEB_URL=https://gitlab.com/hpj/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.deb?job=build"
+    - "TAR_URL=https://gitlab.com/hpj/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/raw/public/$CI_PROJECT_NAME.tar.xz?job=build"
 
     # the builds supported by the app builtin update system
     - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
