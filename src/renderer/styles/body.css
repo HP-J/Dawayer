@@ -76,7 +76,7 @@ body
   display: grid;
   grid-template-rows: 100%;
   grid-template-columns: auto auto auto;
-  grid-template-areas: "playing local options";
+  grid-template-areas: "playing local podcasts options";
 
   top: 0;
   width: 100%;
@@ -156,6 +156,13 @@ body
 .page.local
 {
   grid-area: local;
+
+  width: 100vw;
+}
+
+.page.podcasts
+{
+  grid-area: podcasts;
 
   width: 100vw;
 }

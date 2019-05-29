@@ -64,7 +64,11 @@ const localIconsContainer = localButton.children[0];
 
 /**  @type { HTMLDivElement }
 */
-const optionsButton = menu.children.item(2);
+const podcastsButton = menu.children.item(2);
+
+/**  @type { HTMLDivElement }
+*/
+const optionsButton = menu.children.item(3);
 
 /**  @type { HTMLDivElement }
 */
@@ -203,6 +207,8 @@ function initEvents()
       changeLocalSubPage(Array.prototype.indexOf.call(localSubPagesContainer.children, selectedLocalSubPage));
   };
 
+  podcastsButton.onclick = () => changePage(podcastsButton);
+
   optionsButton.onclick = () => changePage(optionsButton);
 
   // playback events
@@ -242,6 +248,11 @@ function initEvents()
     changePage(localButton, () => changeLocalSubPage(1));
   };
 
+  document.body.querySelector('.submenuButton.podcasts').onclick = () =>
+  {
+    changePage(podcastsButton);
+  };
+
   document.body.querySelector('.submenuButton.options').onclick = () =>
   {
     changePage(optionsButton);
@@ -272,6 +283,13 @@ function initTippy()
 
   tippy(localButton, {
     content: document.body.querySelector('.submenuContainer.local'),
+    placement: 'bottom',
+    interactive: true,
+    arrow: true
+  });
+
+  tippy(podcastsButton, {
+    content: document.body.querySelector('.submenuContainer.podcasts'),
     placement: 'bottom',
     interactive: true,
     arrow: true

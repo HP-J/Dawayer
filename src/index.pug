@@ -90,6 +90,10 @@ html(lang='en')
 
       .menuItem.wrapper
         .menuItem.container
+          +icon('podcasts')
+
+      .menuItem.wrapper
+        .menuItem.container
           +icon('options')
 
     .playing.background
@@ -109,14 +113,17 @@ html(lang='en')
           .artists.wrapper
             .artists.container
 
+      .page.podcasts
+        .options.wrapper
+
       .page.options
         .options.wrapper
 
           .options.container
-            .optionsItem.directories
-              .option.title Audio Directories
-              .option.directories.container
-              .option.directories.buttons
+            .optionsItem.localAudio
+              .option.title Local Audio Directories
+              .option.localAudio.container
+              .option.localAudio.buttons
                 .option.button.add Add
                 .option.button.rescan Rescan
             .optionsItem.controls
@@ -126,6 +133,11 @@ html(lang='en')
               .option.text Skip
               input.option.controls.skip(type='number')
               .option.controls.button.apply.clean Apply
+            .optionsItem.podcasts
+              .option.title Podcasts
+              .option.podcasts.buttons
+                .option.podcasts.button.true Enabled
+                .option.podcasts.button.false Disabled
 
           .options.container
             .optionsItem.tray
@@ -143,12 +155,15 @@ html(lang='en')
               .option.title About
 
     .submenuContainer.playing
-      .submenuButton.playing Playing Now
+      .submenuButton.playing Now Playing
 
     .submenuContainer.local
       .submenuButton.albums Albums
       .submenuButton.tracks Tracks
       .submenuButton.artists Artists
+
+    .submenuContainer.podcasts
+      .submenuButton.podcasts Podcasts
 
     .submenuContainer.options
       .submenuButton.options Options
