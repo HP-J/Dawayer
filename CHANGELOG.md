@@ -1,5 +1,1 @@
-- fixed an issue where scanning a deleted audio directory breaks the scan button.
-- fixed an issue where scanning without any audio directories breaks the scan button.
-- you can't remove your last audio directory from the ui anymore.
-- added a changelog button.
-- 'An update exists but is not available for your package' message now appears if that happens aka AUR packages.
+- we're aware of Lastfm API Changes, we removed all of their APIs from Dawayer as a response, sorry for the inconvenience, we will have a solution soon.

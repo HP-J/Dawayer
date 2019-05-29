@@ -9,10 +9,7 @@ import { union } from 'lodash';
 
 import * as settings from '../settings.js';
 
-import download from '../dl.js';
-
 import { parseFile as getMetadata } from 'music-metadata';
-import getLastFm from 'last-fm';
 
 import { createElement, createIcon, createContextMenu } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
@@ -67,8 +64,6 @@ export const artistsRegex = /,\s+|\s+ft.?\s+|\s+feat.?\s+/g;
 /**  @type { string }
 */
 export const missingPicture = join(__dirname, '../../missing.png');
-
-const lastfm = new getLastFm('f7bad3bd904131752e9bf050562a00ee');
 
 /**  @type { HTMLDivElement }
 */
@@ -512,10 +507,10 @@ function isStorageOld(date)
 */
 function cacheArtists(storage)
 {
-  for (const artist in storage.artists)
-  {
-    cacheArtist(artist, storage);
-  }
+  // for (const artist in storage.artists)
+  // {
+  //   cacheArtist(artist, storage);
+  // }
 }
 
 /** adds a summary and a picture url for an artist to the storage object
@@ -524,83 +519,83 @@ function cacheArtists(storage)
 */
 function cacheArtist(artist, storage)
 {
-  // don't get info about unknown artists
-  if (artist === 'Unknown Artist')
-    return;
+  // // don't get info about unknown artists
+  // if (artist === 'Unknown Artist')
+  //   return;
 
-  const regex = /[^a-zA-Z0-9]+/g;
+  // const regex = /[^a-zA-Z0-9]+/g;
 
-  lastfm.artistSearch({
-    q: artist,
-    limit: 5
-  }, (err, data) =>
-  {
-    if (err)
-      return;
+  // lastfm.artistSearch({
+  //   q: artist,
+  //   limit: 5
+  // }, (err, data) =>
+  // {
+  //   if (err)
+  //     return;
 
-    const artistForSearch = artist.replace(regex, ' ');
+  //   const artistForSearch = artist.replace(regex, ' ');
 
-    for (let i = 0; i < data.result.length; i++)
-    {
-      if (data.result[i].name.replace(regex, ' ').indexOf(artistForSearch) > -1)
-      {
-        // the array is different sizes of the same picture
-        // the third picture size is large
-        if (data.result[i].images.length > 3)
-          cacheImage(data.result[i].images[3]);
+  //   for (let i = 0; i < data.result.length; i++)
+  //   {
+  //     if (data.result[i].name.replace(regex, ' ').indexOf(artistForSearch) > -1)
+  //     {
+  //       // the array is different sizes of the same picture
+  //       // the third picture size is large
+  //       if (data.result[i].images.length > 3)
+  //         cacheImage(data.result[i].images[3]);
 
-        cacheSummary(data.result[i].name);
+  //       cacheSummary(data.result[i].name);
      
-        break;
-      }
-    }
-  });
+  //       break;
+  //     }
+  //   }
+  // });
 
-  function cacheImage(pictureUrl)
-  {
-    const pictureDir = join(configDir, 'ArtistsCache');
+  // function cacheImage(pictureUrl)
+  // {
+  //   const pictureDir = join(configDir, 'ArtistsCache');
 
-    download(pictureUrl, {
-      dir: pictureDir,
-      filename: artist,
-      onDone: () =>
-      {
-        const img = new Image();
+  //   download(pictureUrl, {
+  //     dir: pictureDir,
+  //     filename: artist,
+  //     onDone: () =>
+  //     {
+  //       const img = new Image();
 
-        img.src = join(pictureDir, artist);
+  //       img.src = join(pictureDir, artist);
 
-        img.onload = () =>
-        {
-          updateArtistElement(
-            storage.artists[artist].artistElement,
-            storage.artists[artist].overlayElement, {
-              picture: img.src
-            });
-        };
-      }
-    });
-  }
+  //       img.onload = () =>
+  //       {
+  //         updateArtistElement(
+  //           storage.artists[artist].artistElement,
+  //           storage.artists[artist].overlayElement, {
+  //             picture: img.src
+  //           });
+  //       };
+  //     }
+  //   });
+  // }
 
-  function cacheSummary(name)
-  {
-    lastfm.artistInfo({
-      name: name
-    }, (err, data) =>
-    {
-      if (err || !data || !data.summary)
-        return;
+  // function cacheSummary(name)
+  // {
+  //   lastfm.artistInfo({
+  //     name: name
+  //   }, (err, data) =>
+  //   {
+  //     if (err || !data || !data.summary)
+  //       return;
 
-      storage.artists[artist].summary = data.summary;
+  //     storage.artists[artist].summary = data.summary;
 
-      cacheStorage(undefined, storage);
+  //     cacheStorage(undefined, storage);
 
-      updateArtistElement(
-        storage.artists[artist].artistElement,
-        storage.artists[artist].overlayElement, {
-          summary: data.summary
-        });
-    });
-  }
+  //     updateArtistElement(
+  //       storage.artists[artist].artistElement,
+  //       storage.artists[artist].overlayElement, {
+  //         summary: data.summary
+  //       });
+  //   });
+  // }
 }
 
 function appendAlbumPlaceholder()
