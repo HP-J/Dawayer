@@ -1,2 +1,3 @@
-- added podcasts (disabled by default)
+- added podcasts (disabled by default).
 - we're aware of Lastfm API Changes, we removed all of their APIs from Dawayer as a response, sorry for the inconvenience, we will have a solution soon.
+- fixed an error that appears when scanning a non-existing directories.

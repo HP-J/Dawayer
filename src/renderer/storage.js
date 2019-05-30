@@ -133,19 +133,10 @@ function walk(directories)
  
           // return empty array if all directories don't exists
           if (nonExisting === directories.length)
-          {
             resolve([]);
-            
-            return;
-          }
           
-          // TODO it was like this, I think it's bugged and will exit the function if just one directory dosn't exists
-          // TEST it both ways
-          // it should maybe be continue?
-          //  if (nonExisting === directories.length)          
-          //    resolve([]);
-          
-          //  return;
+          // don't attempt to read directory
+          return;
         }
 
         readdir(dir).then((list) =>
