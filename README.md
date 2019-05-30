@@ -3,7 +3,7 @@
 
 #### Features
 - Play local audio files
-- Play podcasts (Soon)
+- Play podcasts
 - All the other modern audio player features like saving your seek-time and queue between sessions and etc...
 - TBA
 

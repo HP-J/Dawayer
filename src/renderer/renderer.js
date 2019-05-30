@@ -1,5 +1,7 @@
 import tippy from 'tippy.js';
 
+import * as settings from '../settings.js';
+
 import scroll from './scroll.js';
 
 import { initStorage, secondsToDuration } from './storage.js';
@@ -147,6 +149,7 @@ function changePage(element, callback)
     // get the index of the button
     const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
 
+    // hide controls background in page is Now Playing
     if (pageIndex === 0)
     {
       controlBar.classList.add('extended');
@@ -257,6 +260,10 @@ function initEvents()
   {
     changePage(optionsButton);
   };
+
+  // disable on settings change
+  
+  settings.onChange('podcasts', togglePodcastsPage);
 
   // window events
 
@@ -525,6 +532,25 @@ function volumeControl(percentage, ignoreLock)
     }
   
     updateBarPercentage(volumeBar, percentage);
+  }
+}
+
+export function togglePodcastsPage(state)
+{
+  if (state)
+  {
+    menu.insertBefore(podcastsButton, menu.children[podcastsButton.index]);
+    pagesContainer.insertBefore(podcastsButton.page, pagesContainer.children[podcastsButton.index]);
+  }
+  else
+  {
+    podcastsButton.index = Array.prototype.indexOf.call(menu.children, podcastsButton);
+    podcastsButton.page = pagesContainer.children[podcastsButton.index];
+
+    menu.removeChild(podcastsButton);
+    pagesContainer.removeChild(podcastsButton.page);
+
+    podcastsButton.page.style.display = 'none';
   }
 }
 

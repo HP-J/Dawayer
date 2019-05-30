@@ -9,7 +9,7 @@ import request from 'request-promise-native';
 import * as settings from '../settings.js';
 import download from '../dl.js';
 
-import { createElement, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
+import { createElement, togglePodcastsPage, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
 
 import { addNewDirectories, removeDirectory, rescanStorage, removeAllChildren } from './storage.js';
 import { getRewindTiming, setRewindTiming, getSkipTiming, setSkipTiming } from './playback.js';
@@ -39,11 +39,11 @@ const optionsPageElement = document.body.querySelector('.page.options');
 
 /**  @type { HTMLDivElement }
 */
-const directoriesSection = optionsPageElement.querySelector('.optionsItem.directories');
+const localAudioSection = optionsPageElement.querySelector('.optionsItem.localAudio');
 
 /**  @type { HTMLDivElement }
 */
-const directoriesContainer = directoriesSection.querySelector('.option.directories.container');
+const localAudioDirectoriesContainer = localAudioSection.querySelector('.option.localAudio.container');
 
 /**  @type { HTMLDivElement }
 */
@@ -56,6 +56,10 @@ const traySection = optionsPageElement.querySelector('.optionsItem.tray');
 /**  @type { HTMLDivElement }
 */
 const controlsSection = optionsPageElement.querySelector('.optionsItem.controls');
+
+/**  @type { HTMLDivElement }
+*/
+const podcastsSection = optionsPageElement.querySelector('.optionsItem.podcasts');
 
 /** @type { HTMLInputElement }
 */
@@ -95,6 +99,7 @@ export function initOptions()
 
   appendTray();
   appendControls();
+  appendPodcasts();
 }
 
 /** appends a directory element in the options, allowing the user to see
@@ -112,20 +117,20 @@ export function appendDirectoryNode(directory)
   removeButton.innerText = 'X';
 
   // don't remove the last directory
-  if (directoriesContainer.children.length <= 0)
+  if (localAudioDirectoriesContainer.children.length <= 0)
     removeButton.classList.add('clean');
   // it's not the last directory anymore
-  else if (directoriesContainer.children.length === 1)
-    directoriesContainer.children[0].querySelector('.option.button').classList.remove('clean');
+  else if (localAudioDirectoriesContainer.children.length === 1)
+    localAudioDirectoriesContainer.children[0].querySelector('.option.button').classList.remove('clean');
   
   removeButton.onclick = () =>
   {
     // remove from dom
-    directoriesContainer.removeChild(container);
+    localAudioDirectoriesContainer.removeChild(container);
 
     // don't remove the last directory
-    if (directoriesContainer.children.length === 1)
-      directoriesContainer.children[0].querySelector('.option.button').classList.add('clean');
+    if (localAudioDirectoriesContainer.children.length === 1)
+      localAudioDirectoriesContainer.children[0].querySelector('.option.button').classList.add('clean');
 
     // remove it from the save file
     removeDirectory(directory);
@@ -134,7 +139,7 @@ export function appendDirectoryNode(directory)
   container.appendChild(directoryText);
   container.appendChild(removeButton);
 
-  directoriesContainer.appendChild(container);
+  localAudioDirectoriesContainer.appendChild(container);
 
   return container;
 }
@@ -154,7 +159,7 @@ function createAboutText(text)
 
 function appendDirectories()
 {
-  directoriesSection.querySelector('.option.add').onclick = () =>
+  localAudioSection.querySelector('.option.add').onclick = () =>
   {
     remote.dialog.showOpenDialog(
       mainWindow, {
@@ -165,7 +170,7 @@ function appendDirectories()
     );
   };
 
-  directoriesSection.querySelector('.option.rescan').onclick = () =>
+  localAudioSection.querySelector('.option.rescan').onclick = () =>
   {
     rescanStorage();
   };
@@ -280,6 +285,7 @@ function appendTray()
   falseElement.onclick = () =>
   {
     traySection.querySelector('.currentState').classList.remove('highlight', 'currentState');
+
     event.srcElement.classList.add('highlight', 'currentState');
     
     if (event.srcElement.isSameNode(trueElement))
@@ -293,6 +299,7 @@ function appendTray()
   lightElement.onclick = () =>
   {
     traySection.querySelector('.currentColor').classList.remove('highlight', 'currentColor');
+    
     event.srcElement.classList.add('highlight', 'currentColor');
 
     settings.set('trayIconColor', event.srcElement.classList[3]);
@@ -353,6 +360,32 @@ function appendControls()
       changeSkipTiming(skipOptionInput.value);
     
     applyElement.classList.add('clean');
+  };
+}
+
+function appendPodcasts()
+{
+  const enabled = settings.get('podcasts', false);
+
+  const trueElement = podcastsSection.querySelector('.true');
+  const falseElement = podcastsSection.querySelector('.false');
+
+  podcastsSection.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
+
+  if (!enabled)
+    togglePodcastsPage(false);
+
+  trueElement.onclick =
+  falseElement.onclick = () =>
+  {
+    podcastsSection.querySelector('.currentState').classList.remove('highlight', 'currentState');
+
+    event.srcElement.classList.add('highlight', 'currentState');
+    
+    if (event.srcElement.isSameNode(trueElement))
+      settings.set('podcasts', true);
+    else
+      settings.set('podcasts', false);
   };
 }
 
@@ -422,7 +455,7 @@ function resetUpdateElement()
 * @param { number } total
 */
 function updateProgress(current, total)
-{  
+{
   const percentage = ((current / total) * 100).toFixed(1);
 
   checkElement.innerText = `Downloading ${percentage}%`;

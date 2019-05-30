@@ -108,6 +108,7 @@ input.option.controls
 }
 
 .option.tray.button,
+.option.podcasts.button,
 .option.clean
 {
   color: var(--holder-2);
@@ -138,7 +139,7 @@ input.option.controls
 }
 
 .option.button,
-.option.directories.title,
+.option.localAudio.title,
 .option.directory.text
 {
   white-space: pre-line;

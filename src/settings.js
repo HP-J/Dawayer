@@ -1,6 +1,11 @@
 import { remote, app } from 'electron';
+
+import { EventEmitter } from 'events';
+
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
+
+const changes = new EventEmitter();
 
 /** @param { string } key
 */
@@ -31,6 +36,8 @@ export function set(key, value)
 
   config[key] = value;
 
+  changes.emit(key, value);
+
   saveConfig(config);
 }
 
@@ -42,17 +49,22 @@ export function remove(key)
 
   config[key] = undefined;
   
+  changes.emit(key, undefined);
+
   saveConfig(config);
+}
+
+/** @param { string } key
+* @param { (value: any) => void } callback
+*/
+export function onChange(key, callback)
+{
+  changes.on(key, callback);
 }
 
 export function all()
 {
   return getConfig();
-}
-
-export function purge()
-{
-  saveConfig({});
 }
 
 export function getPath()
