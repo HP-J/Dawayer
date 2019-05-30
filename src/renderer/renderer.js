@@ -5,6 +5,7 @@ import * as settings from '../settings.js';
 import scroll from './scroll.js';
 
 import { initStorage, secondsToDuration } from './storage.js';
+import { initPodcasts } from './podcasts.js';
 import { initOptions } from './options.js';
 
 import {
@@ -379,6 +380,7 @@ function init()
   initOptions();
 
   initStorage();
+  initPodcasts();
 
   seekTimeControl(getSeekTime(), true);
   initBar(seekBar, showSeekTime, seekTimeControl);
