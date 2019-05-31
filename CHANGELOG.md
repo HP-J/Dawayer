@@ -3,3 +3,4 @@
 - support for opening a track file while Dawayer is already running.
 - fixed an error that appears when scanning a non-existing directories.
 - fixed a bug where shuffle always plays the first track instead of the random.
+- fixed a bug where the previous button was doing the opposite of what it should be doing.

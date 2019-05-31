@@ -385,7 +385,7 @@ export function previouslyOnQueue()
     const resetLimit = (duration > 10) ? 5 : 1;
 
     // reset the seek-time to the beginning
-    if (getSeekTime() <= resetLimit)
+    if (getSeekTime() > resetLimit)
     {
       seekTimeControl(0);
     }
