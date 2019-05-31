@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 
 import { parseFile as getMetadata } from 'music-metadata';
 import { Howl, Howler as howler } from 'howler';
@@ -83,12 +83,21 @@ export function initPlayback()
   */
   let args = remote.getGlobal('argv');
   
-  args = args.filter((arg) => arg.match(audioExtensionsRegex));
+  args = args.filter((arg) => typeof arg === 'string' && arg.match(audioExtensionsRegex));
   
   if (args.length > 0)
-    queueTracks(false, undefined, undefined, ...args);
+    queueTracks(false, undefined, undefined, true, ...args);
   else
     loadQueue();
+
+  // allows the main process to queue tracks on the case it might needs to
+  ipcRenderer.on('queueTracks', (...args) =>
+  {
+    args = args.filter((arg) => typeof arg === 'string' && arg.match(audioExtensionsRegex));
+    
+    if (args.length > 0)
+      queueTracks(false, undefined, undefined, true, ...args);
+  });
 
   // save playing percentage on unload
   window.onbeforeunload = () =>
@@ -599,13 +608,17 @@ export function queueStorageTracks(storage, playingTrackUrl, seekTime, clear, ..
 /** should be used to load track from urls, used to load saved queues or files that are not stored
 * @param { boolean } quiet
 * @param { string } playingTrackUrl
-* @param { number } urls
-* @param { string[] } seekTime
+* @param { number } playingPercentage
+* @param { boolean } clear
+* @param { string[] } urls
 */
-function queueTracks(quiet, playingTrackUrl, playingPercentage, ...urls)
+function queueTracks(quiet, playingTrackUrl, playingPercentage, clear, ...urls)
 {
   return new Promise((resolve) =>
   {
+    if (clear)
+      partialClearQueue();
+
     const promises = [];
 
     for (let i = 0; i < urls.length; i++)
@@ -913,7 +926,7 @@ function loadQueue()
       true,
       settings.get('playingTrack'),
       settings.get('playingPercentage', 0),
-      ...tracks);
+      true, ...tracks);
   }
 }
 

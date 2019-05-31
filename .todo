@@ -4,7 +4,6 @@ Performance Issues and Bugs:
 Testing:
 
 Features:
-  ☐ support multiple instances (just send the args from the event to the same function that handles them on start-up)
   ☐ MPRIS service support for linux
 
 UI/UX:

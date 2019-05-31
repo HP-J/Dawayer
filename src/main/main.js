@@ -186,10 +186,15 @@ else
   // Some APIs can only be used after this event occurs.
   app.on('ready', createWindow);
 
-  app.on('second-instance', () =>
+  app.on('second-instance', (event, args) =>
   {
     if (mainWindow)
+    {
       focus();
+
+      // sends the args to the renderer to queue them for playback
+      mainWindow.webContents.send('queueTracks', ...args);
+    }
   });
 
   // handle any errors at the renderer process
