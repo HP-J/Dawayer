@@ -1,3 +1,4 @@
 - added podcasts (disabled by default).
 - we're aware of Lastfm API Changes, we removed all of their APIs from Dawayer as a response, sorry for the inconvenience, we will have a solution soon.
+- support for opening a track file while Dawayer is already running.
 - fixed an error that appears when scanning a non-existing directories.

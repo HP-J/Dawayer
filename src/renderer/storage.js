@@ -43,6 +43,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 * @property { string } title
 * @property { boolean } picture
 * @property { string[] } artists
+* @property { string[] } album
 * @property { number } duration
 * @property { HTMLDivElement } element
 */
@@ -321,6 +322,7 @@ function scanCacheAudioFiles()
                     title: title,
                     picture: (metadata.common.picture && metadata.common.picture.length > 0),
                     artists: artists,
+                    album: metadata.common.album,
                     duration: duration
                   };
 

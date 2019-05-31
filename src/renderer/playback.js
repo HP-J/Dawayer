@@ -1,10 +1,12 @@
 import { remote, ipcRenderer } from 'electron';
 
-import { parseFile as getMetadata } from 'music-metadata';
-import { Howl, Howler as howler } from 'howler';
+import { EventEmitter } from 'events';
 
 import { basename, extname, join } from 'path';
 import { union } from 'lodash';
+
+import { parseFile as getMetadata } from 'music-metadata';
+import { Howl, Howler as howler } from 'howler';
 
 import * as settings from '../settings.js';
 
@@ -16,7 +18,9 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 /** @typedef { import('./storage.js').Storage } Storage
 */
 
-/**  @type { [ { url: string, index: number, title: string, artist: string, picture: string, duration: number } ] }
+const events = new EventEmitter();
+
+/**  @type { [ { url: string, index: number, title: string, artists: string[], album: string, picture: string, duration: number } ] }
 */
 let queue = [];
 
@@ -157,6 +161,8 @@ export function setSeekTime(time, visualOnly, isInPercentage)
     currentHowl.seek(time);
 
     currentHowl.seekTimeProgress = time * 1000;
+    
+    events.emit('seekTime', time);
   }
 
   if (playingIndex > -1 && currentHowl)
@@ -199,6 +205,8 @@ export function setVolume(volume)
     settings.set('currentVolume', volume);
 
     howler.volume(volume);
+
+    events.emit('volume', volume);
 
     return true;
   }
@@ -267,12 +275,16 @@ export function setPlayingMode(mode)
         currentHowl.pause();
       else
         currentHowl.play();
+
+      events.emit('playingMode', playingMode);
   
       return true;
     }
     else if (mode === 'paused')
     {
       playingMode = mode;
+
+      events.emit('playingMode', playingMode);
 
       return true;
     }
@@ -299,6 +311,8 @@ export function setShuffleMode(mode)
     // apply the shuffle mode to the queue
     shuffleQueue();
 
+    events.emit('shuffleMode', shuffleMode);
+
     return true;
   }
 
@@ -324,6 +338,8 @@ export function setRepeatMode(mode)
     // the current repeat mode
     if (playingIndex > -1)
       resortQueue(playingIndex);
+
+    events.emit('repeatMode', repeatMode);
 
     return true;
   }
@@ -447,14 +463,14 @@ function updateCurrentCard(index)
   queueCurrentElement.querySelector('.cover').style.backgroundImage =
   playingBackground.style.backgroundImage = queue[index].picture;
 
-  queueCurrentElement.querySelector('.artist').innerText =  queue[index].artist;
+  queueCurrentElement.querySelector('.artist').innerText =  queue[index].artists.join(',');
   queueCurrentElement.querySelector('.title').innerText = queue[index].title;
 }
 
 /** @param { Storage } storage
 * @param { string } title
 * @param { string } url
-* @returns { Promise<{ title: string, artist: string, picture: string, duration: number }> }
+* @returns { Promise<{ title: string, artists: string[], album: string, picture: string, duration: number }> }
 */
 function getTrackMetadata(storage, url)
 {
@@ -468,7 +484,8 @@ function getTrackMetadata(storage, url)
     {
       resolve({
         title: storage.tracks[url].title,
-        artist: storage.tracks[url].artists.join(', '),
+        artists: storage.tracks[url].artists,
+        album: storage.tracks[url].album,
         picture: storage.tracks[url].element.querySelector('.cover').style.backgroundImage || `url(${missingPicture})`,
         duration: storage.tracks[url].duration
       });
@@ -483,7 +500,7 @@ function getTrackMetadata(storage, url)
         let artists = metadata.common.artists || [ 'Unknown Artist' ];
 
         // auto split artists by comma
-        artists = union(...[].concat(artists).map((v) => v.split(artistsRegex))).join(', ');
+        artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
 
         if (metadata.common.picture && metadata.common.picture.length > 0)
         {
@@ -493,7 +510,8 @@ function getTrackMetadata(storage, url)
             {
               resolve({
                 title: title,
-                artist: artists,
+                artists: artists,
+                album: metadata.common.album,
                 picture: `url(${picture})`,
                 duration: metadata.format.duration
               });
@@ -506,7 +524,8 @@ function getTrackMetadata(storage, url)
           {
             resolve({
               title: title,
-              artist: artists,
+              artists: artists,
+              album: metadata.common.album,
               picture: `url(${missingPicture})`,
               duration: metadata.format.duration
             });
@@ -533,6 +552,15 @@ function appendQueueItem()
   queueItem.appendChild(titleElement);
 
   return queueContainer.appendChild(queueItem);
+}
+
+/** add a callback to a playback event
+* @param {  'track' | 'seekTime' | 'volume' | 'playingMode' | 'shuffleMode' | 'repeatMode' } eventName
+* @param { (...args) => void } callback
+*/
+export function on(eventName, callback)
+{
+  events.on(eventName, callback);
 }
 
 /** the main way to handle queuing tracks in dawayer, using the storage object to obtain the required metadata
@@ -568,7 +596,7 @@ export function queueStorageTracks(storage, playingTrackUrl, seekTime, clear, ..
             url: tracks[i],
             index: queue.length,
             title: obj.title,
-            artist: obj.artist,
+            artists: obj.artists,
             picture: obj.picture,
             duration: obj.duration
           });
@@ -629,7 +657,8 @@ function queueTracks(quiet, playingTrackUrl, playingPercentage, clear, ...urls)
           url: urls[i],
           index: queue.length,
           title: obj.title,
-          artist: obj.artist,
+          artists: obj.artists,
+          album: obj.album,
           picture: obj.picture,
           duration: obj.duration
         });
@@ -826,7 +855,7 @@ function resortQueue(fromIndex)
     }
 
     // update the artist and the title
-    queueElements[i].children[1].innerText = queue[i].artist;
+    queueElements[i].children[1].innerText = queue[i].artists.join(',');
     queueElements[i].children[2].innerText = queue[i].title;
   }
 }
@@ -939,7 +968,11 @@ function changeQueue(quiet)
 
   // if playing index is -1, this is a clear, not a change
   if (playingIndex === -1 && !currentHowl)
+  {
+    events.emit('track', undefined);
+
     return;
+  }
 
   if (currentHowl)
   {
@@ -976,6 +1009,8 @@ function changeQueue(quiet)
     {
       currentHowl = undefined;
 
+      events.emit('track', undefined);
+
       return;
     }
   }
@@ -994,6 +1029,15 @@ function changeQueue(quiet)
   howl.on('pause', pauseEvent);
 
   howl.on('end', endEvent);
+
+  // emit a track change event
+  events.emit('track', {
+    title: queue[playingIndex].title,
+    artists: queue[playingIndex].artists,
+    album: queue[playingIndex].album,
+    picture: queue[playingIndex].picture,
+    duration: queue[playingIndex].duration
+  });
 
   // set the seek-bar ui
   seekTimeControl(0, quiet);
