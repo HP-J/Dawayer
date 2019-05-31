@@ -597,6 +597,7 @@ export function queueStorageTracks(storage, playingTrackUrl, seekTime, clear, ..
             index: queue.length,
             title: obj.title,
             artists: obj.artists,
+            album: obj.album,
             picture: obj.picture,
             duration: obj.duration
           });
@@ -615,9 +616,18 @@ export function queueStorageTracks(storage, playingTrackUrl, seekTime, clear, ..
       else
       {
         if (playingIndex < 0)
-          resortQueue(0);
+        {
+          let newIndex = 0;
+
+          if (shuffleMode === 'shuffled')
+            newIndex = Math.floor(Math.random() * queue.length);
+
+          resortQueue(newIndex);
+        }
         else
+        {
           resortQueue(playingIndex);
+        }
       }
 
       saveQueue();
@@ -676,9 +686,18 @@ function queueTracks(quiet, playingTrackUrl, playingPercentage, clear, ...urls)
       else
       {
         if (playingIndex < 0)
-          resortQueue(0);
+        {
+          let newIndex = 0;
+
+          if (shuffleMode === 'shuffled')
+            newIndex = Math.floor(Math.random() * queue.length);
+
+          resortQueue(newIndex);
+        }
         else
+        {
           resortQueue(playingIndex);
+        }
       }
   
       saveQueue();
