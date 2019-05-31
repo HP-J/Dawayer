@@ -35,10 +35,6 @@
         "mimeType": "audio/mpeg3"
       },
       {
-        "ext": "mp4",
-        "mimeType": "audio/mp4"
-      },
-      {
         "ext": "mpeg",
         "mimeType": "audio/mpeg"
       },
@@ -48,7 +44,7 @@
       },
       {
         "ext": "ogg",
-        "mimeType": "audio/ogg"
+        "mimeType": "application/ogg"
       },
       {
         "ext": "wav",
@@ -57,10 +53,6 @@
       {
         "ext": "aac",
         "mimeType": "audio/aac"
-      },
-      {
-        "ext": "m4a",
-        "mimeType": "audio/m4a"
       },
       {
         "ext": "flac",
@@ -100,6 +92,7 @@
     "fs-extra": "^8.0.1",
     "howler": "^2.1.2",
     "lodash": "^4.17.11",
+    "mpris-service": "^2.1.0",
     "music-metadata": "^4.0.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",

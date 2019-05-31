@@ -58,10 +58,19 @@ export function quit()
 }
 
 /** shows/hides the main window
+* @param { 'focus' | 'blur' } state
 */
-export function showHide()
+export function showHide(state)
 {
-  if (!mainWindow.isVisible() || !mainWindow.isFocused())
+  if (state !== 'focus' && state !== 'blur')
+  {
+    if (!mainWindow.isVisible() || !mainWindow.isFocused())
+      state = 'focus';
+    else
+      state = 'blur';
+  }
+
+  if (state === 'focus')
   {
     mainWindow.restore();
 
@@ -71,7 +80,7 @@ export function showHide()
     
     mainWindow.setSkipTaskbar(false);
   }
-  else
+  else if (state === 'blur')
   {
     mainWindow.blur();
     mainWindow.hide();

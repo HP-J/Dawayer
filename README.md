@@ -4,6 +4,7 @@
 #### Features
 - Play local audio files
 - Play podcasts
+- MPRIS Player support for linux.
 - All the other modern audio player features like saving your seek-time and queue between sessions and etc...
 - TBA
 

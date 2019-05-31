@@ -1,8 +1,11 @@
 import tippy from 'tippy.js';
 
+import { platform } from 'os';
+
 import * as settings from '../settings.js';
 
 import scroll from './scroll.js';
+import { initMPRISPlayer } from './mpris.js';
 
 import { initStorage, secondsToDuration } from './storage.js';
 import { initPodcasts } from './podcasts.js';
@@ -372,9 +375,11 @@ function initBar(element, mousemove, mousedown)
 
 function init()
 {
+  const currentPlatform = platform();
+
   initEvents();
   initTippy();
-  
+
   initPlayback();
   
   initOptions();
@@ -382,11 +387,11 @@ function init()
   initStorage();
   initPodcasts();
 
-  seekTimeControl(getSeekTime(), true);
-  initBar(seekBar, showSeekTime, seekTimeControl);
+  setSeekTimeWithUI(getSeekTime(), true);
+  initBar(seekBar, showSeekTime, setSeekTimeWithUI);
 
-  volumeControl(getVolume(), true);
-  initBar(volumeBar, undefined, volumeControl);
+  setVolumeWithUI(getVolume(), true);
+  initBar(volumeBar, undefined, setVolumeWithUI);
 
   // they have default classes
   shuffleButton.classList.remove('shuffled');
@@ -394,6 +399,10 @@ function init()
 
   shuffleButton.classList.add(getShuffleMode());
   repeatButton.classList.add(getRepeatMode());
+
+  // enable MPRIS Player if on linux
+  if (currentPlatform === 'linux')
+    initMPRISPlayer();
 }
 
 function initPages()
@@ -429,6 +438,19 @@ export function switchPlayingMode()
   }
 }
 
+/** @param { 'paused' | 'playing' } mode
+*/
+export function forcePlayingMode(mode)
+{
+  const playingMode = getPlayingMode();
+
+  playButton.classList.remove(playingMode);
+
+  setPlayingMode(mode);
+
+  playButton.classList.add(mode);
+}
+
 function switchShuffleMode()
 {
   const modes =
@@ -444,6 +466,19 @@ function switchShuffleMode()
     shuffleButton.classList.remove(shuffleMode);
     shuffleButton.classList.add(modes[shuffleMode]);
   }
+}
+
+/** @param { 'shuffled' | 'normal' } mode
+*/
+export function forceShuffleMode(mode)
+{
+  const shuffleMode = getShuffleMode();
+
+  shuffleButton.classList.remove(shuffleMode);
+
+  setShuffleMode(mode);
+
+  shuffleButton.classList.add(mode);
 }
 
 function switchRepeatMode()
@@ -464,14 +499,27 @@ function switchRepeatMode()
   }
 }
 
+/** @param { 'looping' | 'repeating' | 'once' } mode
+*/
+export function forceRepeatMode(mode)
+{
+  const repeatMode = getRepeatMode();
+
+  repeatButton.classList.remove(repeatMode);
+
+  setRepeatMode(mode);
+
+  repeatButton.classList.add(mode);
+}
+
 function muteVolume()
 {
   if (!volumeButton.classList.contains('muted'))
-    volumeControl(0);
+    setVolumeWithUI(0);
   else if (lastRememberedVolume === 0 || 0.15 >= lastRememberedVolume)
-    volumeControl(0.15);
+    setVolumeWithUI(0.15);
   else
-    volumeControl(lastRememberedVolume);
+    setVolumeWithUI(lastRememberedVolume);
 }
 
 /** @param { HTMLDivElement } element
@@ -503,8 +551,10 @@ function showSeekTime(percentage)
 /** @param { number } percentage
 * @param { boolean } visualOnly
 */
-export function seekTimeControl(percentage, visualOnly)
+export function setSeekTimeWithUI(percentage, visualOnly)
 {
+  percentage = percentage || 0;
+
   if (setSeekTime(percentage, visualOnly, true))
   {
     updateBarPercentage(seekBar, percentage);
@@ -514,7 +564,7 @@ export function seekTimeControl(percentage, visualOnly)
 /** @param { number } percentage
 * @param { boolean } ignoreLock
 */
-function volumeControl(percentage, ignoreLock)
+export function setVolumeWithUI(percentage, ignoreLock)
 {
   percentage = percentage || 0;
 

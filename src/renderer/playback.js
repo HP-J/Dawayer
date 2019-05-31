@@ -10,7 +10,7 @@ import { Howl, Howler as howler } from 'howler';
 
 import * as settings from '../settings.js';
 
-import { createElement, createContextMenu, seekTimeControl, switchPlayingMode } from './renderer.js';
+import { createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode } from './renderer.js';
 import { artistsRegex, audioExtensionsRegex, missingPicture, getTrackPicture, removeAllChildren } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
@@ -123,6 +123,7 @@ export function getSeekTime()
   if (playingIndex > -1 && currentHowl && currentHowl.state() === 'loaded')
   {
     const seekTime = currentHowl.seek();
+    
     if (typeof seekTime === 'number')
       return seekTime;
     else if (currentHowl.seekTimeProgress)
@@ -157,12 +158,12 @@ export function setSeekTime(time, visualOnly, isInPercentage)
   {
     if (isInPercentage)
       time = time * getDuration();
-  
+
     currentHowl.seek(time);
 
     currentHowl.seekTimeProgress = time * 1000;
     
-    events.emit('seekTime', time);
+    events.emit('position', getSeekTime());
   }
 
   if (playingIndex > -1 && currentHowl)
@@ -173,11 +174,18 @@ export function setSeekTime(time, visualOnly, isInPercentage)
       {
         currentHowl.setTimeOnLoad = time;
 
-        currentHowl.once('load', () => set(currentHowl.setTimeOnLoad));
+        currentHowl.once('load', () =>
+        {
+          set(currentHowl.setTimeOnLoad);
+
+          events.emit('seekTime', getSeekTime());
+        });
       }
       else
       {
         set(time);
+
+        events.emit('seekTime', getSeekTime());
       }
     }
 
@@ -347,28 +355,38 @@ export function setRepeatMode(mode)
   return false;
 }
 
-export function rewindBackwards()
+/** @param { number } time
+*/
+export function rewindBackwards(time)
 {
   if (playingIndex <= -1)
     return;
 
+  if (typeof time !== 'number')
+    time = rewindTime;
+
   const duration = queue[playingIndex].duration;
 
-  const seekTime = Math.max(getSeekTime() - rewindTime, 0);
+  const seekTime = Math.max(getSeekTime() - time, 0);
 
-  seekTimeControl(seekTime / duration);
+  setSeekTimeWithUI(seekTime / duration);
 }
 
-export function skipForward()
+/** @param { number } time
+*/
+export function skipForward(time)
 {
   if (playingIndex <= -1)
     return;
 
+  if (typeof time !== 'number')
+    time = skipTime;
+
   const duration = queue[playingIndex].duration;
 
-  const seekTime = Math.min(getSeekTime() + skipTime, duration);
+  const seekTime = Math.min(getSeekTime() + time, duration);
   
-  seekTimeControl(seekTime / duration);
+  setSeekTimeWithUI(seekTime / duration);
 }
 
 export function previouslyOnQueue()
@@ -387,7 +405,7 @@ export function previouslyOnQueue()
     // reset the seek-time to the beginning
     if (getSeekTime() > resetLimit)
     {
-      seekTimeControl(0);
+      setSeekTimeWithUI(0);
     }
     // change to the previous track
     else
@@ -402,7 +420,7 @@ export function previouslyOnQueue()
   // keep resetting the seek-time to 0
   else
   {
-    seekTimeControl(0);
+    setSeekTimeWithUI(0);
   }
 }
 
@@ -423,7 +441,7 @@ export function nextInQueue()
   // act according to the repeat mode
   else
   {
-    seekTimeControl(1);
+    setSeekTimeWithUI(1);
   }
 }
 
@@ -555,7 +573,7 @@ function appendQueueItem()
 }
 
 /** add a callback to a playback event
-* @param {  'track' | 'seekTime' | 'volume' | 'playingMode' | 'shuffleMode' | 'repeatMode' } eventName
+* @param {  'track' | 'position' | 'seekTime' | 'volume' | 'clear' | 'playingMode' | 'shuffleMode' | 'repeatMode' } eventName
 * @param { (...args) => void } callback
 */
 export function on(eventName, callback)
@@ -636,7 +654,7 @@ export function queueStorageTracks(storage, playingTrackUrl, seekTime, clear, ..
       changeQueue();
 
       if (seekTime)
-        seekTimeControl(seekTime / getDuration());
+        setSeekTimeWithUI(seekTime / getDuration());
 
       resolve();
     });
@@ -706,7 +724,7 @@ function queueTracks(quiet, playingTrackUrl, playingPercentage, clear, ...urls)
       changeQueue(quiet);
 
       if (playingPercentage)
-        seekTimeControl(playingPercentage);
+        setSeekTimeWithUI(playingPercentage);
 
       resolve();
     });
@@ -897,8 +915,11 @@ function clearQueue()
   // save the queue as empty
   saveQueue();
 
+  // emit
+  events.emit('clear');
+
   // empty the seek-bar ui
-  seekTimeControl(0);
+  setSeekTimeWithUI(0);
 
   // pause
   if (playingMode === 'playing')
@@ -940,7 +961,7 @@ function partialClearQueue()
   queueElements = [];
 
   // empty the seek-bar ui
-  seekTimeControl(0);
+  setSeekTimeWithUI(0);
 
   // remove all the tracks from the queue ui
   removeAllChildren(queueContainer);
@@ -1050,16 +1071,19 @@ function changeQueue(quiet)
   howl.on('end', endEvent);
 
   // emit a track change event
-  events.emit('track', {
-    title: queue[playingIndex].title,
-    artists: queue[playingIndex].artists,
-    album: queue[playingIndex].album,
-    picture: queue[playingIndex].picture,
-    duration: queue[playingIndex].duration
+  howl.once('load', () =>
+  {
+    events.emit('track', {
+      title: queue[playingIndex].title,
+      artists: queue[playingIndex].artists,
+      album: queue[playingIndex].album,
+      picture: queue[playingIndex].picture,
+      duration: queue[playingIndex].duration
+    });
   });
 
   // set the seek-bar ui
-  seekTimeControl(0, quiet);
+  setSeekTimeWithUI(0, true);
 
   // start playback
   if (!quiet)
@@ -1105,7 +1129,7 @@ function updateSeekTimeEvent()
 
   currentHowl.seekTimeProgress = currentHowl.seekTimeProgress + delta;
 
-  seekTimeControl(
+  setSeekTimeWithUI(
     Math.min(
       (currentHowl.seekTimeProgress / 1000) / queue[playingIndex].duration,
       queue[playingIndex].duration
@@ -1120,13 +1144,13 @@ function endEvent()
   cancelAnimationFrame(currentHowl.updateSeekTimeHandle);
 
   // empty the seek-bar ui
-  seekTimeControl(0, true);
+  setSeekTimeWithUI(0, true);
 
   // repeating the same track
   if (getRepeatMode() === 'repeating')
   {
     // reset the track to the beginning
-    seekTimeControl(0);
+    setSeekTimeWithUI(0);
 
     // howl stops when the track ends and needs to be re-played
     currentHowl.play();
@@ -1153,7 +1177,7 @@ function endEvent()
       // if the queue is 1 track long then just repeat it
       if (queue.length === 1)
       {
-        seekTimeControl(0, true);
+        setSeekTimeWithUI(0, true);
 
         currentHowl.play();
       }
