@@ -14,34 +14,42 @@
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
 
-const request = require('request');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+import { createWriteStream, rename } from 'fs';
+import { basename, join } from 'path';
+import { tmpdir } from 'os';
 
-const defaultOption =
-{
-  dir: os.tmpdir(),
-  filename: null,
-  onDone: empty,
-  onError: empty,
-  onProgress: null
-};
+import { EventEmitter } from 'events';
+import request from 'request';
 
-function empty()
-{
-  //
-}
+const busyPaths = {};
 
-function download(url, filepath, onError, onDone, onProgress)
+const tempDir = tmpdir();
+
+function download(url, filepath, events, option)
 {
+  if (busyPaths[filepath])
+  {
+    if (option.onError)
+      busyPaths[filepath].on('error', option.onError);
+
+    if (option.onDone)
+      busyPaths[filepath].on('done', option.onDone);
+
+    if (option.onProgress)
+      busyPaths[filepath].on('progress', option.onProgress);
+
+    return;
+  }
+    
   // the file will have a temporary path during downloading
   const temppath = filepath + Date.now();
 
-  const out = fs.createWriteStream(temppath);
+  const out = createWriteStream(temppath);
   const req = request.get(url);
 
   let isAbort = false;
+
+  busyPaths[filepath] = events;
 
   req.on('response', (res) =>
   {
@@ -56,33 +64,27 @@ function download(url, filepath, onError, onDone, onProgress)
       // Check if the file was fully downloaded
       if (!isFullDown)
       {
-        onError({
-          msg: 'The download was incomplete.',
-          errcode: 'err_dlincomplete'
-        });
+        events.emit('error', 'The download was incomplete.', 'err_dlincomplete');
+
+        delete busyPaths[filepath];
       }
       else
       {
         // rename/move the file to the correct place
-        fs.rename(temppath, filepath, (err) =>
+        rename(temppath, filepath, (err) =>
         {
           if (err)
           {
-            onError({
-              msg: 'The download was incomplete.',
-              errcode: 'err_dlincomplete'
-            });
+            events.emit('error', 'The download was incomplete.', 'err_dlincomplete');
+
+            delete busyPaths[filepath];
           }
           else
           {
-            if (onProgress)
-              onProgress(totalSize, totalSize);
-                        
-            onDone({
-              path: filepath,
-              url: url,
-              size: totalSize
-            });
+            events.emit('progress', totalSize, totalSize);
+            events.emit('done', filepath, url, totalSize);
+
+            delete busyPaths[filepath];
           }
         });
       }
@@ -102,13 +104,14 @@ function download(url, filepath, onError, onDone, onProgress)
       curSize += chunk.length;
                 
       // 判读是否显示进度条
-      if (onProgress)
-        onProgress(curSize, totalSize);
+      events.emit('progress', curSize, totalSize);
     });
   })
     .on('error', (err) =>
     {
-      onError(err);
+      events.emit('error', err);
+      
+      delete busyPaths[filepath];
     })
     .pipe(out);
 
@@ -126,13 +129,20 @@ function download(url, filepath, onError, onDone, onProgress)
 module.exports = function(url, option = {})
 {
   if (!option.filename)
-    option.filename = path.basename(url) || ('tmp-' + Date.now());
+    option.filename = basename(url) || ('tmp-' + Date.now());
 
-  const filepath = path.join(option.dir || defaultOption.dir, option.filename);
+  const filepath = join(option.dir || tempDir, option.filename);
 
-  const onError = option.onError || defaultOption.onError;
-  const onDone = option.onDone || defaultOption.onDone;
-  const onProgress = option.onProgress || defaultOption.onProgress;
+  const events = new EventEmitter();
 
-  return download(url, filepath, onError, onDone, onProgress);
+  if (option.onError)
+    events.on('error', option.onError);
+
+  if (option.onDone)
+    events.on('done', option.onDone);
+
+  if (option.onProgress)
+    events.on('progress', option.onProgress);
+
+  return download(url, filepath, events, option);
 };
