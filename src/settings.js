@@ -69,10 +69,15 @@ export function all()
 
 export function getPath()
 {
+  return join(getDirectory(), 'config.json');
+}
+
+export function getDirectory()
+{
   if (remote)
-    return join(remote.app.getPath('appData'), remote.app.getName(), 'config.json');
+    return join(remote.app.getPath('appData'), remote.app.getName());
   else
-    return join(app.getPath('appData'), app.getName(), 'config.json');
+    return join(app.getPath('appData'), app.getName());
 }
 
 function getConfig()

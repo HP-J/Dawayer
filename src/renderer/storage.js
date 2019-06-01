@@ -1,8 +1,8 @@
-import { remote, ipcRenderer } from 'electron';
+import { remote } from 'electron';
 
 import { existsSync, pathExists, stat, emptyDir, writeJson, readJSON, readdir } from 'fs-extra';
 
-import { join, dirname, basename, extname } from 'path';
+import { join, basename, extname } from 'path';
 import { homedir, platform } from 'os';
 
 import { union } from 'lodash';
@@ -11,7 +11,7 @@ import * as settings from '../settings.js';
 
 import { parseFile as getMetadata } from 'music-metadata';
 
-import { createElement, createIcon, createContextMenu } from './renderer.js';
+import { cachedImagesDirectory, createElement, createIcon, createContextMenu, cacheImage } from './renderer.js';
 import { appendDirectoryNode } from './options.js';
 import { queueStorageTracks } from './playback.js';
 
@@ -41,7 +41,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 /** @typedef { Object } Track
 * @property { string } title
-* @property { boolean } picture
+* @property { string } picture
 * @property { string[] } artists
 * @property { string[] } album
 * @property { number } duration
@@ -58,13 +58,13 @@ export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$
 
 /* the base directory for the app config files
 */
-const configDir = dirname(settings.getPath());
+const configDir = settings.getDirectory();
 
 export const artistsRegex = /,\s+|\s+ft.?\s+|\s+feat.?\s+/g;
 
 /**  @type { string }
 */
-export const missingPicture = join(__dirname, '../../missing.png');
+export const defaultPicture = join(__dirname, '../../missing.png');
 
 /**  @type { HTMLDivElement }
 */
@@ -233,11 +233,7 @@ export function initStorage()
         // takes effect when the app is re-opened
         if (isStorageOld(storageInfo.date))
         {
-          scanCacheAudioFiles().then((scan) =>
-          {
-            cacheStorage(scan.storageInfo, scan.storage);
-            cacheArtists(scan.storage);
-          });
+          scanCacheAudioFiles().then((scan) => cacheStorage(scan.storageInfo, scan.storage));
         }
       });
   }
@@ -269,8 +265,8 @@ function scanCacheAudioFiles()
 
   return new Promise((resolve) =>
   {
-    // empty the artists cache directory and ensures that it exists
-    emptyDir(join(configDir, 'ArtistsCache')).then(() =>
+    // empty the cached images directory
+    emptyDir(cachedImagesDirectory).then(() =>
     {
       // walk through all the listed audio directories
       walk(audioDirectories)
@@ -320,7 +316,6 @@ function scanCacheAudioFiles()
                   // using the url as a key
                   storage.tracks[file] = {
                     title: title,
-                    picture: (metadata.common.picture && metadata.common.picture.length > 0),
                     artists: artists,
                     album: metadata.common.album,
                     duration: duration
@@ -394,7 +389,15 @@ function scanCacheAudioFiles()
                       };
                     }
                   }
-                }));
+
+                  // cache track's picture
+                  if (metadata.common.picture && metadata.common.picture.length > 0)                    
+                    return cacheImage(metadata.common.picture[0]);
+                  else
+                    return undefined;
+                })
+                .then((pictureURL) => storage.tracks[file].picture = pictureURL)
+            );
           }
 
           // when all files are parsed and added to the storage object
@@ -493,102 +496,6 @@ function isStorageOld(date)
   // then that means it's been more than two days since the last time
   // storage been cached
   return (now.getTime() >= date.getTime());
-}
-
-/** cache and store info like pictures, summary about the artists form Wikipedia
-* @param { Storage } storage
-*/
-function cacheArtists(storage)
-{
-  // for (const artist in storage.artists)
-  // {
-  //   cacheArtist(artist, storage);
-  // }
-}
-
-/** adds a summary and a picture url for an artist to the storage object
-* @param { string } artist
-* @param { Storage } storage
-*/
-function cacheArtist(artist, storage)
-{
-  // // don't get info about unknown artists
-  // if (artist === 'Unknown Artist')
-  //   return;
-
-  // const regex = /[^a-zA-Z0-9]+/g;
-
-  // lastfm.artistSearch({
-  //   q: artist,
-  //   limit: 5
-  // }, (err, data) =>
-  // {
-  //   if (err)
-  //     return;
-
-  //   const artistForSearch = artist.replace(regex, ' ');
-
-  //   for (let i = 0; i < data.result.length; i++)
-  //   {
-  //     if (data.result[i].name.replace(regex, ' ').indexOf(artistForSearch) > -1)
-  //     {
-  //       // the array is different sizes of the same picture
-  //       // the third picture size is large
-  //       if (data.result[i].images.length > 3)
-  //         cacheImage(data.result[i].images[3]);
-
-  //       cacheSummary(data.result[i].name);
-     
-  //       break;
-  //     }
-  //   }
-  // });
-
-  // function cacheImage(pictureUrl)
-  // {
-  //   const pictureDir = join(configDir, 'ArtistsCache');
-
-  //   download(pictureUrl, {
-  //     dir: pictureDir,
-  //     filename: artist,
-  //     onDone: () =>
-  //     {
-  //       const img = new Image();
-
-  //       img.src = join(pictureDir, artist);
-
-  //       img.onload = () =>
-  //       {
-  //         updateArtistElement(
-  //           storage.artists[artist].artistElement,
-  //           storage.artists[artist].overlayElement, {
-  //             picture: img.src
-  //           });
-  //       };
-  //     }
-  //   });
-  // }
-
-  // function cacheSummary(name)
-  // {
-  //   lastfm.artistInfo({
-  //     name: name
-  //   }, (err, data) =>
-  //   {
-  //     if (err || !data || !data.summary)
-  //       return;
-
-  //     storage.artists[artist].summary = data.summary;
-
-  //     cacheStorage(undefined, storage);
-
-  //     updateArtistElement(
-  //       storage.artists[artist].artistElement,
-  //       storage.artists[artist].overlayElement, {
-  //         summary: data.summary
-  //       });
-  //   });
-  // }
 }
 
 function appendAlbumPlaceholder()
@@ -732,7 +639,14 @@ function appendAlbumsPageItems(storage)
 
     const img = new Image();
 
-    img.src = missingPicture;
+    // search all track in the the album for a picture
+    // returns the first picture it finds
+    // if none found returns the default picture
+    img.src = storage.albums[albums[i]].tracks.map((trackUrl) =>
+    {
+      if (storage.tracks[trackUrl].picture)
+        return storage.tracks[trackUrl].picture;
+    })[0] || defaultPicture;
 
     img.onload = () =>
     {
@@ -744,20 +658,6 @@ function appendAlbumsPageItems(storage)
         duration: secondsToDuration(storage.albums[albums[i]].duration)
       }, storage);
     };
-
-    const tracks = storage.albums[albums[i]].tracks;
-
-    for (let x = 0; x < tracks.length; x++)
-    {
-      const trackUrl = tracks[x];
-
-      if (storage.tracks[trackUrl].picture)
-      {
-        getTrackPicture(trackUrl).then((picture) => img.src = picture);
-
-        break;
-      }
-    }
   }
 }
 
@@ -915,8 +815,6 @@ function appendArtistsPageItems(storage)
 
   for (let i = 0; i < artists.length; i++)
   {
-    const artistPicture = join(configDir, 'ArtistsCache', artists[i]);
-    
     const placeholder = appendArtistPlaceholder();
     const overlayElement = createArtistOverlay();
 
@@ -925,7 +823,7 @@ function appendArtistsPageItems(storage)
 
     const img = new Image();
 
-    img.src = missingPicture;
+    img.src = defaultPicture;
 
     img.onload = () =>
     {
@@ -941,12 +839,7 @@ function appendArtistsPageItems(storage)
         });
     };
 
-    // // if it does load it
-    pathExists(artistPicture).then((exists) =>
-    {
-      if (exists)
-        img.src = artistPicture;
-    });
+    // TODO load artist picture if it exists in cache
   }
 }
 
@@ -1093,7 +986,8 @@ function appendTracksPageItems(storage)
 
     const img = new Image();
 
-    img.src = missingPicture;
+    // track picture
+    img.src = track.picture || defaultPicture;
 
     img.onload = () =>
     {
@@ -1105,8 +999,6 @@ function appendTracksPageItems(storage)
         duration: secondsToDuration(track.duration)
       });
     };
-
-    getTrackPicture(tracks[i]).then((picture) => img.src = picture);
   }
 }
 
@@ -1377,7 +1269,6 @@ export function rescanStorage()
     cacheStorage(scan.storageInfo, scan.storage);
 
     appendItems(scan.storage);
-    cacheArtists(scan.storage);
     
     navigation = (...keys) => storageNavigation(scan.storage, ...keys);
   });
@@ -1415,24 +1306,6 @@ export function removeDirectory(directory)
 
   // remove the directory from the save file
   settings.set('audioDirectories', audioDirectories);
-}
-
-/** turns the pictures info base64 strings on the main process
-* to reduces the lagging on the renderer process
-* @param { string } trackUrl
-*/
-export function getTrackPicture(trackUrl)
-{
-  return new Promise((resolve) =>
-  {
-    ipcRenderer.send('sendTrackPicture', trackUrl);
-
-    ipcRenderer.once(trackUrl, (e, base64Url) =>
-    {
-      if (base64Url)
-        resolve(base64Url);
-    });
-  });
 }
 
 /**@param { number } seconds

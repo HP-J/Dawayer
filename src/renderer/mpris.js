@@ -76,7 +76,7 @@ function mprisStartingState()
 
 function mprisReceiveEvents()
 {
-  // MPRIS gets his position from this function
+  // MPRIS gets its position from this function
   player.getPosition = () =>
   {
     return getSeekTime() * 1000 * 1000;
@@ -92,14 +92,12 @@ function mprisReceiveEvents()
       return;
     }
 
-    // TODO since we cache images as base64 in memory
-    // it doesn't seem like mpris would accept that format
-    // caching image locally seems faster and better but would take a lot of time
     player.metadata = {
       'mpris:trackid': player.objectPath(++counter),
       'xesam:title': trackObj.title,
       'xesam:artist': trackObj.artists,
       'xesam:album': trackObj.album,
+      'mpris:artUrl': `file://${trackObj.picture}`,
       'mpris:length': Math.floor(trackObj.duration) * 1000 * 1000
     };
     

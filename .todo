@@ -2,9 +2,14 @@ Performance Issues and Bugs:
   ☐ add a substitute after the removal of lastfm apis
 
 Testing:
+  ☐ test the new cached images system on an system-installed production build of Dawayer
+    what I wanna make sure of is how loading a cached storage handles it @critical 
 
 Features:
-  ☐ research on adding a streaming service support like (Spotify, Deezer)
+  ✔ replaced the base64 picture system with a new locally cached pictures system @done(19-06-01 15:37)
+  ☐ move the cache system off the scanning function to make scanning faster or show the placeholders while the scanning is happing
+
+  ☐ research adding a streaming service support like (Spotify or Deezer or etc)
 
 UI/UX:
   ☐ sketching the podcasts page

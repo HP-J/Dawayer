@@ -5,3 +5,4 @@
 - fixed an error that appears when scanning a non-existing directories.
 - fixed a bug where shuffle always plays the first track instead of the random.
 - fixed a bug where the previous button was doing the opposite of what it should be doing.
+- minor performance improvements... or huge it really depends on your rig.

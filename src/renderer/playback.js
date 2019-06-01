@@ -10,8 +10,8 @@ import { Howl, Howler as howler } from 'howler';
 
 import * as settings from '../settings.js';
 
-import { createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode } from './renderer.js';
-import { artistsRegex, audioExtensionsRegex, missingPicture, getTrackPicture, removeAllChildren } from './storage.js';
+import { cacheImage, createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode } from './renderer.js';
+import { artistsRegex, audioExtensionsRegex, defaultPicture, removeAllChildren } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -479,7 +479,7 @@ function updateCurrentCard(index)
   queueCurrentElement.setAttribute('style', '');
 
   queueCurrentElement.querySelector('.cover').style.backgroundImage =
-  playingBackground.style.backgroundImage = queue[index].picture;
+  playingBackground.style.backgroundImage = `url("${queue[index].picture}")`;
 
   queueCurrentElement.querySelector('.artist').innerText =  queue[index].artists.join(',');
   queueCurrentElement.querySelector('.title').innerText = queue[index].title;
@@ -492,10 +492,7 @@ function updateCurrentCard(index)
 */
 function getTrackMetadata(storage, url)
 {
-  if (
-    storage &&
-    storage.tracks[url] &&
-    storage.tracks[url].element.querySelector('.cover').style.backgroundImage
+  if (storage && storage.tracks[url]
   )
   {
     return new Promise((resolve) =>
@@ -504,7 +501,7 @@ function getTrackMetadata(storage, url)
         title: storage.tracks[url].title,
         artists: storage.tracks[url].artists,
         album: storage.tracks[url].album,
-        picture: storage.tracks[url].element.querySelector('.cover').style.backgroundImage || `url(${missingPicture})`,
+        picture: storage.tracks[url].picture || defaultPicture,
         duration: storage.tracks[url].duration
       });
     });
@@ -520,35 +517,30 @@ function getTrackMetadata(storage, url)
         // auto split artists by comma
         artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
 
-        if (metadata.common.picture && metadata.common.picture.length > 0)
+        return new Promise((resolve) =>
         {
-          return new Promise((resolve) =>
+          const obj = {
+            title: title,
+            artists: artists,
+            album: metadata.common.album,
+            picture: defaultPicture,
+            duration: metadata.format.duration
+          };
+
+          if (metadata.common.picture && metadata.common.picture.length > 0)
           {
-            getTrackPicture(url).then((picture) =>
+            cacheImage(metadata.common.picture[0]).then((pictureUrl) =>
             {
-              resolve({
-                title: title,
-                artists: artists,
-                album: metadata.common.album,
-                picture: `url(${picture})`,
-                duration: metadata.format.duration
-              });
+              obj.picture = pictureUrl;
+
+              resolve(obj);
             });
-          });
-        }
-        else
-        {
-          return new Promise((resolve) =>
+          }
+          else
           {
-            resolve({
-              title: title,
-              artists: artists,
-              album: metadata.common.album,
-              picture: `url(${missingPicture})`,
-              duration: metadata.format.duration
-            });
-          });
-        }
+            resolve(obj);
+          }
+        });
       });
   }
 }
