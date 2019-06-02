@@ -8,6 +8,7 @@
   height: 7%;
 
   cursor: pointer;
+  border-radius: 5px;
 }
 
 .volumeBar.container
@@ -23,6 +24,7 @@
   height: 1vh;
 
   cursor: pointer;
+  border-radius: 5px;
   
   margin: 4px 0;
 }

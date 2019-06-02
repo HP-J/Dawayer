@@ -107,8 +107,9 @@
   width: 85%;
   height: fit-content;
 
+  overflow: hidden;
   border-radius: 5px;
-
+  
   font-family: Montserrat, sans-serif;
 }
 
@@ -119,8 +120,17 @@
   align-items: center;
   justify-content: center;
 
+  overflow: hidden;
+  border-radius: 5px;
+  
   width: 100%;
   height: auto;
+}
+
+.tracksGroup.container > .track.wrapper
+{
+  overflow: visible;
+  border-radius: 0px;
 }
 
 .track.container

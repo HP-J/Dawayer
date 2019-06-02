@@ -78,7 +78,7 @@
 .artistOverlay.cover,
 .artistOverlay.cover:after
 {
-  border-radius: 6px;
+  border-radius: 5px;
 }
 
 .artistOverlay.card

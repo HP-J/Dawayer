@@ -28,13 +28,14 @@
 {
   position: relative;
 
-  background-color: var(--color-4);
-
   min-width: 125px;
   max-width: 147px;
   max-height: fit-content;
   width: calc(14vw + 2vh);
   height: auto;
+
+  overflow: hidden;
+  border-radius: 5px;
 
   margin: 1.5%;
 }
