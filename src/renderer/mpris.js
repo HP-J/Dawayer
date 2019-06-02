@@ -4,6 +4,8 @@ import { join } from 'path';
 
 import Player from 'mpris-service';
 
+import * as settings from '../settings.js';
+
 import {
   on as onDawayer, getVolume, getPlayingMode,
   getSeekTime, getRepeatMode, getShuffleMode,
@@ -97,9 +99,20 @@ function mprisReceiveEvents()
       'xesam:title': trackObj.title,
       'xesam:artist': trackObj.artists,
       'xesam:album': trackObj.album,
-      'mpris:artUrl': `file://${trackObj.picture}`,
       'mpris:length': Math.floor(trackObj.duration) * 1000 * 1000
     };
+
+    // load cached track image
+    if (trackObj.picture)
+    {
+      settings.receiveCachedImage(trackObj.picture).then((imageUrl) =>
+      {
+        player.metadata = {
+          ...player.metadata,
+          'mpris:artUrl': `file://${imageUrl}`
+        };
+      });
+    }
     
     player.duration = trackObj.duration;
     player.seeked(0);

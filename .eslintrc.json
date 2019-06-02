@@ -26,7 +26,7 @@
     "brace-style": ["error", "allman"],
     "semi": ["error", "always"],
     "prefer-arrow-callback": "error",
-    "no-console": ["warn"],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
     "space-before-function-paren": ["error", "never"],
     "space-in-parens": ["error", "never"],
     "object-curly-spacing": ["error", "always"],

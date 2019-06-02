@@ -1,13 +1,8 @@
 import tippy from 'tippy.js';
 
 import { platform } from 'os';
-import { join } from 'path';
-
-import md5 from 'md5';
-import { existsSync, ensureDir, writeFile } from 'fs-extra';
 
 import * as settings from '../settings.js';
-import download from '../dl.js';
 
 import scroll from './scroll.js';
 import { initMPRISPlayer } from './mpris.js';
@@ -104,10 +99,6 @@ const nextButton = controlBar.querySelector('.nextButton');
 /**  @type { HTMLDivElement }
 */
 const skipButton = controlBar.querySelector('.skipButton');
-
-/** the directory where cached images are stored
-*/
-export const cachedImagesDirectory = join(settings.getDirectory(), 'CachedImages');
 
 /**  @type { HTMLDivElement }
 */
@@ -646,51 +637,6 @@ function onresize()
 }
 
 // API
-
-/** caches images locally from url or buffer and returns the image file path
-* @param { string | { data: Buffer } } image
-*/
-export function cacheImage(image)
-{
-  return new Promise((resolve, reject) =>
-  {
-    ensureDir(cachedImagesDirectory)
-      .then(() =>
-      {
-        let filename;
-
-        if (image.data !== undefined)
-          filename = join(cachedImagesDirectory, md5(image.data));
-        else
-          filename = join(cachedImagesDirectory, md5(image));
-
-        // if already cached return it
-        if (existsSync(filename))
-        {
-          resolve(filename);
-
-          return;
-        }
-        
-        // if buffer start write to disk
-        if (image.data !== undefined)
-        {
-          writeFile(filename, image.data).then(() => resolve(filename)).catch(reject);
-        }
-        // else download from the web
-        else
-        {
-          download(image, {
-            dir: cachedImagesDirectory,
-            filename: md5(image),
-            onDone: () => resolve(filename),
-            onError: reject
-          });
-        }
-      })
-      .catch(reject);
-  });
-}
 
 /** @param { string } classes
 * @param { string } [tagName]

@@ -10,7 +10,7 @@ import { Howl, Howler as howler } from 'howler';
 
 import * as settings from '../settings.js';
 
-import { cacheImage, createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode } from './renderer.js';
+import { createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode } from './renderer.js';
 import { artistsRegex, audioExtensionsRegex, defaultPicture, removeAllChildren } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
@@ -477,12 +477,21 @@ function shuffleArray(array)
 function updateCurrentCard(index)
 {
   queueCurrentElement.setAttribute('style', '');
-
-  queueCurrentElement.querySelector('.cover').style.backgroundImage =
-  playingBackground.style.backgroundImage = `url("${queue[index].picture}")`;
-
+ 
   queueCurrentElement.querySelector('.artist').innerText =  queue[index].artists.join(',');
   queueCurrentElement.querySelector('.title').innerText = queue[index].title;
+  queueCurrentElement.querySelector('.cover').style.backgroundImage =
+  playingBackground.style.backgroundImage = `url("${defaultPicture}")`;
+
+  // load cached track image
+  if (queue[index].picture)
+  {
+    settings.receiveCachedImage(queue[index].picture).then((imagePath) =>
+    {
+      queueCurrentElement.querySelector('.cover').style.backgroundImage =
+      playingBackground.style.backgroundImage = `url("${imagePath}")`;
+    });
+  }
 }
 
 /** @param { Storage } storage
@@ -492,8 +501,7 @@ function updateCurrentCard(index)
 */
 function getTrackMetadata(storage, url)
 {
-  if (storage && storage.tracks[url]
-  )
+  if (storage && storage.tracks[url])
   {
     return new Promise((resolve) =>
     {
@@ -501,7 +509,7 @@ function getTrackMetadata(storage, url)
         title: storage.tracks[url].title,
         artists: storage.tracks[url].artists,
         album: storage.tracks[url].album,
-        picture: storage.tracks[url].picture || defaultPicture,
+        picture: storage.tracks[url].picture,
         duration: storage.tracks[url].duration
       });
     });
@@ -517,30 +525,17 @@ function getTrackMetadata(storage, url)
         // auto split artists by comma
         artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
 
-        return new Promise((resolve) =>
-        {
-          const obj = {
-            title: title,
-            artists: artists,
-            album: metadata.common.album,
-            picture: defaultPicture,
-            duration: metadata.format.duration
-          };
+        const obj = {
+          title: title,
+          artists: artists,
+          album: metadata.common.album,
+          duration: metadata.format.duration
+        };
 
-          if (metadata.common.picture && metadata.common.picture.length > 0)
-          {
-            cacheImage(metadata.common.picture[0]).then((pictureUrl) =>
-            {
-              obj.picture = pictureUrl;
+        if (metadata.common.picture && metadata.common.picture.length > 0)
+          obj.picture = settings.cacheImage(metadata.common.picture[0]);
 
-              resolve(obj);
-            });
-          }
-          else
-          {
-            resolve(obj);
-          }
-        });
+        return obj;
       });
   }
 }
