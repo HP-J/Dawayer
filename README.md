@@ -28,5 +28,5 @@ This project is licensed under the [MIT](https://gitlab.com/hpj/Dawayer/blob/dev
 All icons inside the [icons](https://gitlab.com/hpj/Dawayer/tree/development/res) folder are made by us and are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 # Acknowledgments
-Dawayer's design is inspired by [Phonograph](https://play.google.com/store/apps/details?id=com.kabouzeid.gramophone).  
+the Queue design is inspired by [Phonograph](https://play.google.com/store/apps/details?id=com.kabouzeid.gramophone) created by [Karim Abou Zeid](https://kabouzeid.com/).  
 the Album design is inspired by this [dribble](https://dribbble.com/shots/4579038-Foodiefit-Interaction-studio-included) created by [Kreativa Studio](https://dribbble.com/KreativaStudio).  
