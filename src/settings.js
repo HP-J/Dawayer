@@ -11,29 +11,29 @@ import download from './dl.js';
 
 const currentlyCaching = {};
 
-const changes = new EventEmitter();
-
-/** the directory where the default app config is stored
+/** @type { Object<string, EventEmitter> }
 */
-export const configPath = join(getDirectory(), 'config.json');
+const changes = {};
 
 /** the directory where cached images are stored
 */
 export const cachedImagesDirectory = join(getDirectory(), 'CachedImages');
 
 /** @param { string } key
+* @param { string } [configKey]
 */
-export function has(key)
+export function has(key, configKey)
 {
-  return getConfig()[key] !== undefined;
+  return getConfig(configKey || 'config')[key] !== undefined;
 }
 
 /** @param { string } key
 * @param { any } [defaultValue]
+* @param { string } [configKey]
 */
-export function get(key, defaultValue)
+export function get(key, defaultValue, configKey)
 {
-  const obj = getConfig()[key];
+  const obj = getConfig(configKey || 'config')[key];
 
   if (obj !== undefined)
     return obj;
@@ -43,42 +43,65 @@ export function get(key, defaultValue)
 
 /** @param { string } key
 * @param { any } value
+* @param { string } [configKey]
 */
-export function set(key, value)
+export function set(key, value, configKey)
 {
-  const config = getConfig();
+  configKey = configKey || 'config' ;
+
+  const config = getConfig(configKey);
 
   config[key] = value;
 
-  changes.emit(key, value);
+  emitChange(key, value, configKey);
 
   saveConfig(config);
 }
 
 /** @param { string } key
+* @param { string } [configKey]
 */
-export function remove(key)
+export function remove(key, configKey)
 {
-  const config = getConfig();
+  configKey = configKey || 'config' ;
+
+  const config = getConfig(configKey);
 
   config[key] = undefined;
   
-  changes.emit(key, undefined);
+  emitChange(key, undefined, configKey);
 
   saveConfig(config);
 }
 
 /** @param { string } key
 * @param { (value: any) => void } callback
+* @param { string } [configKey]
 */
-export function onChange(key, callback)
+export function onChange(key, callback, configKey)
 {
-  changes.on(key, callback);
+  configKey = configKey || 'config' ;
+
+  if (changes[configKey] === undefined)
+    changes[configKey] = new EventEmitter();
+
+  changes[configKey].on(key, callback);
 }
 
-export function all()
+/** @param { any } value
+* @param { string } [configKey]
+*/
+function emitChange(key, value, configKey)
 {
-  return getConfig();
+  if (changes[configKey])
+    changes[configKey].emit(key, value);
+}
+
+/** @param { string } [configKey]
+*/
+export function all(configKey)
+{
+  return getConfig(configKey || 'config');
 }
 
 export function getDirectory()
@@ -185,15 +208,28 @@ export function receiveCachedImage(image)
   });
 }
 
-function getConfig()
+/** @param { string } [configKey]
+*/
+function getConfig(configKey)
 {
+  configKey = configKey || 'config';
+
+  const configPath = join(getDirectory(), configKey + '.json');
+
   if (existsSync(configPath))
     return JSON.parse(readFileSync(configPath));
   else
     return {};
 }
 
-function saveConfig(config)
+/** @param { {} } config
+* @param { string } [configKey]
+*/
+function saveConfig(config, configKey)
 {
+  configKey = configKey || 'config';
+
+  const configPath = join(getDirectory(), configKey + '.json');
+
   writeFileSync(configPath, JSON.stringify(config));
 }
