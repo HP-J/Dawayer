@@ -881,7 +881,7 @@ function appendArtistsPageItems(storage)
   }
 }
 
-function getTracksPlaceholder()
+function getTrackPlaceholder()
 {
   const placeholderWrapper = createElement('.track.wrapper.placeholder');
   const placeholderContainer = createElement('.track.container');
@@ -908,7 +908,7 @@ function getTracksPlaceholder()
 /** @param { HTMLDivElement } element
 * @param { { picture: string, artist: string[], title: string, url: string, duration: string } } options
 */
-function updateTracksElement(element, options)
+function updateTrackElement(element, options)
 {
   if (element.classList.contains('placeholder'))
     element.classList.remove('placeholder');
@@ -968,7 +968,7 @@ function appendTracksPageItems(storage)
   for (let i = 0; i < tracks.length; i++)
   {
     const track = storage.tracks[tracks[i]];
-    const placeholder = getTracksPlaceholder();
+    const placeholder = getTrackPlaceholder();
 
     let firstCharacter = track.title.substring(0, 1).toUpperCase();
 
@@ -1033,7 +1033,7 @@ function appendTracksPageItems(storage)
     
     img.onload = () =>
     {
-      updateTracksElement(placeholder, {
+      updateTrackElement(placeholder, {
         picture: img.src,
         artist: track.artists,
         title: track.title,
@@ -1229,7 +1229,7 @@ function showArtistOverlay(storage, artist)
 
     for (let i = 0; i < tracks.length; i++)
     {
-      const placeholder = getTracksPlaceholder();
+      const placeholder = getTrackPlaceholder();
       const trackElement = storage.tracks[tracks[i]].element;
 
       window.activeArtistOverlay.trackPlaceholders.push(placeholder);
