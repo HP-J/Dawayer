@@ -21,6 +21,7 @@ html(lang='en')
     link(rel='stylesheet' href='./renderer/styles/menu.css')
     link(rel='stylesheet' href='./renderer/styles/options.css')
     link(rel='stylesheet' href='./renderer/styles/podcasts.css')
+    link(rel='stylesheet' href='./renderer/styles/podcastOverlay.css')
     link(rel='stylesheet' href='./renderer/styles/queue.css')
     link(rel='stylesheet' href='./renderer/styles/tippy.css')
     link(rel='stylesheet' href='./renderer/styles/tracks.css')
@@ -116,10 +117,10 @@ html(lang='en')
 
       .page.podcasts
         .podcasts.wrapper
+          .podcasts.container
 
       .page.options
         .options.wrapper
-
           .options.container
             .optionsItem.localAudio
               .option.title Local Audio Directories

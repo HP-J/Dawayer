@@ -7,7 +7,7 @@ Features:
   ☐ research adding a streaming service support like (Spotify or Deezer or etc)
 
 UI/UX:
-  ☐ sketching the podcasts page
+  ☐ seek bar loading animation when track or podcast is loading/buffering
 
 CI/CD:
   ☐ release a Windows build after testing @help-needed
