@@ -478,7 +478,7 @@ function updateCurrentCard(index)
 {
   queueCurrentElement.setAttribute('style', '');
  
-  queueCurrentElement.querySelector('.artist').innerText =  queue[index].artists.join(',');
+  queueCurrentElement.querySelector('.artist').innerText =  queue[index].artists.join(', ');
   queueCurrentElement.querySelector('.title').innerText = queue[index].title;
   queueCurrentElement.querySelector('.cover').style.backgroundImage =
   playingBackground.style.backgroundImage = `url("${defaultPicture}")`;
@@ -879,7 +879,7 @@ function resortQueue(fromIndex)
     }
 
     // update the artist and the title
-    queueElements[i].children[1].innerText = queue[i].artists.join(',');
+    queueElements[i].children[1].innerText = queue[i].artists.join(', ');
     queueElements[i].children[2].innerText = queue[i].title;
   }
 }
