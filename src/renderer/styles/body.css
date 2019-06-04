@@ -1,10 +1,12 @@
-html
+body.defaultMode
 {
   --queueAndOptions: #A55050;
   --ControlBarAndShadows: #553737;
   --links: #97893C;
 
-  --whiteTextAndBackgrounds: white;
+  --whiteText: white;
+  --whiteBackgrounds: white;
+  
   --blackTextAndShadows: black;
   --emptyPercentageBar: #806969;
   --highlightedIcons: #7FFFD4;
@@ -16,6 +18,35 @@ html
 
   --placeholders-1: #E6E6E6;
   --placeholders-2: #DCD0D0;
+  --scrollbar: white;
+
+  --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
+  --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
+  --highlightedIconsShadows: #336947;
+  --maximizedQueueShadows: #6F3131;
+}
+
+body.darkMode
+{
+  --queueAndOptions: #272525;
+  --ControlBarAndShadows: #131212;
+  --links: #97893C;
+
+  --whiteText: white;
+  --whiteBackgrounds: white;
+
+  --blackTextAndShadows: black;
+  --emptyPercentageBar: #806969;
+  --highlightedIcons: #7FFFD4;
+  --queueNowPlayingCard: #964141;
+
+  --mainBackground: #0e0c0d;
+  --menuButtons: #5D4037;
+  --emptyNowPlayingPageBackground: #381E28;
+
+  --placeholders-1: #E6E6E6;
+  --placeholders-2: #DCD0D0;
+  --scrollbar: white;
 
   --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
   --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
@@ -64,8 +95,8 @@ body
 
 .icon
 {
-  fill: var(--whiteTextAndBackgrounds);
-  stroke: var(--whiteTextAndBackgrounds);
+  fill: var(--whiteText);
+  stroke: var(--whiteText);
 }
 
 .pages.container
@@ -218,5 +249,5 @@ input[type="number"]::-webkit-inner-spin-button
 
 ::-webkit-scrollbar-thumb
 {
-  background: var(--whiteTextAndBackgrounds);
+  background: var(--scrollbar);
 }
