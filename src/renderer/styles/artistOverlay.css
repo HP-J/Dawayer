@@ -35,7 +35,7 @@
 
   cursor: default;
 
-  background-color: var(--color-4);
+  background-color: var(--whiteTextAndBackgrounds);
 
   max-width: 870px;
   width: calc(85vw - 6%);
@@ -57,7 +57,7 @@
   position: fixed;
 
   opacity: 0;
-  background-color: var(--holder-1);
+  background-color: var(--activeOverlayBackgroundHolderAndShadows);
 
   pointer-events: all;
 
@@ -162,8 +162,8 @@
 
 .artistOverlay.hide:hover > .icon
 {
-  fill: var(--color-7);
-  stroke: var(--color-7);
+  fill: var(--highlightedIcons);
+  stroke: var(--highlightedIcons);
 }
 
 .artistOverlay.downward
@@ -197,9 +197,9 @@
 .artistOverlay.button,
 .artistOverlay.icon
 {
-  color: var(--color-5);
-  fill: var(--color-5);
-  stroke: var(--color-5);
+  color: var(--blackTextAndShadows);
+  fill: var(--blackTextAndShadows);
+  stroke: var(--blackTextAndShadows);
 
   white-space: pre-line;
   overflow: hidden;
@@ -223,7 +223,7 @@
 
 .artistOverlay.container > .albums.container > .album.wrapper:not(.placeholder)
 {
-  box-shadow: 0px 0px 40px -8px var(--color-5);
+  box-shadow: 0px 0px 40px -8px var(--blackTextAndShadows);
 }
 
 /* Track Style Inside Artist Overlay */
@@ -236,7 +236,7 @@
 
 .artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder)
 {
-  box-shadow: 0px 0px 40px -8px var(--color-5);
+  box-shadow: 0px 0px 40px -8px var(--blackTextAndShadows);
 }
 
 /* Font Sizes */

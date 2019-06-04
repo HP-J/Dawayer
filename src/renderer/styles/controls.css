@@ -1,6 +1,6 @@
 .seekBar.container
 {
-  background: linear-gradient(90deg, var(--color-4) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--color-6) 0%);
+  background: linear-gradient(90deg, var(--whiteTextAndBackgrounds) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
 
   min-height: 6px;
   max-height: 8px;
@@ -13,7 +13,7 @@
 
 .volumeBar.container
 {
-  background: linear-gradient(90deg, var(--color-4) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--color-6) 0%);
+  background: linear-gradient(90deg, var(--whiteTextAndBackgrounds) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
   
   min-width: 60px;
   max-width: 100px;
@@ -43,7 +43,7 @@
   width: calc(3.5vw + 5vh);
   height: 70%;
 
-  filter: drop-shadow(0px 0px 0px var(--holder-3));
+  filter: drop-shadow(0px 0px 0px var(--highlightedIconsShadows));
 
   transition-property: filter;
   transition-duration: 0.35s;
@@ -54,7 +54,7 @@
 .rewindButton:hover, .skipButton:hover, .shuffleButton:hover,
 .repeatButton:hover, .volumeButton:hover
 {
-  filter: drop-shadow(0px 0px 12px var(--holder-3));
+  filter: drop-shadow(0px 0px 12px var(--highlightedIconsShadows));
 }
 
 .playButton:hover > * > .icon > *, .previousButton:hover > .icon > *, .nextButton:hover > .icon > *,
@@ -62,9 +62,9 @@
 .repeatButton:hover > * > .icon > *, .volumeButton:hover > * .icon > *,
 .rewindButton:hover > .rewindTime, .skipButton:hover > .skipTime
 {
-  fill: var(--color-7);
-  stroke: var(--color-7);
-  color: var(--color-7);
+  fill: var(--highlightedIcons);
+  stroke: var(--highlightedIcons);
+  color: var(--highlightedIcons);
 }
 
 .playButton:active > * > .icon, .nextButton:active > .icon,
@@ -123,7 +123,7 @@
   align-items: center;
 
   position: absolute;
-  color: var(--color-4);
+  color: var(--whiteTextAndBackgrounds);
 
   width: 30%;
   height: 25%;

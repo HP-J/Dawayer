@@ -28,7 +28,7 @@
   z-index: -1;
   position: absolute;
 
-  background-color: var(--color-2);
+  background-color: var(--ControlBarAndShadows);
 
   top: 0;
   width: 100%;

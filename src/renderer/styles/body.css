@@ -1,26 +1,26 @@
 html
 {
-  --color-1: #A55050;
-  --color-2: #553737;
-  --color-3: #97893C;
+  --queueAndOptions: #A55050;
+  --ControlBarAndShadows: #553737;
+  --links: #97893C;
 
-  --color-4: white;
-  --color-5: black;
-  --color-6: #806969;
-  --color-7: #7FFFD4;
-  --color-8: #964141;
+  --whiteTextAndBackgrounds: white;
+  --blackTextAndShadows: black;
+  --emptyPercentageBar: #806969;
+  --highlightedIcons: #7FFFD4;
+  --queueNowPlayingCard: #964141;
 
-  --color-9: #E6E6E6;
-  --color-10: palevioletred;
-  --color-11: #5D4037;
-  --color-12: #4C3731;
-  --color-13: #381E28;
-  --color-14: #DCD0D0;
+  --mainBackground: palevioletred;
+  --menuButtons: #5D4037;
+  --emptyNowPlayingPageBackground: #381E28;
 
-  --holder-1: rgba(0, 0, 0, 0.5);
-  --holder-2: rgba(255, 255, 255, 0.5);
-  --holder-3: #336947;
-  --holder-4: #6F3131;
+  --placeholders-1: #E6E6E6;
+  --placeholders-2: #DCD0D0;
+
+  --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
+  --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
+  --highlightedIconsShadows: #336947;
+  --maximizedQueueShadows: #6F3131;
 }
 
 body
@@ -64,8 +64,8 @@ body
 
 .icon
 {
-  fill: var(--color-4);
-  stroke: var(--color-4);
+  fill: var(--whiteTextAndBackgrounds);
+  stroke: var(--whiteTextAndBackgrounds);
 }
 
 .pages.container
@@ -108,7 +108,7 @@ body
   position: absolute;
 
   background-image: url(../../../missing.png);
-  background-color: var(--color-13);
+  background-color: var(--emptyNowPlayingPageBackground);
   background-position: center;
   background-size: cover;
 
@@ -128,7 +128,7 @@ body
   z-index: -2;
   position: absolute;
 
-  background-color: var(--color-10);
+  background-color: var(--mainBackground);
 
   left: 0;
   width: 100%;
@@ -192,12 +192,12 @@ body
 {
   from
   {
-    background-color: var(--color-9);
+    background-color: var(--placeholders-1);
   }
 
   to
   {
-    background-color: var(--color-14);
+    background-color: var(--placeholders-2);
   }
 }
 
@@ -218,5 +218,5 @@ input[type="number"]::-webkit-inner-spin-button
 
 ::-webkit-scrollbar-thumb
 {
-  background: var(--color-4);
+  background: var(--whiteTextAndBackgrounds);
 }

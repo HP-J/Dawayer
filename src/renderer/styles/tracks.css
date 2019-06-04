@@ -63,7 +63,7 @@
 
 .tracks.characterNavigator
 {
-  color: var(--color-5);
+  color: var(--blackTextAndShadows);
   
   cursor: pointer;
   user-select: none;
@@ -74,7 +74,7 @@
 .tracks.characterNavigator:hover,
 .tracks.characterNavigator.selected
 {
-  color: var(--color-4);
+  color: var(--whiteTextAndBackgrounds);
 }
 
 .tracks.characterObserver
@@ -99,7 +99,7 @@
 .tracksGroup.container
 {
   position: sticky;
-  background-color: var(--color-4);
+  background-color: var(--whiteTextAndBackgrounds);
 
   top: 0;
 
@@ -149,7 +149,7 @@
   width: 100%;
   height: auto;
 
-  box-shadow: 0px 0px 0px 0px var(--holder-2);
+  box-shadow: 0px 0px 0px 0px var(--unavailableButtonsAndShadows);
 
   transition-property: box-shadow;
   transition-duration: 0.25s;
@@ -160,7 +160,7 @@
 {
   z-index: 1;
 
-  box-shadow: 0px 0px 14px -2px var(--holder-1);
+  box-shadow: 0px 0px 14px -2px var(--activeOverlayBackgroundHolderAndShadows);
 }
 
 .track.cover
@@ -232,7 +232,7 @@
 .track.title,
 .track.duration
 {
-  color: var(--color-5);
+  color: var(--blackTextAndShadows);
 
   white-space: pre-line;
   overflow: hidden;
@@ -245,7 +245,7 @@
 
 .track.artistLink
 {
-  color: var(--color-3);
+  color: var(--links);
 
   white-space: pre-line;
 }
@@ -281,7 +281,7 @@
 .track.placeholder > .container > .card > .title,
 .track.placeholder > .container > .card > .duration
 {
-  background-color: var(--color-9);
+  background-color: var(--placeholders-1);
 
   animation-name: placeholder-animation;
   animation-duration: 1s;

@@ -25,27 +25,27 @@
 .contextMenu.wrapper,
 .tippy-backdrop, .tippy-tooltip
 {
-  background-color: var(--color-5);
+  background-color: var(--blackTextAndShadows);
 }
 
 .tippy-popper[x-placement^='top'] .tippy-arrow
 {
-  border-top-color: var(--color-5);
+  border-top-color: var(--blackTextAndShadows);
 }
 
 .tippy-popper[x-placement^='bottom'] .tippy-arrow
 {
-  border-bottom-color: var(--color-5);
+  border-bottom-color: var(--blackTextAndShadows);
 }
 
 .tippy-popper[x-placement^='left'] .tippy-arrow
 {
-  border-left-color: var(--color-5);
+  border-left-color: var(--blackTextAndShadows);
 }
 
 .tippy-popper[x-placement^='right'] .tippy-arrow
 {
-  border-right-color: var(--color-5);
+  border-right-color: var(--blackTextAndShadows);
 }
 
 .contextMenu.item
@@ -58,7 +58,7 @@
 
 .contextMenu.item:hover
 {
-  color: var(--color-7);
+  color: var(--highlightedIcons);
 }
 
 .contextMenu.item ~ .contextMenu.item
@@ -71,7 +71,7 @@
 {
   user-select: none;
 
-  color: var(--color-4);
+  color: var(--whiteTextAndBackgrounds);
   
   font-family: Montserrat, sans-serif;
   font-size: calc(6px + 0.55vw + 0.3vh);
