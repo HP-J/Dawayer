@@ -71,7 +71,7 @@
 {
   user-select: none;
 
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
   
   font-family: Montserrat, sans-serif;
   font-size: calc(6px + 0.55vw + 0.3vh);

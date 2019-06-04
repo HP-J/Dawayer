@@ -28,7 +28,7 @@
 .optionsItem
 {
   background: var(--queueAndOptions);
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
 
   min-width: 315px;
   width: 80%;
@@ -99,7 +99,7 @@ input.option.controls
   width: 100%;
 
   background-color: transparent;
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
 
   outline: none; 
   border: none;
@@ -123,7 +123,7 @@ input.option.controls
 
 .option.button.highlight
 {
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
 
   filter: drop-shadow(0px 0px 8px var(--unavailableButtonsAndShadows));
 }

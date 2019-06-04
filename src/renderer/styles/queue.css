@@ -78,7 +78,7 @@
 .queue.playing.artist,
 .queue.playing.title
 {
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
 
   white-space: pre-line;
   overflow: hidden;
@@ -110,7 +110,7 @@
   grid-area: text;
   display: flex;
 
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
 
   width: 100%;
   height: auto;
@@ -175,7 +175,7 @@
   grid-template-rows: auto auto;
   grid-template-areas: "index artist" "index title";
 
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
   background-color: transparent;
 
   overflow: hidden;

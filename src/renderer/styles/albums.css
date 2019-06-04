@@ -67,7 +67,7 @@
 
   font-family: Montserrat, sans-serif;
 
-  background-color: var(--whiteTextAndBackgrounds);
+  background-color: var(--whiteBackgrounds);
   box-shadow: 0px 0px 0px 0px var(--activeOverlayBackgroundHolderAndShadows);
 
   transition-property: box-shadow;
@@ -92,7 +92,7 @@
   width: 100%;
   height: 100%;
 
-  background-color: var(--whiteTextAndBackgrounds);
+  background-color: var(--whiteBackgrounds);
   opacity: 0;
 
   transition-property: opacity;
@@ -175,7 +175,7 @@
   display: block;
   position: absolute;
 
-  background-color: var(--whiteTextAndBackgrounds);
+  background-color: var(--whiteBackgrounds);
 
   top: 0;
   width: 100%;

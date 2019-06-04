@@ -35,7 +35,7 @@
 
   cursor: default;
 
-  background-color: var(--whiteTextAndBackgrounds);
+  background-color: var(--whiteBackgrounds);
 
   max-width: 870px;
   width: calc(85vw - 6%);
@@ -221,7 +221,7 @@
   margin: 0;
 }
 
-.artistOverlay.container > .albums.container > .album.wrapper:not(.placeholder)
+.artistOverlay.container > .albums.container > .album.wrapper:not(.placeholder) > .album.container
 {
   box-shadow: 0px 0px 40px -8px var(--blackTextAndShadows);
 }
@@ -234,7 +234,7 @@
   margin: 0;
 }
 
-.artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder)
+.artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder) > .track.container
 {
   box-shadow: 0px 0px 40px -8px var(--blackTextAndShadows);
 }

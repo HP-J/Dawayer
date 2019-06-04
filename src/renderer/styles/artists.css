@@ -127,7 +127,7 @@
 .artist.stats
 {
   position: relative;
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
 
   width: 94%;
   height: fit-content;
@@ -153,7 +153,7 @@
 
 .artist.placeholder > .container
 {
-  background-color: var(--whiteTextAndBackgrounds);
+  background-color: var(--whiteBackgrounds);
   cursor: default;
 }
 

@@ -1,6 +1,6 @@
 .seekBar.container
 {
-  background: linear-gradient(90deg, var(--whiteTextAndBackgrounds) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
+  background: linear-gradient(90deg, var(--whiteBackgrounds) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
 
   min-height: 6px;
   max-height: 8px;
@@ -13,7 +13,7 @@
 
 .volumeBar.container
 {
-  background: linear-gradient(90deg, var(--whiteTextAndBackgrounds) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
+  background: linear-gradient(90deg, var(--whiteBackgrounds) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
   
   min-width: 60px;
   max-width: 100px;
@@ -123,7 +123,7 @@
   align-items: center;
 
   position: absolute;
-  color: var(--whiteTextAndBackgrounds);
+  color: var(--whiteText);
 
   width: 30%;
   height: 25%;
