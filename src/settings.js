@@ -63,15 +63,7 @@ export function set(key, value, configKey)
 */
 export function remove(key, configKey)
 {
-  configKey = configKey || 'config' ;
-
-  const config = getConfig(configKey);
-
-  config[key] = undefined;
-  
-  emitChange(key, undefined, configKey);
-
-  saveConfig(config);
+  set(key, undefined, configKey);
 }
 
 /** @param { string } key

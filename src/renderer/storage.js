@@ -204,7 +204,7 @@ export function initStorage()
     {
       event.preventDefault();
 
-      hideActiveArtistOverlay();
+      hideActiveOverlay();
     }
 
     // space button switches between pause and play
@@ -767,49 +767,51 @@ function createArtistOverlay()
   return overlayWrapper;
 }
 
-/** @param { HTMLDivElement } artistElement
-* @param { HTMLDivElement } overlayElement
+/** @param { HTMLDivElement } element
+* @param { HTMLDivElement } overlay
 * @param { { picture: string, title: string, summary: string, albums: string[], tracks: string[], storage: Storage } } options
 */
-function updateArtistElement(artistElement, overlayElement, options)
+function updateArtistElement(element, overlay, options)
 {
-  if (artistElement.classList.contains('placeholder'))
+  if (element.classList.contains('placeholder'))
   {
-    artistElement.classList.remove('placeholder');
+    element.classList.remove('placeholder');
 
-    overlayElement.querySelector('.artistOverlay.hide').onclick = hideActiveArtistOverlay;
+    overlay.querySelector('.artistOverlay.hide').onclick = hideActiveOverlay;
   }
 
   if (options.picture)
   {
-    artistElement.querySelector('.artist.cover').style.backgroundImage =
-    overlayElement.querySelector('.artistOverlay.cover').style.backgroundImage = `url(${options.picture})`;
+    element.querySelector('.artist.cover').style.backgroundImage =
+    overlay.querySelector('.artistOverlay.cover').style.backgroundImage = `url(${options.picture})`;
   }
 
   if (options.title)
   {
-    artistElement.querySelector('.artist.container').onclick = () => navigation('artists', options.title);
+    element.querySelector('.artist.container').onclick = () => navigation('artists', options.title);
 
-    artistElement.querySelector('.artist.title').innerText =
-    overlayElement.querySelector('.artistOverlay.title').innerText = options.title;
+    element.querySelector('.artist.title').innerText =
+    overlay.querySelector('.artistOverlay.title').innerText = options.title;
 
-    const playElement = overlayElement.querySelector('.artistOverlay.button');
+    const playElement = overlay.querySelector('.artistOverlay.button');
 
     playElement.innerText = 'Play';
     playElement.onclick = () => navigation('play-artist', options.title);
 
-    useContextMenu(artistElement, [ options.title ], 'artist', artistElement);
+    useContextMenu(element, [ options.title ], 'artist', element);
   }
 
   if (options.summary)
-    overlayElement.querySelector('.artistOverlay.summary').innerText = options.summary;
+  {
+    overlay.querySelector('.artistOverlay.summary').innerText = options.summary;
+  }
 
   if ((options.albums && options.albums.length > 0) || (options.tracks && options.tracks.length > 0))
   {
-    const stats = artistElement.querySelector('.artist.stats');
+    const stats = element.querySelector('.artist.stats');
 
-    const albumsText = overlayElement.querySelector('.text.albums');
-    const tracksText = overlayElement.querySelector('.text.tracks');
+    const albumsText = overlay.querySelector('.text.albums');
+    const tracksText = overlay.querySelector('.text.tracks');
 
     // clear the text for albums and track outside the overlay
     stats.innerText = '';
@@ -1211,10 +1213,8 @@ function showArtistOverlay(storage, artist)
     overlayElement.classList.add('active');
 
     const albums = storage.artists[artist].albums;
-    const tracks = storage.artists[artist].tracks;
 
     const overlayAlbumsContainer = overlayElement.querySelector('.albums.container');
-    const overlayTracksContainer = overlayElement.querySelector('.tracks.container');
 
     for (let i = 0; i < albums.length; i++)
     {
@@ -1226,6 +1226,10 @@ function showArtistOverlay(storage, artist)
       albumsContainer.replaceChild(placeholder, albumElement);
       overlayAlbumsContainer.appendChild(albumElement);
     }
+    
+    const tracks = storage.artists[artist].tracks;
+
+    const overlayTracksContainer = overlayElement.querySelector('.tracks.container');
 
     for (let i = 0; i < tracks.length; i++)
     {
@@ -1240,7 +1244,7 @@ function showArtistOverlay(storage, artist)
   }, 100);
 }
 
-function hideActiveArtistOverlay()
+export function hideActiveOverlay()
 {
   /** @type { { overlayElement: HTMLElement, visibility: string, albumPlaceholders: HTMLElement[], trackPlaceholders: HTMLElement[] } }
   */
@@ -1255,20 +1259,28 @@ function hideActiveArtistOverlay()
 
   setTimeout(() =>
   {
-    const overlayAlbumsContainer = activeOverlayObject.overlayElement.querySelector('.albums.container');
-    const overlayTracksContainer = activeOverlayObject.overlayElement.querySelector('.tracks.container');
-
     const albumPlaceholders = activeOverlayObject.albumPlaceholders;
-    const trackPlaceholders = activeOverlayObject.trackPlaceholders;
-
-    for (let i = 0; i < albumPlaceholders.length; i++)
+    
+    if (albumPlaceholders)
     {
-      albumsContainer.replaceChild(overlayAlbumsContainer.firstChild, albumPlaceholders[i]);
+      const overlayAlbumsContainer = activeOverlayObject.overlayElement.querySelector('.albums.container');
+
+      for (let i = 0; i < albumPlaceholders.length; i++)
+      {
+        albumsContainer.replaceChild(overlayAlbumsContainer.firstChild, albumPlaceholders[i]);
+      }
     }
 
-    for (let i = 0; i < trackPlaceholders.length; i++)
+    const trackPlaceholders = activeOverlayObject.trackPlaceholders;
+
+    if (trackPlaceholders)
     {
-      trackPlaceholders[i].parentElement.replaceChild(overlayTracksContainer.firstChild, trackPlaceholders[i]);
+      const overlayTracksContainer = activeOverlayObject.overlayElement.querySelector('.tracks.container');
+
+      for (let i = 0; i < trackPlaceholders.length; i++)
+      {
+        trackPlaceholders[i].parentElement.replaceChild(overlayTracksContainer.firstChild, trackPlaceholders[i]);
+      }
     }
   }, 100);
   

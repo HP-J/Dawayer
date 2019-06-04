@@ -29,4 +29,4 @@ All icons inside the [icons](https://gitlab.com/hpj/Dawayer/tree/development/res
 
 # Acknowledgments
 the Queue design is inspired by [Phonograph](https://play.google.com/store/apps/details?id=com.kabouzeid.gramophone) created by [Karim Abou Zeid](https://kabouzeid.com/).  
-the Album design is inspired by this [dribble](https://dribbble.com/shots/4579038-Foodiefit-Interaction-studio-included) created by [Kreativa Studio](https://dribbble.com/KreativaStudio).  
+the Album design is inspired by this [dribble](https://dribbble.com/shots/4579038-Foodiefit-Interaction-studio-included) created by [Kreativa Studio](https://dribbble.com/KreativaStudio/).  

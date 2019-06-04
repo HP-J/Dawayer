@@ -64,7 +64,7 @@ class SearchQuery
 /** search for a podcast on apple podcasts using a term
 * @param { string | { term: string, country: string, entry: string, lang: string, limit: number } } options
 */
-export function getPodcasts(options)
+export function searchPodcasts(options)
 {
   options = options || {};
 
