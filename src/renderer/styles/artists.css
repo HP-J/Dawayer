@@ -84,7 +84,7 @@
 
   display: block;
 
-  background-color: var(--blackBackground);
+  background-color: var(--activeOverlayBackgroundHolderAndShadows);
 
   top: 0;
   width: 100%;
@@ -99,8 +99,8 @@
 
 .artist.wrapper:not(.placeholder):hover > .container > .artist.cover:after
 {
-  background-color: var(--ControlBarAndShadows);
-  opacity: 0.35;
+  background-color: var(--activeOverlayBackgroundHolderAndShadows);
+  opacity: 0.55;
 }
 
 .artist.cover,
