@@ -42,7 +42,7 @@ let selectedLocalSubPage;
 
 /**  @type { HTMLDivElement }
 */
-const menu = document.body.querySelector('.menu.container');
+const menuContainer = document.body.querySelector('.menu.container');
 
 /**  @type { HTMLDivElement }
 */
@@ -58,11 +58,11 @@ const localSubPagesContainer = document.body.querySelector('.page.extended.local
 
 /**  @type { HTMLDivElement }
 */
-const playingButton = menu.children.item(0);
+const playingButton = menuContainer.children.item(0);
 
 /**  @type { HTMLDivElement }
 */
-const localButton = menu.children.item(1);
+const localButton = menuContainer.children.item(1);
 
 /**  @type { HTMLDivElement }
 */
@@ -70,11 +70,11 @@ const localIconsContainer = localButton.children[0];
 
 /**  @type { HTMLDivElement }
 */
-const podcastsButton = menu.children.item(2);
+const podcastsButton = menuContainer.children.item(2);
 
 /**  @type { HTMLDivElement }
 */
-const optionsButton = menu.children.item(3);
+const optionsButton = menuContainer.children.item(3);
 
 /**  @type { HTMLDivElement }
 */
@@ -403,12 +403,16 @@ function init()
   // enable MPRIS Player if on linux
   if (currentPlatform === 'linux')
     initMPRISPlayer();
+
+  initPages();
 }
 
 function initPages()
 {
   // set the default pages
   // the pages the user first sees when they starts the application
+
+  menuContainer.children.item(1).classList.add('selected');
 
   selectedPage = pagesContainer.children.item(1);
   selectedLocalIcon = localIconsContainer.children.item(0);
@@ -591,15 +595,15 @@ export function togglePodcastsPage(state)
 {
   if (state)
   {
-    menu.insertBefore(podcastsButton, menu.children[podcastsButton.index]);
+    menuContainer.insertBefore(podcastsButton, menuContainer.children[podcastsButton.index]);
     pagesContainer.insertBefore(podcastsButton.page, pagesContainer.children[podcastsButton.index]);
   }
   else
   {
-    podcastsButton.index = Array.prototype.indexOf.call(menu.children, podcastsButton);
+    podcastsButton.index = Array.prototype.indexOf.call(menuContainer.children, podcastsButton);
     podcastsButton.page = pagesContainer.children[podcastsButton.index];
 
-    menu.removeChild(podcastsButton);
+    menuContainer.removeChild(podcastsButton);
     pagesContainer.removeChild(podcastsButton.page);
 
     podcastsButton.page.style.display = 'none';
@@ -616,8 +620,6 @@ function resizeEnd()
 
 function onload()
 {
-  initPages();
-
   // remove fast-forward class from the html body
   resizeEnd();
 }
