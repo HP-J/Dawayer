@@ -50,8 +50,7 @@ function appendPodcastPlaceholder()
   const artist = createElement('.podcast.artist');
   const title = createElement('.podcast.title');
 
-  // const card = createElement('.podcast.card');
-  // const details = createElement('.podcasts');
+  const card = createElement('.podcast.card');
 
   placeholderWrapper.overlayElement = createPodcastOverlay();
 
@@ -61,9 +60,7 @@ function appendPodcastPlaceholder()
   podcastContainer.appendChild(artist);
   podcastContainer.appendChild(title);
 
-  // podcastContainer.appendChild(card);
-
-  // card.appendChild(details);
+  podcastContainer.appendChild(card);
 
   podcastsContainer.appendChild(placeholderWrapper);
 
