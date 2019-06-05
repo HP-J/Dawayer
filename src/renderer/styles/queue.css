@@ -196,13 +196,13 @@
   color: var(--unavailableButtonsAndShadows);
 }
 
-.queueItem.container:hover
+.queueItem.container:not(.clear):hover
 {
   cursor: pointer;
 }
 
-.queueItem.container:hover > .queueItem.title,
-.queueItem.container:hover > .queueItem.artist
+.queueItem.container:not(.clear):hover > .queueItem.title,
+.queueItem.container:not(.clear):hover > .queueItem.artist
 {
   text-decoration: underline;
 }
