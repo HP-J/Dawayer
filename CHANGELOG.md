@@ -1,9 +1,8 @@
 - added podcasts (disabled by default).
 - praise the linux gods, MPRIS Player support is here.
-- we're aware of Lastfm API Changes, we removed all of their APIs from Dawayer as a response, sorry for the inconvenience, we will have a solution soon.
 - support for opening a track file while Dawayer is already running.
 - round corners came from space and are everywhere now.
-- fixed an error that appears when scanning non-existing directories.
+- we're aware of Lastfm API changes, we removed all of their APIs from Dawayer as a response, sorry for the inconvenience, we will have a solution soon.
 - fixed a bug where shuffle always plays the first track instead of a random track.
 - fixed a bug where the previous button was doing the opposite of what it should be doing.
-- minor performance improvements... or huge it really depends on your rig.
+- other bug fixed and minor performance improvements.
