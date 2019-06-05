@@ -198,7 +198,7 @@
   width: fit-content;
   height: auto;
 
-  color: unset;
+  color: var(--blackText);
 
   word-break: break-word;
 
@@ -232,7 +232,7 @@
   display: flex;
   align-items: flex-end;
 
-  color: var(--blackTextAndShadows);
+  color: var(--blackText);
 
   font-weight: 700;
 }
@@ -240,6 +240,8 @@
 .album.artist
 {
   grid-area: artist;
+
+  color: var(--blackText);
 }
 
 .album.artistLink

@@ -63,7 +63,7 @@
 
 .tracks.characterNavigator
 {
-  color: var(--blackTextAndShadows);
+  color: var(--blackText);
   
   cursor: pointer;
   user-select: none;
@@ -229,7 +229,7 @@
 .track.title,
 .track.duration
 {
-  color: var(--blackTextAndShadows);
+  color: var(--blackText);
 
   white-space: pre-line;
   overflow: hidden;
@@ -238,6 +238,8 @@
 .track.artist
 {
   grid-area: artist;
+
+  color: var(--blackText);
 }
 
 .track.artistLink

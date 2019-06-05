@@ -7,8 +7,10 @@ body.defaultMode
   --whiteText: white;
   --whiteBackgrounds: white;
   
-  --blackTextAndShadows: black;
+  --blackText: black;
+  --blackBackground: black;
   --emptyPercentageBar: #806969;
+  --filledPercentageBar: white;
   --highlightedIcons: #7FFFD4;
   --queueNowPlayingCard: #964141;
 
@@ -33,25 +35,27 @@ body.darkMode
   --links: #97893C;
 
   --whiteText: white;
-  --whiteBackgrounds: white;
+  --whiteBackgrounds: #272525;
 
-  --blackTextAndShadows: black;
-  --emptyPercentageBar: #806969;
+  --blackText: white;
+  --blackBackground: #272525;
+  --emptyPercentageBar: #4b4b4b;
+  --filledPercentageBar: #d4d4d4;
   --highlightedIcons: #7FFFD4;
   --queueNowPlayingCard: #964141;
 
   --mainBackground: #0e0c0d;
-  --menuButtons: #5D4037;
-  --emptyNowPlayingPageBackground: #381E28;
+  --menuButtons: #272525;
+  --emptyNowPlayingPageBackground: #131212;
 
-  --placeholders-1: #E6E6E6;
+  --placeholders-1: #e6e6e6;
   --placeholders-2: #DCD0D0;
-  --scrollbar: white;
+  --scrollbar: #4b4b4b;
 
-  --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
+  --activeOverlayBackgroundHolderAndShadows: rgba(100, 98, 98, 0.5);
   --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
   --highlightedIconsShadows: #336947;
-  --maximizedQueueShadows: #6F3131;
+  --maximizedQueueShadows: #3f3838;
 }
 
 body

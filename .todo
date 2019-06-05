@@ -4,10 +4,17 @@ Performance Issues and Bugs:
 Testing:
 
 Features:
+  ☐ research feed & an api to get more accurate info about artist releases
+    (probably limited the same api as the streaming service without the streaming part)
+  
   ☐ research adding a streaming service support like (Spotify or Deezer or etc)
+  ☐ using the feed page add downloading feature make it flexible, so it can download podcasts or tracks alike
 
 UI/UX:
   ☐ seek bar loading animation when track or podcast is loading/buffering
+  
+  ☐ dark mode
+  ☐ light mode
 
 CI/CD:
   ☐ release a Windows build after testing @help-needed

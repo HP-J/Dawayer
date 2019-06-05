@@ -195,11 +195,12 @@
 .artistOverlay.title,
 .artistOverlay.summary,
 .artistOverlay.button,
-.artistOverlay.icon
+.artistOverlay.icon,
+.artistOverlay.text
 {
-  color: var(--blackTextAndShadows);
-  fill: var(--blackTextAndShadows);
-  stroke: var(--blackTextAndShadows);
+  color: var(--blackText);
+  fill: var(--blackText);
+  stroke: var(--blackText);
 
   white-space: pre-line;
   overflow: hidden;
@@ -223,7 +224,7 @@
 
 .artistOverlay.container > .albums.container > .album.wrapper:not(.placeholder) > .album.container
 {
-  box-shadow: 0px 0px 40px -8px var(--blackTextAndShadows);
+  box-shadow: 0px 0px 40px -8px var(--activeOverlayBackgroundHolderAndShadows);
 }
 
 /* Track Style Inside Artist Overlay */
@@ -236,7 +237,7 @@
 
 .artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder) > .track.container
 {
-  box-shadow: 0px 0px 40px -8px var(--blackTextAndShadows);
+  box-shadow: 0px 0px 40px -8px var(--activeOverlayBackgroundHolderAndShadows);
 }
 
 /* Font Sizes */

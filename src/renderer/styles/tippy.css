@@ -25,27 +25,27 @@
 .contextMenu.wrapper,
 .tippy-backdrop, .tippy-tooltip
 {
-  background-color: var(--blackTextAndShadows);
+  background-color: var(--blackBackground);
 }
 
 .tippy-popper[x-placement^='top'] .tippy-arrow
 {
-  border-top-color: var(--blackTextAndShadows);
+  border-top-color: var(--blackBackground);
 }
 
 .tippy-popper[x-placement^='bottom'] .tippy-arrow
 {
-  border-bottom-color: var(--blackTextAndShadows);
+  border-bottom-color: var(--blackBackground);
 }
 
 .tippy-popper[x-placement^='left'] .tippy-arrow
 {
-  border-left-color: var(--blackTextAndShadows);
+  border-left-color: var(--blackBackground);
 }
 
 .tippy-popper[x-placement^='right'] .tippy-arrow
 {
-  border-right-color: var(--blackTextAndShadows);
+  border-right-color: var(--blackBackground);
 }
 
 .contextMenu.item
