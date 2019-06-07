@@ -339,7 +339,7 @@ function scanCacheAppendFiles()
                 // auto split artists by comma
                 artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
 
-                const albumTitle = metadata.common.album || 'Other';
+                const albumTitle = undefined;
                 let albumArtist = metadata.common.albumartist || 'Unknown Artist';
 
                 // auto split artists by comma
@@ -350,7 +350,7 @@ function scanCacheAppendFiles()
                 storage.tracks[file] = {
                   title: title,
                   artists: artists,
-                  album: metadata.common.album,
+                  album: albumTitle,
                   duration: duration
                 };
 
@@ -386,8 +386,7 @@ function scanCacheAppendFiles()
                 }
 
                 // if the track belongs in an album, store the album
-                // if the track's album is in the storage object already
-                if (storage.albums[albumTitle])
+                if (albumTitle && storage.albums[albumTitle])
                 {
                   // push the new track to the album's list
                   storage.albums[albumTitle].tracks.push(file);
@@ -396,7 +395,8 @@ function scanCacheAppendFiles()
                   storage.albums[albumTitle].duration =
                 storage.albums[albumTitle].duration + duration;
                 }
-                else
+                // if the track belongs in an album and the track's album is already in storage
+                else if (albumTitle)
                 {
                   // add the album to the storage object
                   storage.albums[albumTitle] = {
@@ -414,14 +414,14 @@ function scanCacheAppendFiles()
                 
                   if (storage.artists[albumArtist[i]])
                   {
-                    if (!storage.artists[albumArtist[i]].albums.includes(albumTitle))
+                    if (albumTitle && !storage.artists[albumArtist[i]].albums.includes(albumTitle))
                       storage.artists[albumArtist[i]].albums.push(albumTitle);
                   }
                   else
                   {
                     storage.artists[albumArtist[i]] = {
                       tracks: [],
-                      albums: [ albumTitle ]
+                      albums: (albumTitle) ? [ albumTitle ] : undefined
                     };
                   }
                 }

@@ -197,7 +197,7 @@
   overflow: hidden;
 }
 
-.podcastOverlay.text
+.podcastOverlay.text:not(:empty)
 {
   font-weight: 700;
   margin: 3% 0 5px 0;

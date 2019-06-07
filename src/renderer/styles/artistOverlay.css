@@ -206,7 +206,7 @@
   overflow: hidden;
 }
 
-.artistOverlay.text
+.artistOverlay.text:not(:empty)
 {
   font-weight: 700;
   margin: 3% 0 5px 0;
@@ -227,6 +227,11 @@
   box-shadow: 0px 0px 40px -8px var(--activeOverlayBackgroundHolderAndShadows);
 }
 
+.artistOverlay.container > .albums.container:empty:after
+{
+  display: none;
+}
+
 /* Track Style Inside Artist Overlay */
 
 .artistOverlay.container > .tracks.container
@@ -238,6 +243,11 @@
 .artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder) > .track.container
 {
   box-shadow: 0px 0px 40px -8px var(--activeOverlayBackgroundHolderAndShadows);
+}
+
+.artistOverlay.container > .tracks.container:empty:after
+{
+  display: none;
 }
 
 /* Font Sizes */
