@@ -1,10 +1,6 @@
 .tracks.wrapper
 {
-  display: grid;
-
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto;
-  grid-template-areas: "container map";
+  display: flex;
 
   width: 100%;
   height: 100%;
@@ -20,9 +16,9 @@
 
 .tracks.container
 {
-  grid-area: container;
-
+  flex-grow: 1;
   display: flex;
+
   flex-wrap: wrap;
   justify-content: center;
 
@@ -32,11 +28,26 @@
   margin-bottom: 10px;
 }
 
+.tracks.container:empty:after
+{
+  content: "No tracks are available.";
+  display: flex;
+  position: relative;
+
+  align-items: center;
+  justify-content: center;
+
+  font-family: Montserrat, sans-serif;
+
+  color: var(--whiteText);
+  filter: drop-shadow(0px 0px 12px var(--activeOverlayBackgroundHolderAndShadows));
+  
+  width: 100%;
+  height: -webkit-fill-available;
+}
 
 .tracks.charactersWrapper
 {
-  grid-area: map;
-
   display: flex;
   align-items: flex-start;
 
@@ -336,6 +347,11 @@
 
 /* Font Sizes */
 
+.tracks.container:empty:after
+{
+  font-size: calc(6px + 0.5vw + 0.5vh);
+}
+
 .tracks.characterNavigator,
 .tracks.characterObserver
 {
@@ -351,6 +367,11 @@
 
 @media screen and (max-width: 800px)
 {
+  .tracks.container:empty:after
+  {
+    font-size: 9px;
+  }
+
   .tracks.characterNavigator,
   .tracks.characterObserver
   {
@@ -367,6 +388,11 @@
 
 @media screen and (min-width: 1020px)
 {
+  .tracks.container:empty:after
+  {
+    font-size: 12px;
+  }
+
   .tracks.characterNavigator,
   .tracks.characterObserver
   {

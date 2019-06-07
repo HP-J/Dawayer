@@ -24,6 +24,24 @@
   margin: 0% 5%;
 }
 
+.artists.container:empty:after
+{
+  content: "No artists are available.";
+  display: flex;
+  position: relative;
+
+  align-items: center;
+  justify-content: center;
+
+  font-family: Montserrat, sans-serif;
+
+  color: var(--whiteText);
+  filter: drop-shadow(0px 0px 12px var(--activeOverlayBackgroundHolderAndShadows));
+  
+  width: 100%;
+  height: -webkit-fill-available;
+}
+
 .artist.wrapper
 {
   position: relative;
@@ -190,6 +208,11 @@
 
 /* Font Sizes */
 
+.artists.container:empty:after
+{
+  font-size: calc(6px + 0.5vw + 0.5vh);
+}
+
 .artist.title,
 .artist.stats
 {
@@ -198,6 +221,11 @@
 
 @media screen and (max-width: 600px)
 {
+  .artists.container:empty:after
+  {
+    font-size: 9px;
+  }
+
   .artist.title,
   .artist.stats
   {
@@ -207,6 +235,11 @@
 
 @media screen and (min-width: 1020px)
 {
+  .artists.container:empty:after
+  {
+    font-size: 12px;
+  }
+
   .artist.title,
   .artist.stats
   {
