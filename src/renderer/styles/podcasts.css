@@ -82,7 +82,7 @@
   background-color: var(--whiteBackgrounds);
 
   left: 100%;
-  width: 60%;
+  width: 65%;
   height: 100%;
 
   padding: 0 5% 0 10%;
@@ -99,7 +99,7 @@
 
 .podcast.wrapper:not(.placeholder):hover > .container > .card
 {
-  left: 25%;
+  left: 20%;
 }
 
 .podcast.artist,
@@ -111,18 +111,25 @@
 .podcast.cover
 {
   grid-area: cover;
+  position: relative;
 
   background-size: cover;
   background-position: center;
 
+  left: 0;
   width: 40%;
   height: 100%;
 
   transform: scale(1.05);
 
-  transition-property: width;
+  transition-property: left;
   transition-duration: 0.5s;
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.podcast.wrapper:not(.placeholder):hover > .container > .cover
+{
+  left: -20%;
 }
 
 .podcast.cover:after
@@ -142,11 +149,6 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.podcast.wrapper:not(.placeholder):hover > .container > .cover
-{
-  width: 25%;
-}
-
 .podcast.wrapper:not(.placeholder):hover > .container > .cover:after
 {
   opacity: 0.75;
@@ -155,14 +157,26 @@
 .podcast.artist
 {
   grid-area: artist;
+  position: relative;
+
   display: flex;
   align-items: flex-end;
 
+  left: 0;
   width: 45%;
   height: 50%;
 
   overflow: hidden;
   font-weight: 900;
+
+  transition-property: left;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.podcast.wrapper:not(.placeholder):hover > .container > .artist
+{
+  left: -20%;
 }
 
 .podcast.title
@@ -184,39 +198,8 @@
 
 .podcast.wrapper:not(.placeholder):hover > .container > .title
 {
-  left: 25%;
+  left: 20%;
 }
-
-/* .podcast.card
-{
-  grid-area: card;
-  position: relative;
-
-  background-color: var(--whiteBackgrounds);
-
-  top: 0;
-
-  transition-property: top;
-  transition-duration: 0.35s;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-.podcast.wrapper:not(.placeholder):hover > .container > .card
-{
-  top: -100%;
-} */
-
-/* .podcast.details
-{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  height: 100%;
-
-  font-weight: 700;
-} */
 
 .podcast.title,
 .podcast.artist

@@ -33,6 +33,13 @@ export function initPodcasts()
   //   {
   //     console.log(feed);
   //   });
+
+  updatePodcastElement(appendPodcastPlaceholder(), {
+    picture: join(homedir(), 'Documents/why.jpeg'),
+    artist: 'The Verge',
+    title: 'Why\'d You Push That Button?',
+    summary: 'A Podcast About love and happiness'
+  });
 }
 
 function watchForPodcastsDisable(state)
@@ -145,11 +152,6 @@ function updatePodcastElement(element, options)
   if (options.summary)
   {
     element.overlayElement.querySelector('.podcastOverlay.summary').innerText = options.summary;
-  }
-
-  // if (options.details)
-  {
-    // element.querySelector('.podcast.details').innerText = /* options.details*/ 'TODO do better details';
   }
 
   // if (options.episodes)
