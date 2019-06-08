@@ -629,6 +629,24 @@ export function togglePodcastsPage(state)
   }
 }
 
+/** @param { boolean } state
+*/
+export function toggleSeekBarLoading(state)
+{
+  const indicator = seekBar.querySelector('.indicator');
+
+  if (state)
+  {
+    if (!indicator.classList.contains('loading'))
+      indicator.classList.add('loading');
+  }
+  else
+  {
+    if (indicator.classList.contains('loading'))
+      indicator.classList.remove('loading');
+  }
+}
+
 // Callbacks
 
 function resizeEnd()

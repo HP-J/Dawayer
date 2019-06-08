@@ -236,6 +236,19 @@ body
   }
 }
 
+@keyframes loading-animation
+{
+  from
+  {
+    left: -15%;
+  }
+
+  to
+  {
+    left: 100%;
+  }
+}
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button
 {

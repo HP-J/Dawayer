@@ -10,7 +10,7 @@ import { Howl, Howler as howler } from 'howler';
 
 import * as settings from '../settings.js';
 
-import { createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode } from './renderer.js';
+import { createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode, toggleSeekBarLoading } from './renderer.js';
 import { artistsRegex, audioExtensionsRegex, defaultPicture, removeAllChildren } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
@@ -165,6 +165,31 @@ export function setSeekTime(time, visualOnly, isInPercentage)
     
     events.emit('position', getSeekTime());
   }
+
+  // toggling seek-bar loading indicator
+
+  if (!currentHowl)
+  {
+    toggleSeekBarLoading(false);
+  }
+  else
+  {
+    if (currentHowl.state() !== 'loaded')
+    {
+      toggleSeekBarLoading(true);
+
+      currentHowl.once('load', () =>
+      {
+        toggleSeekBarLoading(false);
+      });
+    }
+    else
+    {
+      toggleSeekBarLoading(false);
+    }
+  }
+
+  // setting the seek-time
 
   if (playingIndex > -1 && currentHowl)
   {
