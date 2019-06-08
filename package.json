@@ -91,6 +91,7 @@
     "davefeedread": "^0.5.9",
     "fs-extra": "^8.0.1",
     "howler": "^2.1.2",
+    "javascript-time-ago": "^2.0.1",
     "lodash": "^4.17.11",
     "md5": "^2.2.1",
     "mpris-service": "^2.1.0",

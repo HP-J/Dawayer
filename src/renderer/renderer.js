@@ -2,12 +2,15 @@ import tippy from 'tippy.js';
 
 import { platform } from 'os';
 
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
 import * as settings from '../settings.js';
 
 import scroll from './scroll.js';
 import { initMPRISPlayer } from './mpris.js';
 
-import { initStorage, secondsToDuration } from './storage.js';
+import { initStorage } from './storage.js';
 import { initPodcasts } from './podcasts.js';
 import { initOptions } from './options.js';
 
@@ -23,6 +26,10 @@ import {
 */
 
 // Variables
+
+/** @type { TimeAgo }
+*/
+let timeAgo;
 
 let resizeEndTimeout;
 
@@ -375,7 +382,15 @@ function initBar(element, mousemove, mousedown)
 
 function init()
 {
+  // init variables
+
   const currentPlatform = platform();
+
+  TimeAgo.addLocale(en);
+
+  timeAgo = new TimeAgo('en-US');
+
+  // init functions
 
   initEvents();
   initTippy();
@@ -386,6 +401,8 @@ function init()
 
   initStorage();
   initPodcasts();
+
+  // setup
 
   setSeekTimeWithUI(getSeekTime(), true);
   initBar(seekBar, showSeekTime, setSeekTimeWithUI);
@@ -404,17 +421,19 @@ function init()
   if (currentPlatform === 'linux')
     initMPRISPlayer();
 
-  initPages();
+  // setup UI elements
+
+  setupPages();
 }
 
-function initPages()
+function setupPages()
 {
   // set the default pages
   // the pages the user first sees when they starts the application
 
-  menuContainer.children.item(1).classList.add('selected');
+  menuContainer.children.item(2).classList.add('selected');
 
-  selectedPage = pagesContainer.children.item(1);
+  selectedPage = pagesContainer.children.item(2);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
@@ -848,6 +867,51 @@ export function createContextMenu(element, menuItems, parentElement)
       waitThenHide();
     });
   }
+}
+
+/**@param { number } seconds
+*/
+export function secondsToDuration(seconds)
+{
+  const minutes = Math.floor(seconds / 60);
+
+  seconds = Math.floor(seconds - minutes * 60).toString();
+
+  if (seconds.length > 2)
+    seconds.substring(0, 2);
+  else if (seconds.length === 1)
+    seconds = `0${seconds}`;
+
+  return `${minutes}:${seconds}`;
+}
+
+/**@param { number } seconds
+*/
+export function secondsToHms(seconds)
+{
+  seconds = Number(seconds);
+
+  const hs = Math.floor(seconds / 3600);
+  const ms = Math.floor(seconds % 3600 / 60);
+  const ss = Math.floor(seconds % 3600 % 60);
+
+  const hoursString = hs > 0 ? hs + (hs == 1 ? ' hour' : ' hours') : '';
+  const minutesString = ms > 0 ? ms + (ms == 1 ? ' minute' : ' minutes') : '';
+  const secondsString = ss > 0 ? ss + (ss == 1 ? ' second' : ' seconds') : '';
+
+  if (hoursString)
+    return hoursString;
+  else if (minutesString)
+    return minutesString;
+  else
+    return secondsString;
+}
+
+/**@param { number } milliseconds
+*/
+export function millisecondsToTimeAgo(milliseconds)
+{
+  return timeAgo.format(milliseconds);
 }
 
 // initialize the app

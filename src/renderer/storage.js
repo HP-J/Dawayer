@@ -11,7 +11,7 @@ import * as settings from '../settings.js';
 
 import { parseFile as getMetadata } from 'music-metadata';
 
-import { createElement, createIcon, createContextMenu, switchPlayingMode } from './renderer.js';
+import { createElement, createIcon, createContextMenu, secondsToDuration, switchPlayingMode } from './renderer.js';
 
 import { appendDirectoryNode } from './options.js';
 import { queueStorageTracks } from './playback.js';
@@ -339,7 +339,7 @@ function scanCacheAppendFiles()
                 // auto split artists by comma
                 artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
 
-                const albumTitle = undefined;
+                const albumTitle = metadata.common.album;
                 let albumArtist = metadata.common.albumartist || 'Unknown Artist';
 
                 // auto split artists by comma
@@ -960,10 +960,11 @@ function updateTrackElement(element, options)
 */
 function appendTracksPageItems(storage)
 {
+  tracksPerCharacter = [];
+
   // remove all children from tracks pages
   removeAllChildren(tracksContainer);
-
-  tracksPerCharacter = [];
+  removeAllChildren(tracksCharactersScrollbar);
 
   const tracks = Object.keys(storage.tracks);
 
@@ -1348,20 +1349,4 @@ export function removeDirectory(directory)
 
   // remove the directory from the save file
   settings.set('audioDirectories', audioDirectories);
-}
-
-/**@param { number } seconds
-*/
-export function secondsToDuration(seconds)
-{
-  const minutes = Math.floor(seconds / 60);
-
-  seconds = Math.floor(seconds - minutes * 60).toString();
-
-  if (seconds.length > 2)
-    seconds.substring(0, 2);
-  else if (seconds.length === 1)
-    seconds = `0${seconds}`;
-
-  return `${minutes}:${seconds}`;
 }
