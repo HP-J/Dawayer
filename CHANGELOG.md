@@ -1,5 +1,6 @@
 - added podcasts (disabled by default).
 - praise the linux gods, MPRIS Player support is here.
+- added an experimental dark mode.
 - support for opening a track file while Dawayer is already running.
 - round corners came from space and are everywhere now.
 - we're aware of Lastfm API changes, we removed all of their APIs from Dawayer as a response, sorry for the inconvenience, we will have a solution soon.

@@ -55,6 +55,10 @@ const traySection = optionsPageElement.querySelector('.optionsItem.tray');
 
 /**  @type { HTMLDivElement }
 */
+const themingSection = optionsPageElement.querySelector('.optionsItem.theming');
+
+/**  @type { HTMLDivElement }
+*/
 const controlsSection = optionsPageElement.querySelector('.optionsItem.controls');
 
 /**  @type { HTMLDivElement }
@@ -98,6 +102,7 @@ export function initOptions()
   appendDirectories();
 
   appendTray();
+  appendTheming();
   appendControls();
   appendPodcasts();
 }
@@ -296,13 +301,43 @@ function appendTray()
 
   darkElement.onclick =
   blackElement.onclick =
-  lightElement.onclick = () =>
+  lightElement.onclick = (event) =>
   {
     traySection.querySelector('.currentColor').classList.remove('highlight', 'currentColor');
     
     event.srcElement.classList.add('highlight', 'currentColor');
 
     settings.set('trayIconColor', event.srcElement.classList[3]);
+  };
+}
+
+function appendTheming()
+{
+  const mode = settings.get('colorMode', 'default');
+
+  const defaultElement = themingSection.querySelector('.default');
+  const darkElement = themingSection.querySelector('.dark');
+
+  themingSection.querySelector(`.${mode}`).classList.add('highlight', 'currentMode');
+
+  document.body.classList.remove('defaultMode');
+  document.body.classList.add(`${mode}Mode`);
+
+  defaultElement.onclick =
+  darkElement.onclick = (event) =>
+  {
+    const currentMode = themingSection.querySelector('.currentMode').classList[3];
+    const newMode = event.srcElement.classList[3];
+
+    document.body.classList.remove(`${currentMode}Mode`);
+
+    document.body.classList.add(`${newMode}Mode`);
+
+    themingSection.querySelector('.currentMode').classList.remove('highlight', 'currentMode');
+
+    event.srcElement.classList.add('highlight', 'currentMode');
+ 
+    settings.set('colorMode', newMode);
   };
 }
 
@@ -376,7 +411,7 @@ function appendPodcasts()
     togglePodcastsPage(false);
 
   trueElement.onclick =
-  falseElement.onclick = () =>
+  falseElement.onclick = (event) =>
   {
     podcastsSection.querySelector('.currentState').classList.remove('highlight', 'currentState');
 
