@@ -97,14 +97,13 @@ export function initOptions()
     });
   });
   
-  appendAbout();
-
   appendDirectories();
-
-  appendTray();
-  appendTheming();
-  appendControls();
   appendPodcasts();
+  appendControls();
+  
+  appendTheming();
+  appendTray();
+  appendAbout();
 }
 
 /** appends a directory element in the options, allowing the user to see
@@ -178,6 +177,159 @@ function appendDirectories()
   localAudioSection.querySelector('.option.rescan').onclick = () =>
   {
     rescanStorage();
+  };
+}
+
+function appendPodcasts()
+{
+  const enabled = settings.get('podcasts', false);
+
+  const trueElement = podcastsSection.querySelector('.true');
+  const falseElement = podcastsSection.querySelector('.false');
+
+  podcastsSection.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
+
+  if (!enabled)
+    togglePodcastsPage(false);
+
+  trueElement.onclick =
+  falseElement.onclick = (event) =>
+  {
+    podcastsSection.querySelector('.currentState').classList.remove('highlight', 'currentState');
+
+    event.srcElement.classList.add('highlight', 'currentState');
+    
+    if (event.srcElement.isSameNode(trueElement))
+      settings.set('podcasts', true);
+    else
+      settings.set('podcasts', false);
+  };
+}
+
+function appendControls()
+{
+  const applyElement = controlsSection.querySelector('.apply');
+
+  const rewind = getRewindTiming();
+
+  rewindOptionInput.value = rewind;
+  rewindTimeText.innerText = rewind;
+  rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
+
+  const skip = getSkipTiming();
+
+  skipOptionInput.value = skip;
+  skipTimeText.innerText = skip;
+  skipTimeTooltip.setContent(`Skip ${skip}s`);
+
+  rewindOptionInput.tabIndex = skipOptionInput.tabIndex = -1;
+  
+  rewindOptionInput.oninput =
+  skipOptionInput.oninput = (event) =>
+  {
+    if (event.srcElement.value !== '')
+    {
+      if (event.srcElement.value > 99)
+        event.srcElement.value = 99;
+    
+      if (event.srcElement.value < 1)
+        event.srcElement.value = 1;
+    }
+
+    if (
+      rewindOptionInput.value == '' ||
+      skipOptionInput.value == '' ||
+      (getRewindTiming() == rewindOptionInput.value && getSkipTiming() == skipOptionInput.value))
+    {
+      if (!applyElement.classList.contains('clean'))
+        applyElement.classList.add('clean');
+    }
+    else
+    {
+      if (applyElement.classList.contains('clean'))
+        applyElement.classList.remove('clean');
+    }
+  };
+
+  applyElement.onclick = () =>
+  {
+    if (getRewindTiming() != rewindOptionInput.value)
+      changeRewindTiming(rewindOptionInput.value);
+
+    if (getSkipTiming() != skipOptionInput.value)
+      changeSkipTiming(skipOptionInput.value);
+    
+    applyElement.classList.add('clean');
+  };
+}
+
+function appendTheming()
+{
+  const mode = settings.get('colorMode', 'default');
+
+  const defaultElement = themingSection.querySelector('.default');
+  const darkElement = themingSection.querySelector('.dark');
+
+  themingSection.querySelector(`.${mode}`).classList.add('highlight', 'currentMode');
+
+  document.body.classList.remove('defaultMode');
+  document.body.classList.add(`${mode}Mode`);
+
+  defaultElement.onclick =
+  darkElement.onclick = (event) =>
+  {
+    const currentMode = themingSection.querySelector('.currentMode').classList[3];
+    const newMode = event.srcElement.classList[3];
+
+    document.body.classList.remove(`${currentMode}Mode`);
+
+    document.body.classList.add(`${newMode}Mode`);
+
+    themingSection.querySelector('.currentMode').classList.remove('highlight', 'currentMode');
+
+    event.srcElement.classList.add('highlight', 'currentMode');
+ 
+    settings.set('colorMode', newMode);
+  };
+}
+
+function appendTray()
+{
+  const enabled = settings.get('trayIcon', true);
+  const color = settings.get('trayIconColor', 'dark');
+
+  const trueElement = traySection.querySelector('.true');
+  const falseElement = traySection.querySelector('.false');
+
+  const darkElement = traySection.querySelector('.dark');
+  const blackElement = traySection.querySelector('.black');
+  const lightElement = traySection.querySelector('.light');
+
+  traySection.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
+  traySection.querySelector(`.${color}`).classList.add('highlight', 'currentColor');
+
+  trueElement.onclick =
+  falseElement.onclick = () =>
+  {
+    traySection.querySelector('.currentState').classList.remove('highlight', 'currentState');
+
+    event.srcElement.classList.add('highlight', 'currentState');
+    
+    if (event.srcElement.isSameNode(trueElement))
+      settings.set('trayIcon', true);
+    else
+      settings.set('trayIcon', false);
+  };
+
+  darkElement.onclick =
+  blackElement.onclick =
+  lightElement.onclick = (event) =>
+  {
+    traySection.querySelector('.currentColor').classList.remove('highlight', 'currentColor');
+    
+    event.srcElement.classList.add('highlight', 'currentColor');
+
+    settings.set('trayIconColor', event.srcElement.classList[3]);
   };
 }
 
@@ -269,159 +421,6 @@ function appendAbout()
     
     aboutButtonsElement.appendChild(checkElement);
   }
-}
-
-function appendTray()
-{
-  const enabled = settings.get('trayIcon', true);
-  const color = settings.get('trayIconColor', 'dark');
-
-  const trueElement = traySection.querySelector('.true');
-  const falseElement = traySection.querySelector('.false');
-
-  const darkElement = traySection.querySelector('.dark');
-  const blackElement = traySection.querySelector('.black');
-  const lightElement = traySection.querySelector('.light');
-
-  traySection.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
-  traySection.querySelector(`.${color}`).classList.add('highlight', 'currentColor');
-
-  trueElement.onclick =
-  falseElement.onclick = () =>
-  {
-    traySection.querySelector('.currentState').classList.remove('highlight', 'currentState');
-
-    event.srcElement.classList.add('highlight', 'currentState');
-    
-    if (event.srcElement.isSameNode(trueElement))
-      settings.set('trayIcon', true);
-    else
-      settings.set('trayIcon', false);
-  };
-
-  darkElement.onclick =
-  blackElement.onclick =
-  lightElement.onclick = (event) =>
-  {
-    traySection.querySelector('.currentColor').classList.remove('highlight', 'currentColor');
-    
-    event.srcElement.classList.add('highlight', 'currentColor');
-
-    settings.set('trayIconColor', event.srcElement.classList[3]);
-  };
-}
-
-function appendTheming()
-{
-  const mode = settings.get('colorMode', 'default');
-
-  const defaultElement = themingSection.querySelector('.default');
-  const darkElement = themingSection.querySelector('.dark');
-
-  themingSection.querySelector(`.${mode}`).classList.add('highlight', 'currentMode');
-
-  document.body.classList.remove('defaultMode');
-  document.body.classList.add(`${mode}Mode`);
-
-  defaultElement.onclick =
-  darkElement.onclick = (event) =>
-  {
-    const currentMode = themingSection.querySelector('.currentMode').classList[3];
-    const newMode = event.srcElement.classList[3];
-
-    document.body.classList.remove(`${currentMode}Mode`);
-
-    document.body.classList.add(`${newMode}Mode`);
-
-    themingSection.querySelector('.currentMode').classList.remove('highlight', 'currentMode');
-
-    event.srcElement.classList.add('highlight', 'currentMode');
- 
-    settings.set('colorMode', newMode);
-  };
-}
-
-function appendControls()
-{
-  const applyElement = controlsSection.querySelector('.apply');
-
-  const rewind = getRewindTiming();
-
-  rewindOptionInput.value = rewind;
-  rewindTimeText.innerText = rewind;
-  rewindTimeTooltip.setContent(`Rewind ${rewind}s`);
-
-  const skip = getSkipTiming();
-
-  skipOptionInput.value = skip;
-  skipTimeText.innerText = skip;
-  skipTimeTooltip.setContent(`Skip ${skip}s`);
-
-  rewindOptionInput.tabIndex = skipOptionInput.tabIndex = -1;
-  
-  rewindOptionInput.oninput =
-  skipOptionInput.oninput = (event) =>
-  {
-    if (event.srcElement.value !== '')
-    {
-      if (event.srcElement.value > 99)
-        event.srcElement.value = 99;
-    
-      if (event.srcElement.value < 1)
-        event.srcElement.value = 1;
-    }
-
-    if (
-      rewindOptionInput.value == '' ||
-      skipOptionInput.value == '' ||
-      (getRewindTiming() == rewindOptionInput.value && getSkipTiming() == skipOptionInput.value))
-    {
-      if (!applyElement.classList.contains('clean'))
-        applyElement.classList.add('clean');
-    }
-    else
-    {
-      if (applyElement.classList.contains('clean'))
-        applyElement.classList.remove('clean');
-    }
-  };
-
-  applyElement.onclick = () =>
-  {
-    if (getRewindTiming() != rewindOptionInput.value)
-      changeRewindTiming(rewindOptionInput.value);
-
-    if (getSkipTiming() != skipOptionInput.value)
-      changeSkipTiming(skipOptionInput.value);
-    
-    applyElement.classList.add('clean');
-  };
-}
-
-function appendPodcasts()
-{
-  const enabled = settings.get('podcasts', false);
-
-  const trueElement = podcastsSection.querySelector('.true');
-  const falseElement = podcastsSection.querySelector('.false');
-
-  podcastsSection.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
-
-  if (!enabled)
-    togglePodcastsPage(false);
-
-  trueElement.onclick =
-  falseElement.onclick = (event) =>
-  {
-    podcastsSection.querySelector('.currentState').classList.remove('highlight', 'currentState');
-
-    event.srcElement.classList.add('highlight', 'currentState');
-    
-    if (event.srcElement.isSameNode(trueElement))
-      settings.set('podcasts', true);
-    else
-      settings.set('podcasts', false);
-  };
 }
 
 /** @param { number } rewind

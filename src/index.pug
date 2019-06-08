@@ -20,6 +20,7 @@ html(lang='en')
     link(rel='stylesheet' href='./renderer/styles/fonts.css')
     link(rel='stylesheet' href='./renderer/styles/menu.css')
     link(rel='stylesheet' href='./renderer/styles/options.css')
+    link(rel='stylesheet' href='./renderer/styles/podcastImport.css')
     link(rel='stylesheet' href='./renderer/styles/podcastOverlay.css')
     link(rel='stylesheet' href='./renderer/styles/podcasts.css')
     link(rel='stylesheet' href='./renderer/styles/queue.css')
@@ -129,6 +130,11 @@ html(lang='en')
               .option.localAudio.buttons
                 .option.button.add Add
                 .option.button.rescan Rescan
+            .optionsItem.podcasts
+              .option.title Podcasts
+              .option.podcasts.buttons
+                .option.podcasts.button.true Enabled
+                .option.podcasts.button.false Disabled
             .optionsItem.controls
               .option.title Controls
               .option.text Rewind
@@ -136,13 +142,13 @@ html(lang='en')
               .option.text Skip
               input.option.controls.skip(type='number')
               .option.controls.button.apply.clean Apply
-            .optionsItem.podcasts
-              .option.title Podcasts
-              .option.podcasts.buttons
-                .option.podcasts.button.true Enabled
-                .option.podcasts.button.false Disabled
 
           .options.container
+            .optionsItem.theming
+              .option.title Theming
+              .option.theming.buttons
+                .option.theming.button.default Default
+                .option.theming.button.dark Dark (Experimental)
             .optionsItem.tray
               .option.applied Changes are applied after the app is restarted
               .option.title Tray
@@ -154,11 +160,6 @@ html(lang='en')
                 .option.tray.button.dark Dark
                 .option.tray.button.black Black
                 .option.tray.button.light Light
-            .optionsItem.theming
-              .option.title Theming
-              .option.theming.buttons
-                .option.theming.button.default Default
-                .option.theming.button.dark Dark (Experimental)
             .optionsItem.about
               .option.title About
 
