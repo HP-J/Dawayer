@@ -9,8 +9,7 @@ import { searchPodcasts, getPodcastFeedUrl } from './apple-podcasts.js';
 import request from 'request-promise-native';
 import feedParse from 'davefeedread';
 
-import { createElement, createIcon } from './renderer.js';
-import { hideActiveOverlay } from './storage.js';
+import { createElement, createIcon, removeAllChildren, hideActiveOverlay, secondsToHms, millisecondsToTimeAgo } from './renderer.js';
 
 const podcastsContainer = document.body.querySelector('.podcasts.container');
 
@@ -34,12 +33,12 @@ export function initPodcasts()
   //     console.log(feed);
   //   });
 
-  updatePodcastElement(appendPodcastPlaceholder(), {
-    picture: join(homedir(), 'Documents/why.jpeg'),
-    artist: 'The Verge',
-    title: 'Why\'d You Push That Button?',
-    summary: 'A Podcast About love and happiness'
-  });
+  // updatePodcastElement(appendPodcastPlaceholder(), {
+  //   picture: join(homedir(), 'Documents/why.jpeg'),
+  //   artist: 'The Verge',
+  //   title: 'Why\'d You Push That Button?',
+  //   summary: 'A Podcast About love and happiness'
+  // });
 }
 
 function watchForPodcastsDisable(state)
@@ -57,17 +56,29 @@ function appendPodcastPlaceholder()
   const artist = createElement('.podcast.artist');
   const title = createElement('.podcast.title');
 
-  const card = createElement('.podcast.card');
+  const episodesWrapper = createElement('.podcast.episodesWrapper');
+  const episodeContainer = createElement('.podcast.episodeContainer');
+
+  const episodeInfo = createElement('.podcast.episodeInfo');
+  const episodeTitle = createElement('.podcast.episodeTitle');
+
+  episodeInfo.innerText = 'No episodes are available';
 
   placeholderWrapper.overlayElement = createPodcastOverlay();
 
-  placeholderWrapper.appendChild(podcastContainer);
+  podcastContainer.onclick = () => showPodcastOverlay(placeholderWrapper.overlayElement);
 
   podcastContainer.appendChild(cover);
   podcastContainer.appendChild(artist);
   podcastContainer.appendChild(title);
+  
+  episodeContainer.appendChild(episodeInfo);
+  episodeContainer.appendChild(episodeTitle);
 
-  podcastContainer.appendChild(card);
+  episodesWrapper.appendChild(episodeContainer);
+  podcastContainer.appendChild(episodesWrapper);
+
+  placeholderWrapper.appendChild(podcastContainer);
 
   podcastsContainer.appendChild(placeholderWrapper);
 
@@ -93,6 +104,8 @@ function createPodcastOverlay()
   const podcastsText = createElement('.podcastOverlay.episodes.text');
   const podcastEpisodes = createElement('.podcastEpisodes.container');
 
+  overlayHide.onclick = hideActiveOverlay;
+
   overlayWrapper.appendChild(overlayContainer);
   
   overlayWrapper.appendChild(overlayBackground);
@@ -115,21 +128,12 @@ function createPodcastOverlay()
 
 /** @param { HTMLDivElement } element
 * @param { HTMLDivElement } element
-* @param { { picture: string, artist: string, title: string, summary: string } } options
+* @param { { picture: string, artist: string, title: string, summary: string, episodes: { title: string, published: number, duration: number }[] } } options
 */
 function updatePodcastElement(element, options)
 {
   if (element.classList.contains('placeholder'))
-  {
     element.classList.remove('placeholder');
-
-    element.onclick = () => showPodcastOverlay(element.overlayElement);
-    
-    element.overlayElement.querySelector('.podcastOverlay.hide').onclick = hideActiveOverlay;
-
-    // TODO
-    // useContextMenu(element, [ options.title ], 'album', element);
-  }
 
   if (options.picture)
   {
@@ -150,16 +154,65 @@ function updatePodcastElement(element, options)
   }
 
   if (options.summary)
-  {
     element.overlayElement.querySelector('.podcastOverlay.summary').innerText = options.summary;
-  }
 
-  // if (options.episodes)
+  if (options.episodes)
   {
     const episodesText = element.overlayElement.querySelector('.episodes.text');
-    const episodesContainer = element.overlayElement.querySelector('.podcastEpisodes.container');
-    
-    episodesText.innerText = 'Episodes';
+
+    const episodeContainer = element.querySelector('.podcast.episodeContainer');
+
+    const episodeInfo = episodeContainer.querySelector('.podcast.episodeInfo');
+    const episodeTitle = episodeContainer.querySelector('.podcast.episodeTitle');
+
+    episodesText.innerText = '';
+
+    episodeInfo.innerText = 'No episodes are available';
+    episodeTitle.innerText = '';
+
+    if (options.episodes && options.episodes.length > 0)
+    {
+      // overlay text label
+
+      episodesText.innerText = 'Episodes';
+
+      // show latest episode on the hover effect
+  
+      episodeInfo.innerText = `${millisecondsToTimeAgo(options.episodes[0].published)} · ${secondsToHms(options.episodes[0].duration)} left`;
+      episodeTitle.innerText = options.episodes[0].title;
+  
+      episodeContainer.onclick = (event) =>
+      {
+        // TODO queue podcast
+        event.stopPropagation();
+      };
+
+      // list all episodes in the overlay
+
+      /**  @type { HTMLDivElement }
+      */
+      const episodesContainer = element.overlayElement.querySelector('.podcastEpisodes.container');
+
+      // remove current episodes to add new ones
+      removeAllChildren(episodesContainer);
+
+      for (let i = 0; i < options.episodes.length; i++)
+      {
+        const episode = options.episodes[i];
+
+        const episodeContainer = createElement('.podcastEpisode.container');
+        const episodeInfo = createElement('.podcastEpisode.info');
+        const episodeTitle = createElement('.podcastEpisode.title');
+
+        episodeInfo.innerText = `${millisecondsToTimeAgo(episode.published)} · ${secondsToHms(episode.duration)} left`;
+        episodeTitle.innerText = episode.title;
+
+        episodeContainer.appendChild(episodeInfo);
+        episodeContainer.appendChild(episodeTitle);
+
+        episodesContainer.appendChild(episodeContainer);
+      }
+    }
   }
 }
 

@@ -10,8 +10,8 @@ import { Howl, Howler as howler } from 'howler';
 
 import * as settings from '../settings.js';
 
-import { createElement, createContextMenu, setSeekTimeWithUI, switchPlayingMode, toggleSeekBarLoading } from './renderer.js';
-import { artistsRegex, audioExtensionsRegex, defaultPicture, removeAllChildren } from './storage.js';
+import { createElement, createContextMenu, removeAllChildren, setSeekTimeWithUI, switchPlayingMode, toggleSeekBarLoading } from './renderer.js';
+import { artistsRegex, audioExtensionsRegex, defaultPicture } from './storage.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 

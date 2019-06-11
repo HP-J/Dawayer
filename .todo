@@ -1,16 +1,18 @@
 Performance Issues and Bugs: 
-  ☐ add a substitute after the removal of lastfm apis
+  ☐ add a substitute after the removal of lastfm apis (probably also the the same api as the streaming service)
 
 Testing:
 
 Features:
-  ☐ research feed & an api to get more accurate info about artist releases
-    (probably limited the same api as the streaming service without the streaming part)
+  ☐ research feed suggestions & an api to get more accurate info about artist releases
+    (probably the same api as the streaming service)
   
   ☐ research adding a streaming service support like (Spotify or Deezer or etc)
   ☐ using the feed page: add downloading feature and make it flexible, so that it can download podcasts or tracks alike
 
 UI/UX:
+  ☐ sketch the feed page
+
   ☐ dark mode
   ☐ light mode
 

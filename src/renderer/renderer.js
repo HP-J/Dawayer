@@ -887,6 +887,85 @@ export function createContextMenu(element, menuItems, parentElement)
   }
 }
 
+/** @param { HTMLElement } parent
+*/
+export function removeAllChildren(parent, fromIndex)
+{
+  if (fromIndex !== undefined)
+  {
+    const children = [ ...parent.children ];
+
+    children.slice(fromIndex);
+
+    for (let i = fromIndex; i < children.length; i++)
+    {
+      const child = children[i];
+  
+      parent.removeChild(child);
+    }
+  }
+  else
+  {
+    while (parent.lastChild)
+    {
+      parent.removeChild(parent.lastChild);
+    }
+  }
+
+}
+
+export function hideActiveOverlay()
+{
+  /** @type { { overlayElement: HTMLElement, visibility: string, albumPlaceholders: HTMLElement[], trackPlaceholders: HTMLElement[] } }
+  */
+  const activeOverlayObject = window.activeArtistOverlay;
+
+  // if no overlay is currently active then return
+  if (!activeOverlayObject)
+    return;
+
+  // hide the overlay from the user
+  activeOverlayObject.overlayElement.classList.remove('active');
+
+  setTimeout(() =>
+  {
+    const albumPlaceholders = activeOverlayObject.albumPlaceholders;
+    
+    if (albumPlaceholders)
+    {
+      const overlayAlbumsContainer = activeOverlayObject.overlayElement.querySelector('.albums.container');
+
+      for (let i = 0; i < albumPlaceholders.length; i++)
+      {
+        albumPlaceholders[i].parentElement.replaceChild(overlayAlbumsContainer.firstChild, albumPlaceholders[i]);
+      }
+    }
+
+    const trackPlaceholders = activeOverlayObject.trackPlaceholders;
+
+    if (trackPlaceholders)
+    {
+      const overlayTracksContainer = activeOverlayObject.overlayElement.querySelector('.tracks.container');
+
+      for (let i = 0; i < trackPlaceholders.length; i++)
+      {
+        trackPlaceholders[i].parentElement.replaceChild(overlayTracksContainer.firstChild, trackPlaceholders[i]);
+      }
+    }
+  }, 100);
+  
+  // wait the transaction time (0.35s)
+  // then return the rented element to their original places
+  setTimeout(() =>
+  {
+    // remove the overlay from body
+    document.body.removeChild(activeOverlayObject.overlayElement);
+
+    // set the active overlay as null
+    window.activeArtistOverlay = undefined;
+  }, 350);
+}
+
 /**@param { number } seconds
 */
 export function secondsToDuration(seconds)

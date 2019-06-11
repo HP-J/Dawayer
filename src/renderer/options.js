@@ -9,9 +9,9 @@ import request from 'request-promise-native';
 import * as settings from '../settings.js';
 import download from '../dl.js';
 
-import { createElement, togglePodcastsPage, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
+import { createElement, removeAllChildren, togglePodcastsPage, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
 
-import { addNewDirectories, removeDirectory, rescanStorage, removeAllChildren } from './storage.js';
+import { addNewDirectories, removeDirectory, rescanStorage } from './storage.js';
 import { getRewindTiming, setRewindTiming, getSkipTiming, setSkipTiming } from './playback.js';
 
 /** @typedef { Object } BuildData

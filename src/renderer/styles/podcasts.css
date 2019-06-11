@@ -91,37 +91,9 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.podcast.card
-{
-  position: absolute;
-
-  background-color: var(--whiteBackgrounds);
-
-  left: 100%;
-  width: 65%;
-  height: 100%;
-
-  padding: 0 5% 0 10%;
-
-  transition-property: left;
-  transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
 .podcast.wrapper:not(.placeholder):hover > .container
 {
   box-shadow: 0px 0px 20px -2px var(--activeOverlayBackgroundHolderAndShadows);
-}
-
-.podcast.wrapper:not(.placeholder):hover > .container > .card
-{
-  left: 20%;
-}
-
-.podcast.artist,
-.podcast.title
-{
-  padding: 0 5% 0 10%;
 }
 
 .podcast.cover
@@ -135,8 +107,6 @@
   left: 0;
   width: 40%;
   height: 100%;
-
-  transform: scale(1.05);
 
   transition-property: left;
   transition-duration: 0.5s;
@@ -203,7 +173,7 @@
   left: 40%;
   top: -50%;
   width: 45%;
-  height: 50%;
+  height: 45%;
 
   overflow: hidden;
 
@@ -217,10 +187,64 @@
   left: 20%;
 }
 
-.podcast.title,
-.podcast.artist
+.podcast.artist,
+.podcast.title
 {
   color: var(--blackText);
+  padding: 0 5% 0 10%;
+}
+
+.podcast.episodesWrapper
+{
+  position: absolute;
+  display: flex;
+
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  background-color: var(--whiteBackgrounds);
+
+  left: 100%;
+  width: 65%;
+  height: auto;
+  height: calc(100% - 40px);
+
+  padding: 20px 5% 20px 10%;
+  margin: 0;
+
+  transition-property: left;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.podcast.wrapper:not(.placeholder):hover > .container > .episodesWrapper
+{
+  left: 20%;
+}
+
+.podcast.episodeContainer
+{
+  color: var(--blackText);
+
+  width: 100%;
+  height: auto;
+}
+
+.podcast.episodeContainer:hover
+{
+  text-decoration: underline;
+}
+
+.podcast.episodeInfo,
+.podcast.episodeTitle
+{
+  flex-basis: 100%;
+}
+
+.podcast.episodeTitle
+{
+  font-weight: 600;
 }
 
 /* Content Placeholders */
@@ -259,12 +283,15 @@
   font-size: calc(6px + 0.5vw + 0.5vh);
 }
 
-.podcast.artist
+.podcast.artist,
+.podcast.episode,
+.podcast.episodeInfo
 {
   font-size: calc(6px + 0.5vw + 0.2vh);
 }
 
-.podcast.title
+.podcast.title,
+.podcast.episodeTitle
 {
   font-size: calc(7px + 0.5vw + 0.4vh);
 }
@@ -276,14 +303,17 @@
     font-size: 9px;
   }
 
-  .podcast.artist
+  .podcast.artist,
+  .podcast.episode,
+  .podcast.episodeInfo
   {
     font-size: 10px;
   }
 
-  .podcast.title
+  .podcast.title,
+  .podcast.episodeTitle
   {
-    font-size: 12px;
+    font-size: 11px;
   }
 }
 
@@ -294,13 +324,16 @@
     font-size: 12px;
   }
 
-  .podcast.artist
+  .podcast.artist,
+  .podcast.episode,
+  .podcast.episodeInfo
   {
-    font-size: 14px;
+    font-size: 13px;
   }
 
-  .podcast.title
+  .podcast.title,
+  .podcast.episodeTitle
   {
-    font-size: 16px;
+    font-size: 14px;
   }
 }

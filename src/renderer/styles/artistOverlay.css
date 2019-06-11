@@ -192,6 +192,11 @@
   height: fit-content;
 }
 
+.artistOverlay.summary:not(:empty)
+{
+  margin: 5px 0;
+}
+
 .artistOverlay.title,
 .artistOverlay.summary,
 .artistOverlay.button,
@@ -209,6 +214,7 @@
 .artistOverlay.text:not(:empty)
 {
   font-weight: 700;
+
   margin: 3% 0 5px 0;
 }
 
