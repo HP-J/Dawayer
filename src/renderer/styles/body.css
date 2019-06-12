@@ -50,7 +50,7 @@ body.darkMode
 
   --emptyPercentageBar: #4b4b4b;
   --filledPercentageBar: #d4d4d4;
-  --highlightedIcons: #4b4b4b;
+  --highlightedIcons: #965828;
   --queueNowPlayingCard: #1d1a1a;
 
   --mainBackground: #0e0c0d;
@@ -64,7 +64,7 @@ body.darkMode
   --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
   --artistMissingBackgroundAndShadows: rgba(54, 53, 53, 0.5);
   --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
-  --highlightedIconsShadows: #302f2f;
+  --highlightedIconsShadows: #6e4221;
   --maximizedQueueShadows: #3f3838;
 }
 
