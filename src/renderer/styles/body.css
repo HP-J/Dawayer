@@ -6,9 +6,13 @@ body.defaultMode
 
   --whiteText: white;
   --whiteBackgrounds: white;
+  --nullWhiteBackgrounds: rgba(255, 255, 255, 0);
   
   --blackText: black;
   --blackBackground: black;
+  --nullBlackBackground: rgba(0, 0, 0, 0);
+  --tipBackground: black;
+
   --emptyPercentageBar: #806969;
   --filledPercentageBar: white;
   --highlightedIcons: #7FFFD4;
@@ -23,6 +27,7 @@ body.defaultMode
   --scrollbar: white;
 
   --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
+  --artistMissingBackgroundAndShadows: rgba(0, 0, 0, 0.5);
   --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
   --highlightedIconsShadows: #336947;
   --maximizedQueueShadows: #6F3131;
@@ -36,9 +41,13 @@ body.darkMode
 
   --whiteText: white;
   --whiteBackgrounds: #272525;
+  --nullWhiteBackgrounds: rgba(39, 37, 37, 0);
 
   --blackText: white;
   --blackBackground: #272525;
+  --nullBlackBackground: rgba(39, 37, 37, 0);
+  --tipBackground: rgb(59, 59, 59);
+
   --emptyPercentageBar: #4b4b4b;
   --filledPercentageBar: #d4d4d4;
   --highlightedIcons: #7FFFD4;
@@ -52,7 +61,8 @@ body.darkMode
   --placeholders-2: #DCD0D0;
   --scrollbar: #4b4b4b;
 
-  --activeOverlayBackgroundHolderAndShadows: rgba(100, 98, 98, 0.5);
+  --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
+  --artistMissingBackgroundAndShadows: rgba(54, 53, 53, 0.5);
   --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
   --highlightedIconsShadows: #336947;
   --maximizedQueueShadows: #3f3838;

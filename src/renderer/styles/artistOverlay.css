@@ -1,4 +1,3 @@
-
 .artistOverlay.wrapper
 {
   z-index: 4;
@@ -137,8 +136,8 @@
 
 .artistOverlay.hide
 {
-  position: relative;
   grid-area: hide;
+  position: relative;
 
   min-width: 35px;
   max-width: 50px;
@@ -229,7 +228,7 @@
 
 .artistOverlay.container > .albums.container > .album.wrapper:not(.placeholder) > .album.container
 {
-  box-shadow: 0px 0px 40px -8px var(--activeOverlayBackgroundHolderAndShadows);
+  box-shadow: 0px 0px 40px 6px var(--activeOverlayBackgroundHolderAndShadows);
 }
 
 .artistOverlay.container > .albums.container:empty:after
@@ -247,7 +246,7 @@
 
 .artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder) > .track.container
 {
-  box-shadow: 0px 0px 40px -8px var(--activeOverlayBackgroundHolderAndShadows);
+  box-shadow: 0px 0px 40px 2px var(--activeOverlayBackgroundHolderAndShadows);
 }
 
 .artistOverlay.container > .tracks.container:empty:after

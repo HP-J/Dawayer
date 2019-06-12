@@ -36,7 +36,7 @@
   font-family: Montserrat, sans-serif;
 
   color: var(--whiteText);
-  filter: drop-shadow(0px 0px 12px var(--activeOverlayBackgroundHolderAndShadows));
+  filter: drop-shadow(0px 0px 12px var(--artistMissingBackgroundAndShadows));
   
   width: 100%;
   height: -webkit-fill-available;
@@ -84,7 +84,7 @@
   font-family: Montserrat, sans-serif;
 
   background-color: var(--whiteBackgrounds);
-  box-shadow: 0px 0px 0px 0px var(--activeOverlayBackgroundHolderAndShadows);
+  box-shadow: 0px 0px 0px 0px var(--artistMissingBackgroundAndShadows);
 
   transition-property: box-shadow;
   transition-duration: 0.5s;
@@ -93,7 +93,7 @@
 
 .podcast.wrapper:not(.placeholder):hover > .container
 {
-  box-shadow: 0px 0px 20px -2px var(--activeOverlayBackgroundHolderAndShadows);
+  box-shadow: 0px 0px 20px -2px var(--artistMissingBackgroundAndShadows);
 }
 
 .podcast.cover

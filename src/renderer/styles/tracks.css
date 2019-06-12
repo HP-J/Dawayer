@@ -40,7 +40,7 @@
   font-family: Montserrat, sans-serif;
 
   color: var(--whiteText);
-  filter: drop-shadow(0px 0px 12px var(--activeOverlayBackgroundHolderAndShadows));
+  filter: drop-shadow(0px 0px 12px var(--artistMissingBackgroundAndShadows));
   
   width: 100%;
   height: -webkit-fill-available;
@@ -158,6 +158,8 @@
   grid-template-rows: 100%;
   grid-template-areas: "cover card";
 
+  background-color: var(--whiteBackgrounds);
+
   cursor: pointer;
   overflow: hidden;
   user-select: none;
@@ -165,7 +167,7 @@
   width: 100%;
   height: auto;
   
-  box-shadow: 0px 0px 0px 0px var(--unavailableButtonsAndShadows);
+  box-shadow: 0px 0px 0px 0px var(--artistMissingBackgroundAndShadows);
   border-radius: 5px;
 
   transition-property: box-shadow;
@@ -177,7 +179,7 @@
 {
   z-index: 1;
 
-  box-shadow: 0px 0px 14px -2px var(--activeOverlayBackgroundHolderAndShadows);
+  box-shadow: 0px 0px 25px -2px var(--artistMissingBackgroundAndShadows);
 }
 
 .track.cover
@@ -210,7 +212,7 @@
   content: "";
   display: block;
 
-  background: linear-gradient(73deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 70%);
+  background: linear-gradient(73deg, var(--nullWhiteBackgrounds) 0%, var(--whiteBackgrounds) 70%);
 
   width: 105%;
   height: 105%;
@@ -218,7 +220,7 @@
 
 .track.wrapper:not(.placeholder):hover > .container > .track.cover:after
 {
-  background: linear-gradient(73deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 90%);
+  background: linear-gradient(73deg, var(--nullWhiteBackgrounds) 0%, var(--whiteBackgrounds) 90%);
 }
 
 .track.card
