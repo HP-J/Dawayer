@@ -94,7 +94,6 @@
   grid-template-rows: 50% 50%;
 
   grid-column-gap: 20px;
-  grid-row-gap: 2px;
 
   width: 100%;
   height: fit-content;
