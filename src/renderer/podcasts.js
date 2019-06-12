@@ -9,7 +9,7 @@ import { searchPodcasts, getPodcastFeedUrl } from './apple-podcasts.js';
 import request from 'request-promise-native';
 import feedParse from 'davefeedread';
 
-import { createElement, createIcon, removeAllChildren, hideActiveOverlay, secondsToHms, millisecondsToTimeAgo } from './renderer.js';
+import { createElement, createIcon, createContextMenu, removeAllChildren, hideActiveOverlay, secondsToHms, millisecondsToTimeAgo } from './renderer.js';
 
 const podcastsContainer = document.body.querySelector('.podcasts.container');
 
@@ -32,13 +32,6 @@ export function initPodcasts()
   //   {
   //     console.log(feed);
   //   });
-
-  // updatePodcastElement(appendPodcastPlaceholder(), {
-  //   picture: join(homedir(), 'Documents/why.jpeg'),
-  //   artist: 'The Verge',
-  //   title: 'Why\'d You Push That Button?',
-  //   summary: 'A Podcast About love and happiness'
-  // });
 }
 
 function watchForPodcastsDisable(state)
@@ -106,22 +99,21 @@ function createPodcastOverlay()
 
   overlayHide.onclick = hideActiveOverlay;
 
-  overlayWrapper.appendChild(overlayContainer);
-  
-  overlayWrapper.appendChild(overlayBackground);
-  overlayContainer.appendChild(overlayCard);
+  overlayHide.appendChild(overlayDownward);
 
   overlayCard.appendChild(overlayCover);
   overlayCard.appendChild(overlayHide);
   overlayCard.appendChild(overlayArtist);
   overlayCard.appendChild(overlayTitle);
 
-  overlayHide.appendChild(overlayDownward);
-
+  overlayContainer.appendChild(overlayCard);
   overlayContainer.appendChild(overlaySummary);
 
   overlayContainer.appendChild(podcastsText);
   overlayContainer.appendChild(podcastEpisodes);
+
+  overlayWrapper.appendChild(overlayContainer);
+  overlayWrapper.appendChild(overlayBackground);
 
   return overlayWrapper;
 }
@@ -170,6 +162,8 @@ function updatePodcastElement(element, options)
     episodeInfo.innerText = 'No episodes are available';
     episodeTitle.innerText = '';
 
+    episodeContainer.oncontextmenu = undefined;
+
     if (options.episodes && options.episodes.length > 0)
     {
       // overlay text label
@@ -186,6 +180,12 @@ function updatePodcastElement(element, options)
         // TODO queue podcast
         event.stopPropagation();
       };
+
+      // TODO queue podcast
+      createContextMenu(episodeContainer, {
+        'Play': () => {},
+        'Add to Queue': () => {}
+      }, element);
 
       // list all episodes in the overlay
 
@@ -211,6 +211,12 @@ function updatePodcastElement(element, options)
         episodeContainer.appendChild(episodeTitle);
 
         episodesContainer.appendChild(episodeContainer);
+
+        // TODO queue podcast
+        createContextMenu(episodeContainer, {
+          'Play': () => {},
+          'Add to Queue': () => {}
+        }, element);
       }
     }
   }
