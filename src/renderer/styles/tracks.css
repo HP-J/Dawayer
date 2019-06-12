@@ -175,6 +175,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.track.wrapper:not(.placeholder).contextHover > .container,
 .track.wrapper:not(.placeholder):hover > .container
 {
   z-index: 1;
@@ -201,6 +202,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.track.wrapper:not(.placeholder).contextHover > .container > .track.cover,
 .track.wrapper:not(.placeholder):hover > .container > .track.cover
 {
   width: 130%;
@@ -218,6 +220,7 @@
   height: 105%;
 }
 
+.track.wrapper:not(.placeholder).contextHover > .container > .track.cover:after,
 .track.wrapper:not(.placeholder):hover > .container > .track.cover:after
 {
   background: linear-gradient(73deg, var(--nullWhiteBackgrounds) 0%, var(--whiteBackgrounds) 90%);

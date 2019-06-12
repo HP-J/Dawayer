@@ -71,6 +71,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.artist.wrapper:not(.placeholder).contextHover > .container,
 .artist.wrapper:not(.placeholder):hover > .container
 {
   box-shadow: 0px 0px 11px 0px var(--ControlBarAndShadows);
@@ -91,6 +92,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.artist.wrapper:not(.placeholder).contextHover > .container > .artist.cover,
 .artist.wrapper:not(.placeholder):hover > .container > .artist.cover
 {
   transform: scale(1.2);
@@ -115,6 +117,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.artist.wrapper:not(.placeholder).contextHover > .container > .artist.cover:after,
 .artist.wrapper:not(.placeholder):hover > .container > .artist.cover:after
 {
   background-color: var(--artistMissingBackgroundAndShadows);

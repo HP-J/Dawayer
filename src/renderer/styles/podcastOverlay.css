@@ -222,6 +222,7 @@
   margin-top: 3%;
 }
 
+.podcastEpisode.container.contextHover,
 .podcastEpisode.container:hover
 {
   text-decoration: underline;

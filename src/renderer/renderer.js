@@ -776,15 +776,20 @@ export function createContextMenu(element, menuItems, parentElement)
     event.stopPropagation();
 
     // if there's any other opened context menu then remove it
-    if (global.openedMenu && !global.openedMenu.hidden)
+    if (global.openedMenu && !global.openedMenu.contextMenuWrapper.hidden)
     {
-      document.body.removeChild(global.openedMenu);
+      document.body.removeChild(global.openedMenu.contextMenuWrapper);
 
-      global.openedMenu.hidden = true;
+      global.openedMenu.element.classList.remove('contextHover');
+
+      if (global.openedMenu.parentElement)
+        global.openedMenu.parentElement.classList.remove('contextHover');
+
+      global.openedMenu.contextMenuWrapper.hidden = true;
     }
 
     // set this menu as the current opened menu
-    global.openedMenu = contextMenuWrapper;
+    global.openedMenu = { contextMenuWrapper, element, parentElement };
     
     // wait for an animation frame to get the correct size of the menu
     requestAnimationFrame(() =>
@@ -811,6 +816,11 @@ export function createContextMenu(element, menuItems, parentElement)
       {
         document.body.appendChild(contextMenuWrapper);
 
+        element.classList.add('contextHover');
+
+        if (parentElement)
+          parentElement.classList.add('contextHover');
+        
         contextMenuWrapper.hidden = false;
       }
     });
@@ -825,6 +835,11 @@ export function createContextMenu(element, menuItems, parentElement)
     {
       document.body.removeChild(contextMenuWrapper);
 
+      element.classList.remove('contextHover');
+
+      if (parentElement)
+        parentElement.classList.remove('contextHover');
+
       contextMenuWrapper.hidden = true;
     }
   });
@@ -837,6 +852,11 @@ export function createContextMenu(element, menuItems, parentElement)
     if (!contextMenuWrapper.hidden)
     {
       document.body.removeChild(contextMenuWrapper);
+
+      element.classList.remove('contextHover');
+
+      if (parentElement)
+        parentElement.classList.remove('contextHover');
 
       contextMenuWrapper.hidden = true;
     }
@@ -852,6 +872,11 @@ export function createContextMenu(element, menuItems, parentElement)
       )
       {
         document.body.removeChild(contextMenuWrapper);
+
+        element.classList.remove('contextHover');
+
+        if (parentElement)
+          parentElement.classList.remove('contextHover');
 
         contextMenuWrapper.hidden = true;
       }

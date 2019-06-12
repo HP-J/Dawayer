@@ -91,6 +91,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.podcast.wrapper:not(.placeholder).contextHover > .container,
 .podcast.wrapper:not(.placeholder):hover > .container
 {
   box-shadow: 0px 0px 20px -2px var(--artistMissingBackgroundAndShadows);
@@ -113,6 +114,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.podcast.wrapper:not(.placeholder).contextHover > .container > .cover,
 .podcast.wrapper:not(.placeholder):hover > .container > .cover
 {
   left: -20%;
@@ -135,6 +137,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.podcast.wrapper:not(.placeholder).contextHover > .container > .cover:after,
 .podcast.wrapper:not(.placeholder):hover > .container > .cover:after
 {
   opacity: 0.75;
@@ -160,6 +163,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.podcast.wrapper:not(.placeholder).contextHover > .container > .artist,
 .podcast.wrapper:not(.placeholder):hover > .container > .artist
 {
   left: -20%;
@@ -182,6 +186,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.podcast.wrapper:not(.placeholder).contextHover > .container > .title,
 .podcast.wrapper:not(.placeholder):hover > .container > .title
 {
   left: 20%;
@@ -218,6 +223,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.podcast.wrapper:not(.placeholder).contextHover > .container > .episodesWrapper,
 .podcast.wrapper:not(.placeholder):hover > .container > .episodesWrapper
 {
   left: 20%;
@@ -231,6 +237,7 @@
   height: auto;
 }
 
+.podcast.episodeContainer.contextHover,
 .podcast.episodeContainer:hover
 {
   text-decoration: underline;

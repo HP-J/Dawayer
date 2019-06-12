@@ -93,6 +93,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.album.wrapper:not(.placeholder).contextHover > .container,
 .album.wrapper:not(.placeholder):hover > .container
 {
   box-shadow: 0px 0px 20px -2px var(--artistMissingBackgroundAndShadows);
@@ -118,6 +119,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.album.wrapper:not(.placeholder).contextHover > .container:after,
 .album.wrapper:not(.placeholder):hover > .container:after
 {
   opacity: 0.825;
@@ -136,6 +138,7 @@
   overflow-y: hidden;
 }
 
+.album.wrapper:not(.placeholder).contextHover > .container > .tracks.
 .album.wrapper:not(.placeholder):hover > .container > .tracks
 {
   overflow-y: scroll;
@@ -159,6 +162,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.album.wrapper:not(.placeholder).contextHover > .container > .cover,
 .album.wrapper:not(.placeholder):hover > .container > .cover
 {
   height: 0;
@@ -203,6 +207,7 @@
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+.album.wrapper:not(.placeholder).contextHover > .container > .card:before,
 .album.wrapper:not(.placeholder):hover > .container > .card:before
 {
   top: 100%;
@@ -224,11 +229,13 @@
   margin-top: 3.5%;
 }
 
+.album.track.contextHover,
 .album.track:hover
 {
   text-decoration: underline;
 }
 
+.album.wrapper:not(.placeholder).contextHover > .container > .tracks > .track,
 .album.wrapper:not(.placeholder):hover > .container > .tracks > .track
 {
   opacity: 1;
@@ -291,6 +298,7 @@
   font-weight: 900;
 }
 
+.album.wrapper:not(.placeholder).contextHover > .container > .card > .duration,
 .album.wrapper:not(.placeholder):hover > .container > .card > .duration
 {
   opacity: 1;

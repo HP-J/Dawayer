@@ -48,6 +48,17 @@
   border-right-color: var(--tipBackground);
 }
 
+.contextMenu.container,
+.tippy-content
+{
+  user-select: none;
+
+  color: var(--whiteText);
+  
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+}
+
 .contextMenu.item
 {
   display: flex;
@@ -66,16 +77,12 @@
   margin-top: 3px;
 }
 
+/* Font Sizes */
+
 .contextMenu.container,
 .tippy-content
 {
-  user-select: none;
-
-  color: var(--whiteText);
-  
-  font-family: Montserrat, sans-serif;
   font-size: calc(6px + 0.55vw + 0.3vh);
-  font-weight: 700;
 }
 
 @media screen and (max-width: 600px)
