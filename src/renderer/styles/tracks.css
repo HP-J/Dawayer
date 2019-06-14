@@ -39,8 +39,8 @@
 
   font-family: Montserrat, sans-serif;
 
-  color: var(--whiteText);
-  filter: drop-shadow(0px 0px 12px var(--artistMissingBackgroundAndShadows));
+  color: var(--white-text);
+  filter: drop-shadow(0px 0px 12px var(--artist-missing-background-and-shadows));
   
   width: 100%;
   height: -webkit-fill-available;
@@ -62,7 +62,7 @@
   display: grid;
   position: sticky;
 
-  background-color: var(--whiteBackgrounds);
+  background-color: var(--white-background);
   
   top: 0;
 
@@ -83,7 +83,7 @@
   align-items: center;
   justify-content: center;
 
-  color: var(--blackText);
+  color: var(--black-text);
   
   cursor: pointer;
   user-select: none;
@@ -94,7 +94,7 @@
 .tracks.characterNavigator:hover,
 .tracks.characterNavigator.selected
 {
-  color: var(--mainBackground);
+  color: var(--main-background);
 }
 
 .tracks.characterObserver
@@ -119,7 +119,7 @@
 .tracksGroup.container
 {
   position: sticky;
-  background-color: var(--whiteBackgrounds);
+  background-color: var(--white-background);
 
   top: 0;
 
@@ -158,7 +158,7 @@
   grid-template-rows: 100%;
   grid-template-areas: "cover card";
 
-  background-color: var(--whiteBackgrounds);
+  background-color: var(--white-background);
 
   cursor: pointer;
   overflow: hidden;
@@ -167,7 +167,7 @@
   width: 100%;
   height: auto;
   
-  box-shadow: 0px 0px 0px 0px var(--artistMissingBackgroundAndShadows);
+  box-shadow: 0px 0px 0px 0px var(--artist-missing-background-and-shadows);
   border-radius: 5px;
 
   transition-property: box-shadow;
@@ -180,7 +180,7 @@
 {
   z-index: 1;
 
-  box-shadow: 0px 0px 25px -2px var(--artistMissingBackgroundAndShadows);
+  box-shadow: 0px 0px 25px -2px var(--artist-missing-background-and-shadows);
 }
 
 .track.cover
@@ -214,7 +214,7 @@
   content: "";
   display: block;
 
-  background: linear-gradient(73deg, var(--nullWhiteBackgrounds) 0%, var(--whiteBackgrounds) 70%);
+  background: linear-gradient(73deg, var(--null-white-background) 0%, var(--white-background) 70%);
 
   width: 105%;
   height: 105%;
@@ -223,7 +223,7 @@
 .track.wrapper:not(.placeholder).contextHover > .container > .track.cover:after,
 .track.wrapper:not(.placeholder):hover > .container > .track.cover:after
 {
-  background: linear-gradient(73deg, var(--nullWhiteBackgrounds) 0%, var(--whiteBackgrounds) 90%);
+  background: linear-gradient(73deg, var(--null-white-background) 0%, var(--white-background) 90%);
 }
 
 .track.card
@@ -254,7 +254,7 @@
 .track.title,
 .track.duration
 {
-  color: var(--blackText);
+  color: var(--black-text);
 
   white-space: pre-line;
   overflow: hidden;
@@ -264,12 +264,12 @@
 {
   grid-area: artist;
 
-  color: var(--blackText);
+  color: var(--black-text);
 }
 
 .track.artistLink
 {
-  color: var(--links);
+  color: var(--links-text);
 
   white-space: pre-line;
 }

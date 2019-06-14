@@ -1,26 +1,24 @@
 body.defaultMode
 {
-  --queueAndOptions: #A55050;
-  --ControlBarAndShadows: #553737;
-  --links: #97893C;
+  --queue-and-options-background: #A55050;
+  --control-bar-background: #553737;
+  --links-text: #97893C;
 
-  --whiteText: white;
-  --whiteBackgrounds: white;
-  --nullWhiteBackgrounds: rgba(255, 255, 255, 0);
+  --white-text: white;
+  --white-background: white;
+  --null-white-background: rgba(255, 255, 255, 0);
   
-  --blackText: black;
-  --blackBackground: black;
-  --nullBlackBackground: rgba(0, 0, 0, 0);
-  --tipBackground: black;
+  --black-text: black;
+  --tippy-background: black;
 
-  --emptyPercentageBar: #806969;
-  --filledPercentageBar: white;
-  --highlightedIcons: #7FFFD4;
-  --queueNowPlayingCard: #964141;
+  --empty-percentageBar: #806969;
+  --filled-percentageBar: white;
+  --accent-color: #7FFFD4;
+  --queue-now-playing-card-background: #964141;
 
-  --mainBackground: palevioletred;
-  --menuButtons: #5D4037;
-  --emptyNowPlayingPageBackground: #381E28;
+  --main-background: palevioletred;
+  --menu-buttons-background: #5D4037;
+  --empty-now-playing-page-background: #381E28;
 
   --placeholders-1: #E6E6E6;
   --placeholders-2: #DCD0D0;
@@ -28,36 +26,35 @@ body.defaultMode
   --search-border: white;
   --scrollbar: white;
 
-  --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
-  --artistMissingBackgroundAndShadows: rgba(0, 0, 0, 0.5);
-  --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
-  --highlightedIconsShadows: #336947;
-  --maximizedQueueShadows: #6F3131;
+  --active-overlay-holder-and-shadows: rgba(0, 0, 0, 0.5);
+  --artist-missing-background-and-shadows: rgba(0, 0, 0, 0.5);
+  --unavailable-buttons-and-shadows: rgba(255, 255, 255, 0.5);
+  
+  --accent-color-shadows: #336947;
+  --maximized-queue-shadows: #6F3131;
 }
 
 body.darkMode
 {
-  --queueAndOptions: #272525;
-  --ControlBarAndShadows: #131212;
-  --links: #97893C;
+  --queue-and-options-background: #272525;
+  --control-bar-background: #131212;
+  --links-text: #97893C;
 
-  --whiteText: white;
-  --whiteBackgrounds: #272525;
-  --nullWhiteBackgrounds: rgba(39, 37, 37, 0);
+  --white-text: white;
+  --white-background: #272525;
+  --null-white-background: rgba(39, 37, 37, 0);
 
-  --blackText: white;
-  --blackBackground: #272525;
-  --nullBlackBackground: rgba(39, 37, 37, 0);
-  --tipBackground: rgb(59, 59, 59);
+  --black-text: white;
+  --tippy-background: rgb(59, 59, 59);
 
-  --emptyPercentageBar: #4b4b4b;
-  --filledPercentageBar: #d4d4d4;
-  --highlightedIcons: #8281a5;
-  --queueNowPlayingCard: #1d1a1a;
+  --empty-percentageBar: #4b4b4b;
+  --filled-percentageBar: #d4d4d4;
+  --accent-color: #8281a5;
+  --queue-now-playing-card-background: #1d1a1a;
 
-  --mainBackground: #0e0c0d;
-  --menuButtons: #272525;
-  --emptyNowPlayingPageBackground: #131212;
+  --main-background: #0e0c0d;
+  --menu-buttons-background: #272525;
+  --empty-now-playing-page-background: #131212;
 
   --placeholders-1: #e6e6e6;
   --placeholders-2: #DCD0D0;
@@ -65,11 +62,11 @@ body.darkMode
   --search-border: white;
   --scrollbar: #4b4b4b;
 
-  --activeOverlayBackgroundHolderAndShadows: rgba(0, 0, 0, 0.5);
-  --artistMissingBackgroundAndShadows: rgba(54, 53, 53, 0.5);
-  --unavailableButtonsAndShadows: rgba(255, 255, 255, 0.5);
-  --highlightedIconsShadows: #565575;;
-  --maximizedQueueShadows: #3f3838;
+  --active-overlay-holder-and-shadows: rgba(0, 0, 0, 0.5);
+  --artist-missing-background-and-shadows: rgba(54, 53, 53, 0.5);
+  --unavailable-buttons-and-shadows: rgba(255, 255, 255, 0.5);
+  --accent-color-shadows: #565575;;
+  --maximized-queue-shadows: #3f3838;
 }
 
 body
@@ -113,8 +110,8 @@ body
 
 .icon
 {
-  fill: var(--whiteText);
-  stroke: var(--whiteText);
+  fill: var(--white-text);
+  stroke: var(--white-text);
 }
 
 .pages.container
@@ -157,7 +154,7 @@ body
   position: absolute;
 
   background-image: url(../../../missing.png);
-  background-color: var(--emptyNowPlayingPageBackground);
+  background-color: var(--empty-now-playing-page-background);
   background-position: center;
   background-size: cover;
 
@@ -177,7 +174,7 @@ body
   z-index: -2;
   position: absolute;
 
-  background-color: var(--mainBackground);
+  background-color: var(--main-background);
 
   left: 0;
   width: 100%;

@@ -1,6 +1,6 @@
 .seekBar.container
 {
-  background: linear-gradient(90deg, var(--filledPercentageBar) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
+  background: linear-gradient(90deg, var(--filled-percentageBar) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--empty-percentageBar) 0%);
 
   min-height: 6px;
   max-height: 8px;
@@ -37,7 +37,7 @@
 
   border-radius: 5px;
 
-  background-color: var(--filledPercentageBar);
+  background-color: var(--filled-percentageBar);
 
   animation-name: loading-animation;
   animation-duration: 1s;
@@ -48,7 +48,7 @@
 
 .volumeBar.container
 {
-  background: linear-gradient(90deg, var(--filledPercentageBar) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--emptyPercentageBar) 0%);
+  background: linear-gradient(90deg, var(--filled-percentageBar) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--empty-percentageBar) 0%);
   
   min-width: 60px;
   max-width: 100px;
@@ -80,7 +80,7 @@
   width: calc(3.5vw + 5vh);
   height: 70%;
 
-  filter: drop-shadow(0px 0px 0px var(--highlightedIconsShadows));
+  filter: drop-shadow(0px 0px 0px var(--accent-color-shadows));
 
   transition-property: filter;
   transition-duration: 0.35s;
@@ -91,7 +91,7 @@
 .rewindButton:hover, .skipButton:hover, .shuffleButton:hover,
 .repeatButton:hover, .volumeButton:hover
 {
-  filter: drop-shadow(0px 0px 12px var(--highlightedIconsShadows));
+  filter: drop-shadow(0px 0px 12px var(--accent-color-shadows));
 }
 
 .playButton:hover > * > .icon > *, .previousButton:hover > .icon > *, .nextButton:hover > .icon > *,
@@ -99,9 +99,9 @@
 .repeatButton:hover > * > .icon > *, .volumeButton:hover > * .icon > *,
 .rewindButton:hover > .rewindTime, .skipButton:hover > .skipTime
 {
-  fill: var(--highlightedIcons);
-  stroke: var(--highlightedIcons);
-  color: var(--highlightedIcons);
+  fill: var(--accent-color);
+  stroke: var(--accent-color);
+  color: var(--accent-color);
 }
 
 .playButton:active > * > .icon, .nextButton:active > .icon,
@@ -160,7 +160,7 @@
   align-items: center;
 
   position: absolute;
-  color: var(--whiteText);
+  color: var(--white-text);
 
   width: 30%;
   height: 25%;

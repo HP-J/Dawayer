@@ -39,7 +39,7 @@
 
   cursor: default;
 
-  background-color: var(--queueAndOptions);
+  background-color: var(--queue-and-options-background);
 
   min-width: 245px;
   max-width: 335px;
@@ -64,7 +64,7 @@
   position: fixed;
 
   opacity: 0;
-  background-color: var(--activeOverlayBackgroundHolderAndShadows);
+  background-color: var(--active-overlay-holder-and-shadows);
 
   pointer-events: all;
 
@@ -121,15 +121,15 @@
 .podcastCollectionOverlay.file > .icon,
 .podcastCollectionOverlay.hide > .icon
 {
-  fill: var(--whiteText);
-  stroke: var(--whiteText);
+  fill: var(--white-text);
+  stroke: var(--white-text);
 }
 
 .podcastCollectionOverlay.file:hover > .icon,
 .podcastCollectionOverlay.hide:hover > .icon
 {
-  fill: var(--highlightedIcons);
-  stroke: var(--highlightedIcons);
+  fill: var(--accent-color);
+  stroke: var(--accent-color);
 }
 
 .podcastCollectionOverlay.browse,
@@ -144,8 +144,8 @@
 
   background-color: unset;
 
-  color: var(--whiteText);
-  caret-color: var(--whiteText);
+  color: var(--white-text);
+  caret-color: var(--white-text);
 
   font-family: Montserrat, sans-serif;
 

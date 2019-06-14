@@ -35,8 +35,8 @@
 
   font-family: Montserrat, sans-serif;
 
-  color: var(--whiteText);
-  filter: drop-shadow(0px 0px 12px var(--artistMissingBackgroundAndShadows));
+  color: var(--white-text);
+  filter: drop-shadow(0px 0px 12px var(--artist-missing-background-and-shadows));
   
   width: 100%;
   height: -webkit-fill-available;
@@ -85,8 +85,8 @@
   
   font-family: Montserrat, sans-serif;
 
-  background-color: var(--whiteBackgrounds);
-  box-shadow: 0px 0px 0px 0px var(--artistMissingBackgroundAndShadows);
+  background-color: var(--white-background);
+  box-shadow: 0px 0px 0px 0px var(--artist-missing-background-and-shadows);
 
   transition-property: box-shadow;
   transition-duration: 0.5s;
@@ -96,7 +96,7 @@
 .album.wrapper:not(.placeholder).contextHover > .container,
 .album.wrapper:not(.placeholder):hover > .container
 {
-  box-shadow: 0px 0px 20px -2px var(--artistMissingBackgroundAndShadows);
+  box-shadow: 0px 0px 20px -2px var(--artist-missing-background-and-shadows);
 }
 
 .album.container:after
@@ -111,7 +111,7 @@
   width: 100%;
   height: 100%;
 
-  background-color: var(--whiteBackgrounds);
+  background-color: var(--white-background);
   opacity: 0;
 
   transition-property: opacity;
@@ -196,7 +196,7 @@
   display: block;
   position: absolute;
 
-  background-color: var(--whiteBackgrounds);
+  background-color: var(--white-background);
 
   top: 0;
   width: 100%;
@@ -220,7 +220,7 @@
   width: fit-content;
   height: auto;
 
-  color: var(--blackText);
+  color: var(--black-text);
 
   word-break: break-word;
 
@@ -256,7 +256,7 @@
   display: flex;
   align-items: flex-end;
 
-  color: var(--blackText);
+  color: var(--black-text);
 
   font-weight: 700;
 }
@@ -265,12 +265,12 @@
 {
   grid-area: artist;
 
-  color: var(--blackText);
+  color: var(--black-text);
 }
 
 .album.artistLink
 {
-  color: var(--links);
+  color: var(--links-text);
 }
 
 .album.artistLink:hover
@@ -285,7 +285,7 @@
   opacity: 0;
   display: flex;
 
-  color: var(--blackText);
+  color: var(--black-text);
 
   justify-content: flex-end;
   align-items: center;

@@ -34,7 +34,7 @@
 
   cursor: default;
 
-  background-color: var(--whiteBackgrounds);
+  background-color: var(--white-background);
 
   max-width: 870px;
   width: calc(85vw - 6%);
@@ -56,7 +56,7 @@
   position: fixed;
 
   opacity: 0;
-  background-color: var(--activeOverlayBackgroundHolderAndShadows);
+  background-color: var(--active-overlay-holder-and-shadows);
 
   pointer-events: all;
 
@@ -166,8 +166,8 @@
 
 .podcastOverlay.hide:hover > .icon
 {
-  fill: var(--highlightedIcons);
-  stroke: var(--highlightedIcons);
+  fill: var(--accent-color);
+  stroke: var(--accent-color);
 }
 
 .podcastOverlay.downward
@@ -192,9 +192,9 @@
 .podcastOverlay.icon,
 .podcastOverlay.text
 {
-  color: var(--blackText);
-  fill: var(--blackText);
-  stroke: var(--blackText);
+  color: var(--black-text);
+  fill: var(--black-text);
+  stroke: var(--black-text);
 
   white-space: pre-line;
   overflow: hidden;
@@ -217,7 +217,7 @@
   cursor: pointer;
   width: fit-content;
 
-  color: var(--blackText);
+  color: var(--black-text);
 
   margin-top: 3%;
 }

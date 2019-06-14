@@ -34,7 +34,7 @@
 
   cursor: default;
 
-  background-color: var(--whiteBackgrounds);
+  background-color: var(--white-background);
 
   max-width: 870px;
   width: calc(85vw - 6%);
@@ -56,7 +56,7 @@
   position: fixed;
 
   opacity: 0;
-  background-color: var(--activeOverlayBackgroundHolderAndShadows);
+  background-color: var(--active-overlay-holder-and-shadows);
 
   pointer-events: all;
 
@@ -160,8 +160,8 @@
 
 .artistOverlay.hide:hover > .icon
 {
-  fill: var(--highlightedIcons);
-  stroke: var(--highlightedIcons);
+  fill: var(--accent-color);
+  stroke: var(--accent-color);
 }
 
 .artistOverlay.downward
@@ -201,9 +201,9 @@
 .artistOverlay.icon,
 .artistOverlay.text
 {
-  color: var(--blackText);
-  fill: var(--blackText);
-  stroke: var(--blackText);
+  color: var(--black-text);
+  fill: var(--black-text);
+  stroke: var(--black-text);
 
   white-space: pre-line;
   overflow: hidden;
@@ -228,7 +228,7 @@
 
 .artistOverlay.container > .albums.container > .album.wrapper:not(.placeholder) > .album.container
 {
-  box-shadow: 0px 0px 40px 6px var(--activeOverlayBackgroundHolderAndShadows);
+  box-shadow: 0px 0px 40px 6px var(--active-overlay-holder-and-shadows);
 }
 
 .artistOverlay.container > .albums.container:empty:after
@@ -246,7 +246,7 @@
 
 .artistOverlay.container > .tracks.container > .track.wrapper:not(.placeholder) > .track.container
 {
-  box-shadow: 0px 0px 40px 2px var(--activeOverlayBackgroundHolderAndShadows);
+  box-shadow: 0px 0px 40px 2px var(--active-overlay-holder-and-shadows);
 }
 
 .artistOverlay.container > .tracks.container:empty:after

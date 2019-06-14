@@ -62,7 +62,7 @@
 
   position: absolute;
 
-  background-color: var(--menuButtons);
+  background-color: var(--menu-buttons-background);
 
   top: 0;
   height: 100%;
@@ -73,7 +73,7 @@
 
   border-radius: 30% / 50%;
 
-  box-shadow: 0px 0px 0px 0px var(--menuButtons);
+  box-shadow: 0px 0px 0px 0px var(--menu-buttons-background);
 
   transition-property: box-shadow, background-color;
   transition-duration: 0.25s;
@@ -115,5 +115,5 @@
 
 .submenuButton:hover
 {
-  color: var(--highlightedIcons);
+  color: var(--accent-color);
 }

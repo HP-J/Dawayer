@@ -27,8 +27,8 @@
 
 .optionsItem
 {
-  background: var(--queueAndOptions);
-  color: var(--whiteText);
+  background: var(--queue-and-options-background);
+  color: var(--white-text);
 
   min-width: 315px;
   width: 80%;
@@ -100,7 +100,7 @@ input.option.controls
   width: 100%;
 
   background-color: transparent;
-  color: var(--whiteText);
+  color: var(--white-text);
 
   outline: none; 
   border: none;
@@ -113,7 +113,7 @@ input.option.controls
 .option.podcasts.button,
 .option.clean
 {
-  color: var(--unavailableButtonsAndShadows);
+  color: var(--unavailable-buttons-and-shadows);
 }
 
 .option.button.highlight,
@@ -125,14 +125,14 @@ input.option.controls
 
 .option.button.highlight
 {
-  color: var(--whiteText);
+  color: var(--white-text);
 
-  filter: drop-shadow(0px 0px 8px var(--unavailableButtonsAndShadows));
+  filter: drop-shadow(0px 0px 8px var(--unavailable-buttons-and-shadows));
 }
 
 .option.button:not(.highlight):not(.clean):hover
 {
-  color: var(--highlightedIcons);
+  color: var(--accent-color);
 }
 
 .option.about.button
