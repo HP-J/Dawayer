@@ -1,0 +1,195 @@
+.podcastCollectionOverlay.wrapper
+{
+  z-index: 4;
+  position: fixed;
+
+  display: flex;
+  justify-content: center;
+
+  background-color: transparent;
+
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+  overflow-x: hidden;
+  overflow-y: overlay;
+
+  transition-property: top;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.podcastCollectionOverlay.wrapper.active
+{
+  top: 0;
+}
+
+.podcastCollectionOverlay.container
+{
+  display: grid;
+
+  grid-template-areas:
+  ". file hide"
+  "search search search"
+  "collection collection collection";
+  grid-template-columns: 1fr auto auto;
+
+  cursor: default;
+
+  background-color: var(--queueAndOptions);
+
+  min-width: 245px;
+  max-width: 335px;
+  width: calc(38vw - 5%);
+  height: fit-content;
+
+  pointer-events: all;
+  overflow: hidden;
+  user-select: none;
+
+  border-radius: 5px;
+
+  padding: 3%;
+  margin: 3% 0;
+
+  font-family: Montserrat, sans-serif;
+}
+
+.podcastCollectionOverlay.background
+{
+  z-index: -1;
+  position: fixed;
+
+  opacity: 0;
+  background-color: var(--activeOverlayBackgroundHolderAndShadows);
+
+  pointer-events: all;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  transition-property: opacity;
+  transition-duration: 0.25s;
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.podcastCollectionOverlay.wrapper.active > .podcastCollectionOverlay.background
+{
+  opacity: 1;
+}
+
+.podcastCollectionOverlay.file
+{
+  grid-area: file;
+}
+
+.podcastCollectionOverlay.hide
+{
+  grid-area: hide;
+}
+
+.podcastCollectionOverlay.file,
+.podcastCollectionOverlay.hide
+{
+  position: relative;
+
+  min-width: 35px;
+  max-width: 50px;
+  width: 5%;
+  height: fit-content;
+
+  cursor: pointer;
+}
+
+.podcastCollectionOverlay.file:after,
+.podcastCollectionOverlay.hide:after
+{
+  content: "";
+  display: block;
+
+  width: 100%;
+  height: 0;
+
+  padding-bottom: 100%;
+}
+
+.podcastCollectionOverlay.file > .icon,
+.podcastCollectionOverlay.hide > .icon
+{
+  fill: var(--whiteText);
+  stroke: var(--whiteText);
+}
+
+.podcastCollectionOverlay.file:hover > .icon,
+.podcastCollectionOverlay.hide:hover > .icon
+{
+  fill: var(--highlightedIcons);
+  stroke: var(--highlightedIcons);
+}
+
+.podcastCollectionOverlay.browse,
+.podcastCollectionOverlay.downward
+{
+  position: absolute;
+}
+
+.podcastCollectionOverlay.searchBar
+{
+  grid-area: search;
+
+  background-color: unset;
+
+  color: var(--whiteText);
+  caret-color: var(--whiteText);
+
+  font-family: Montserrat, sans-serif;
+
+  padding: 2px 0;
+  margin: 10px 0;
+
+  border: 0;
+  border-bottom: 2px var(--search-border) solid;
+}
+
+.podcastCollectionOverlay.searchBar::placeholder
+{
+  color: var(--search-placeholder);
+}
+
+.podcastCollectionOverlay.searchBar:focus
+{
+  outline: 0;
+}
+
+.podcastCollection.container
+{
+  grid-area: collection;
+}
+
+/* Font Sizes */
+
+.podcastCollectionOverlay.searchBar
+{
+ font-size: calc(7px + 0.5vw + 0.5vh);
+}
+
+@media screen and (max-width: 600px)
+{
+  .podcastCollectionOverlay.searchBar
+  {
+    font-size: 12px;
+  }
+}
+
+@media screen and (min-width: 1020px)
+{
+  .podcastCollectionOverlay.searchBar
+  {
+    font-size: 15px;
+  }
+}

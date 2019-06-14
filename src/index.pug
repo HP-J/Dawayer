@@ -20,7 +20,7 @@ html(lang='en')
     link(rel='stylesheet' href='./renderer/styles/fonts.css')
     link(rel='stylesheet' href='./renderer/styles/menu.css')
     link(rel='stylesheet' href='./renderer/styles/options.css')
-    link(rel='stylesheet' href='./renderer/styles/podcastImport.css')
+    link(rel='stylesheet' href='./renderer/styles/podcastCollection.css')
     link(rel='stylesheet' href='./renderer/styles/podcastOverlay.css')
     link(rel='stylesheet' href='./renderer/styles/podcasts.css')
     link(rel='stylesheet' href='./renderer/styles/queue.css')
@@ -132,9 +132,12 @@ html(lang='en')
                 .option.button.rescan Rescan
             .optionsItem.podcasts
               .option.title Podcasts
-              .option.podcasts.buttons
+              .option.podcasts.buttons.state
                 .option.podcasts.button.true Enabled
                 .option.podcasts.button.false Disabled
+              .option.title Collection
+              .option.podcasts.buttons.collection
+                .option.button.manage Manage Podcasts
             .optionsItem.controls
               .option.title Controls
               .option.text Rewind
@@ -152,11 +155,11 @@ html(lang='en')
             .optionsItem.tray
               .option.applied Changes are applied after the app is restarted
               .option.title Tray
-              .option.tray.buttons
+              .option.tray.buttons.state
                 .option.tray.button.true Enabled
                 .option.tray.button.false Disabled
-              .option.title Tray Color
-              .option.tray.buttons
+              .option.title Color
+              .option.tray.buttons.color
                 .option.tray.button.dark Dark
                 .option.tray.button.black Black
                 .option.tray.button.light Light

@@ -744,18 +744,15 @@ function createArtistOverlay()
 
   const tracksText = createElement('.artistOverlay.text.tracks');
   const tracksContainer = createElement('.tracks.container');
-
-  overlayWrapper.appendChild(overlayContainer);
   
-  overlayWrapper.appendChild(overlayBackground);
-  overlayContainer.appendChild(overlayCard);
+  overlayHide.appendChild(overlayDownward);
 
   overlayCard.appendChild(overlayCover);
   overlayCard.appendChild(overlayHide);
-  overlayHide.appendChild(overlayDownward);
   overlayCard.appendChild(overlayTitle);
   overlayCard.appendChild(overlayButton);
 
+  overlayContainer.appendChild(overlayCard);
   overlayContainer.appendChild(overlaySummary);
 
   overlayContainer.appendChild(albumsText);
@@ -763,6 +760,9 @@ function createArtistOverlay()
 
   overlayContainer.appendChild(tracksText);
   overlayContainer.appendChild(tracksContainer);
+
+  overlayWrapper.appendChild(overlayContainer);
+  overlayWrapper.appendChild(overlayBackground);
 
   return overlayWrapper;
 }

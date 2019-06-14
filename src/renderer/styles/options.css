@@ -75,7 +75,8 @@
 }
 
 .option.applied,
-.option.tray.buttons,
+.option.podcasts.buttons.state,
+.option.tray.buttons.state,
 input.option.controls
 {
   margin-bottom: 9px;

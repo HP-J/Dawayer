@@ -65,11 +65,11 @@ const localSubPagesContainer = document.body.querySelector('.page.extended.local
 
 /**  @type { HTMLDivElement }
 */
-const playingButton = menuContainer.children.item(0);
+export const playingButton = menuContainer.children.item(0);
 
 /**  @type { HTMLDivElement }
 */
-const localButton = menuContainer.children.item(1);
+export const localButton = menuContainer.children.item(1);
 
 /**  @type { HTMLDivElement }
 */
@@ -77,11 +77,11 @@ const localIconsContainer = localButton.children[0];
 
 /**  @type { HTMLDivElement }
 */
-const podcastsButton = menuContainer.children.item(2);
+export const podcastsButton = menuContainer.children.item(2);
 
 /**  @type { HTMLDivElement }
 */
-const optionsButton = menuContainer.children.item(3);
+export const optionsButton = menuContainer.children.item(3);
 
 /**  @type { HTMLDivElement }
 */
@@ -142,69 +142,6 @@ export let rewindTimeTooltip;
 /** @type { TippyInstance }
 */
 export let skipTimeTooltip;
-
-// Page Transactions
-
-/** @param { HTMLDivElement } element
-* @param { () => void } callback
-*/
-function changePage(element, callback)
-{
-  const selected = document.querySelector('.menuItem.selected');
-
-  if (selected !== element)
-  {
-    selected.classList.remove('selected');
-    element.classList.add('selected');
-
-    // get the index of the button
-    const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
-
-    // hide controls background in page is Now Playing
-    if (pageIndex === 0)
-    {
-      controlBar.classList.add('extended');
-    }
-    else
-    {
-      if (controlBar.classList.contains('extended'))
-        controlBar.classList.remove('extended');
-    }
-
-    // the index of the button is the same the the page
-    selectedPage = pagesContainer.children.item(pageIndex);
-
-    // scroll to the page
-    scroll(selectedPage, { callback: callback });
-
-    return true;
-  }
-  else
-  {
-    if (callback)
-      callback();
-
-    return false;
-  }
-}
-
-/** @param { number } index
-* @param { () => void } callback
-*/
-function changeLocalSubPage(index, callback)
-{
-  if ((index + 1) >= localIconsContainer.children.length)
-    index = 0;
-  else
-    index = index + 1;
-
-  selectedLocalIcon = localIconsContainer.children.item(index);
-  selectedLocalSubPage = localSubPagesContainer.children.item(index);
-
-  // smooth scroll to the sub-page and its icon
-  scroll(selectedLocalIcon, { direction: 'vertical' });
-  scroll(selectedLocalSubPage, { direction: 'vertical', callback: callback });
-}
 
 // Init
 
@@ -673,6 +610,70 @@ function onresize()
 
   // set a new resize-end timeout
   resizeEndTimeout = setTimeout(resizeEnd, 25);
+}
+
+
+// Page Transactions
+
+/** @param { HTMLDivElement } element
+* @param { () => void } callback
+*/
+export function changePage(element, callback)
+{
+  const selected = document.querySelector('.menuItem.selected');
+
+  if (selected !== element)
+  {
+    selected.classList.remove('selected');
+    element.classList.add('selected');
+
+    // get the index of the button
+    const pageIndex = Array.prototype.indexOf.call(element.parentElement.children, element);
+
+    // hide controls background in page is Now Playing
+    if (pageIndex === 0)
+    {
+      controlBar.classList.add('extended');
+    }
+    else
+    {
+      if (controlBar.classList.contains('extended'))
+        controlBar.classList.remove('extended');
+    }
+
+    // the index of the button is the same the the page
+    selectedPage = pagesContainer.children.item(pageIndex);
+
+    // scroll to the page
+    scroll(selectedPage, { callback: callback });
+
+    return true;
+  }
+  else
+  {
+    if (callback)
+      callback();
+
+    return false;
+  }
+}
+
+/** @param { number } index
+* @param { () => void } callback
+*/
+export function changeLocalSubPage(index, callback)
+{
+  if ((index + 1) >= localIconsContainer.children.length)
+    index = 0;
+  else
+    index = index + 1;
+
+  selectedLocalIcon = localIconsContainer.children.item(index);
+  selectedLocalSubPage = localSubPagesContainer.children.item(index);
+
+  // smooth scroll to the sub-page and its icon
+  scroll(selectedLocalIcon, { direction: 'vertical' });
+  scroll(selectedLocalSubPage, { direction: 'vertical', callback: callback });
 }
 
 // API

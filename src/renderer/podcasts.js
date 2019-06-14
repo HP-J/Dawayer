@@ -1,3 +1,5 @@
+import { remote } from 'electron';
+
 import * as settings from '../settings.js';
 
 import { homedir } from 'os';
@@ -9,9 +11,19 @@ import { searchPodcasts, getPodcastFeedUrl } from './apple-podcasts.js';
 import request from 'request-promise-native';
 import feedParse from 'davefeedread';
 
-import { createElement, createIcon, createContextMenu, removeAllChildren, hideActiveOverlay, secondsToHms, millisecondsToTimeAgo } from './renderer.js';
+import {
+  createElement, createIcon, createContextMenu,
+  changePage, removeAllChildren, hideActiveOverlay,
+  secondsToHms, millisecondsToTimeAgo, podcastsButton
+} from './renderer.js';
+
+const { mainWindow } = remote.require(join(__dirname, '../main/window.js'));
 
 const podcastsContainer = document.body.querySelector('.podcasts.container');
+
+/** @type { HTMLDivElement }
+*/
+let collectionOverlay;
 
 export function initPodcasts()
 {
@@ -32,6 +44,15 @@ export function initPodcasts()
   //   {
   //     console.log(feed);
   //   });
+
+  collectionOverlay = createPodcastCollectionOverlay();
+
+  // updatePodcastElement(appendPodcastPlaceholder(), {
+  //   picture: join(homedir(), 'Documents/why.jpeg'),
+  //   artist: 'The Verge',
+  //   title: 'Why\'d You Push That Button?',
+  //   summary: 'A Podcast About love and happiness',
+  // });
 }
 
 function watchForPodcastsDisable(state)
@@ -111,6 +132,58 @@ function createPodcastOverlay()
 
   overlayContainer.appendChild(podcastsText);
   overlayContainer.appendChild(podcastEpisodes);
+
+  overlayWrapper.appendChild(overlayContainer);
+  overlayWrapper.appendChild(overlayBackground);
+
+  return overlayWrapper;
+}
+
+function createPodcastCollectionOverlay()
+{
+  const overlayWrapper = createElement('.podcastCollectionOverlay.wrapper');
+  const overlayBackground = createElement('.podcastCollectionOverlay.background');
+  const overlayContainer = createElement('.podcastCollectionOverlay.container');
+
+  const overlayFile = createElement('.podcastCollectionOverlay.file');
+  const overlayBrowse = createIcon('browse', '.podcastCollectionOverlay.browse');
+  
+  const overlayHide = createElement('.podcastCollectionOverlay.hide');
+  const overlayDownward = createIcon('downward', '.podcastCollectionOverlay.downward');
+
+  const overlaySearchBar = createElement('.podcastCollectionOverlay.searchBar', 'input');
+  const overlayCollection = createElement('.podcastCollection.container');
+
+  overlaySearchBar.placeholder = 'Search for Podcasts';
+
+  overlayFile.onclick = () =>
+  {
+    remote.dialog.showOpenDialog(
+      mainWindow, {
+        title: 'Choose the podcast feed files',
+        properties: [ 'openFile', 'multiSelections' ]
+      }, (files) =>
+      {
+        addFromFiles(files);
+
+        // hide the overlay and go to podcasts page
+        // as a feedback that the process is done
+        hideActiveOverlay();
+        changePage(podcastsButton);
+      }
+    );
+  };
+
+  overlayHide.onclick = hideActiveOverlay;
+
+  overlayFile.appendChild(overlayBrowse);
+  overlayHide.appendChild(overlayDownward);
+
+  overlayContainer.appendChild(overlayFile);
+  overlayContainer.appendChild(overlayHide);
+
+  overlayContainer.appendChild(overlaySearchBar);
+  overlayContainer.appendChild(overlayCollection);
 
   overlayWrapper.appendChild(overlayContainer);
   overlayWrapper.appendChild(overlayBackground);
@@ -222,28 +295,6 @@ function updatePodcastElement(element, options)
   }
 }
 
-/** @param { HTMLElement } overlay
-*/
-function showPodcastOverlay(overlay)
-{
-  // only one overlay is to be shown at once
-  if (window.activeArtistOverlay)
-    return;
-  
-  window.activeArtistOverlay = {
-    overlayElement: overlay
-  };
-
-  // add the overlay to the body
-  document.body.appendChild(overlay);
-
-  // triggers the animation
-  setTimeout(() =>
-  {
-    overlay.classList.add('active');
-  }, 100);
-}
-
 /** @param { string } filename
 */
 function readFeedFile(filename)
@@ -298,4 +349,50 @@ function readFeedURL(url)
         reject(err);
       });
   });
+}
+
+/** @param { string[] } files
+*/
+function addFromFiles(files)
+{
+  for (let i = 0; i < files.length; i++)
+  {
+    // read each file feed then add it to collection
+    readFeedFile(files[i]).then((feed) => addPodcastToCollection(feed));
+  }
+}
+
+/** @param { {} } feed
+*/
+function addPodcastToCollection(feed)
+{
+  // TODO add podcast to collection
+  console.log(feed);
+}
+
+/** @param { HTMLElement } overlay
+*/
+function showPodcastOverlay(overlay)
+{
+  // only one overlay is to be shown at once
+  if (window.activeArtistOverlay)
+    return;
+  
+  window.activeArtistOverlay = {
+    overlayElement: overlay
+  };
+
+  // add the overlay to the body
+  document.body.appendChild(overlay);
+
+  // triggers the animation
+  setTimeout(() =>
+  {
+    overlay.classList.add('active');
+  }, 100);
+}
+
+export function showPodcastCollectionOverlay()
+{
+  showPodcastOverlay(collectionOverlay);
 }

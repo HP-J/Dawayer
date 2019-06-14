@@ -12,6 +12,8 @@ import download from '../dl.js';
 import { createElement, removeAllChildren, togglePodcastsPage, rewindTimeText, rewindTimeTooltip, skipTimeText, skipTimeTooltip } from './renderer.js';
 
 import { addNewDirectories, removeDirectory, rescanStorage } from './storage.js';
+import { showPodcastCollectionOverlay } from './podcasts.js';
+
 import { getRewindTiming, setRewindTiming, getSkipTiming, setSkipTiming } from './playback.js';
 
 /** @typedef { Object } BuildData
@@ -118,7 +120,7 @@ export function appendDirectoryNode(directory)
   directoryText.innerText = directory;
 
   const removeButton = createElement('.option.button');
-  removeButton.innerText = 'X';
+  removeButton.innerText = '✖';
 
   // don't remove the last directory
   if (localAudioDirectoriesContainer.children.length <= 0)
@@ -186,11 +188,19 @@ function appendPodcasts()
 
   const trueElement = podcastsSection.querySelector('.true');
   const falseElement = podcastsSection.querySelector('.false');
+  
+  const manageButton = podcastsSection.querySelector('.manage');
+
+  if (!enabled)
+  {
+    togglePodcastsPage(false);
+
+    manageButton.classList.add('clean');
+  }
 
   podcastsSection.querySelector(`.${enabled}`).classList.add('highlight', 'currentState');
 
-  if (!enabled)
-    togglePodcastsPage(false);
+  manageButton.onclick = showPodcastCollectionOverlay;
 
   trueElement.onclick =
   falseElement.onclick = (event) =>
@@ -200,9 +210,17 @@ function appendPodcasts()
     event.srcElement.classList.add('highlight', 'currentState');
     
     if (event.srcElement.isSameNode(trueElement))
+    {
       settings.set('podcasts', true);
+
+      manageButton.classList.remove('clean');
+    }
     else
+    {
       settings.set('podcasts', false);
+
+      manageButton.classList.add('clean');
+    }
   };
 }
 
