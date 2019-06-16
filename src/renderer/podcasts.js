@@ -47,6 +47,8 @@ export function initPodcasts()
 
   collectionOverlay = createPodcastCollectionOverlay();
 
+  // TODO load podcasts from the collection json
+
   // updatePodcastElement(appendPodcastPlaceholder(), {
   //   picture: join(homedir(), 'Documents/why.jpeg'),
   //   artist: 'The Verge',
@@ -189,6 +191,37 @@ function createPodcastCollectionOverlay()
   overlayWrapper.appendChild(overlayBackground);
 
   return overlayWrapper;
+}
+
+/** @param { string } picture
+* @param { { picture: string, artist: string, title: string } } options
+*/
+function createPodcastCollectionItem(options)
+{
+  const itemWrapper = createElement('.podcastCollection.itemWrapper');
+  const itemContainer = createElement('.podcastCollection.itemContainer');
+
+  const cover = createElement('.podcastCollection.cover');
+  const artist = createElement('.podcastCollection.artist');
+  const title = createElement('.podcastCollection.title');
+  const button = createElement('.podcastCollection.button');
+
+  cover.style.backgroundImage = `url(${options.picture})`;
+
+  artist.innerText = options.artist;
+  title.innerText = options.title;
+
+  // TODO change marks ✓
+  button.innerText = 'Remove';
+
+  itemContainer.appendChild(cover);
+  itemContainer.appendChild(artist);
+  itemContainer.appendChild(title);
+  itemContainer.appendChild(button);
+
+  itemWrapper.appendChild(itemContainer);
+
+  return itemWrapper;
 }
 
 /** @param { HTMLDivElement } element
@@ -366,8 +399,10 @@ function addFromFiles(files)
 */
 function addPodcastToCollection(feed)
 {
-  // TODO add podcast to collection
-  console.log(feed);
+  // TODO save the podcast to the  podcast collection json
+  const container = collectionOverlay.querySelector('.podcastCollection.container');
+
+  container.appendChild(createPodcastCollectionItem(feed));
 }
 
 /** @param { HTMLElement } overlay

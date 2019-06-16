@@ -19,6 +19,7 @@ body.defaultMode
   --main-background: palevioletred;
   --menu-buttons-background: #5D4037;
   --empty-now-playing-page-background: #381E28;
+  --now-playing-page-shadow: rgba(56, 30, 40, 0.45);
 
   --placeholders-1: #E6E6E6;
   --placeholders-2: #DCD0D0;
@@ -36,15 +37,15 @@ body.defaultMode
 
 body.darkMode
 {
-  --queue-and-options-background: #272525;
+  --queue-and-options-background: #1b1818;
   --control-bar-background: #131212;
   --links-text: #97893C;
 
-  --white-text: white;
+  --white-text: #e6e6e6;
   --white-background: #272525;
   --null-white-background: rgba(39, 37, 37, 0);
 
-  --black-text: white;
+  --black-text: #e6e6e6;
   --tippy-background: rgb(59, 59, 59);
 
   --empty-percentageBar: #4b4b4b;
@@ -55,18 +56,20 @@ body.darkMode
   --main-background: #0e0c0d;
   --menu-buttons-background: #272525;
   --empty-now-playing-page-background: #131212;
+  --now-playing-page-shadow: rgba(19, 18, 18, 0.45);
 
   --placeholders-1: #e6e6e6;
   --placeholders-2: #DCD0D0;
   --search-placeholder: rgba(255, 255, 255, 0.43);
-  --search-border: white;
+  --search-border: #e6e6e6;
   --scrollbar: #4b4b4b;
 
   --active-overlay-holder-and-shadows: rgba(0, 0, 0, 0.5);
   --artist-missing-background-and-shadows: rgba(54, 53, 53, 0.5);
   --unavailable-buttons-and-shadows: rgba(255, 255, 255, 0.5);
-  --accent-color-shadows: #565575;;
-  --maximized-queue-shadows: #3f3838;
+
+  --accent-color-shadows: #565575;
+  --maximized-queue-shadows: #292727;
 }
 
 body
@@ -167,6 +170,17 @@ body
   transition-property: background-image;
   transition-duration: 0.25s;
   transition-timing-function: ease-in-out;
+}
+
+.playing.background:before
+{
+  content: "";
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: var(--now-playing-page-shadow);
 }
 
 .pages.background
