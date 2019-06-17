@@ -2,9 +2,7 @@
 
 Dawayer is an audio player built with web technologies it lets you play local files, download and stream podcasts, stream music from a streaming service, Dawayer also has a feed page that gives you personalized playlists, statistics about your listening habits and notifies you when your favorite artist published a new track or a new podcast episode.
 
-## Dawayer is still in development with main features being added gradually
-## we're are currently adding Podcasts, Dark Mode, MPRIS Support.
-## And next update we'll add the feed and the streaming service.
+Dawayer is still in development with main features being added gradually, we're currently adding Podcasts, Dark Mode, MPRIS Support, and next update we'll add the feed and the streaming service.
 
 #### Features
 - Play podcasts.
@@ -22,12 +20,24 @@ Dawayer is an audio player built with web technologies it lets you play local fi
 ![Artist's Page](pictures/artistOverlay.png)
 
 # Download
-#### Dawayer is a new software it may be buggy
+
+**We need people to test Windows and macOS versions before we can release them.**
+
+**And we're also going to be working on a PWA when we're done adding the rest of the main features.**
 
 - **Linux:**
 [AUR](https://aur.archlinux.org/packages/dawayer) |
 [deb](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.deb?job=build) |
 [tar.xz](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build)
+
+# Compile It Yourself
+If you want to try the latest features from the development branch or your platform to get official releases.
+
+- open a terminal in a new folder and write.  
+- git clone https://gitlab.com/hpj/Dawayer.git .  
+- npm install  
+- npm run compile  
+- npx electron "./compiled/main/main.js"
 
 # Licenses
 This project is licensed under the [MIT](https://gitlab.com/hpj/Dawayer/blob/development/LICENSE) License.  
