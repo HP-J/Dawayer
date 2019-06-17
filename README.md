@@ -31,10 +31,12 @@ Dawayer is still in development with main features being added gradually, we're 
 [tar.xz](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build)
 
 # Compile It Yourself
-If you want to try the latest features from the development branch, or your platform don't get an official release, or want to help in Dawayer's development.
+If you want to try the latest features from the development branch, or your platform don't get an official release, or want to help in Dawayer's development.  
 
-- open a terminal in a new folder and write.  
-- git clone https://gitlab.com/hpj/Dawayer.git .  
+(make sure you install Git and NPM on your device first)  
+open a terminal in a new folder and write:
+
+- git clone "https://gitlab.com/hpj/Dawayer.git" .  
 - npm install  
 - npm run compile  
 - npx electron "./compiled/main/main.js"
