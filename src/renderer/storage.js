@@ -11,10 +11,14 @@ import * as settings from '../settings.js';
 
 import { parseFile as getMetadata } from 'music-metadata';
 
-import { createElement, createIcon, createContextMenu, removeAllChildren, hideActiveOverlay, secondsToDuration, switchPlayingMode } from './renderer.js';
-
 import { appendDirectoryNode } from './options.js';
 import { queueStorageTracks } from './playback.js';
+
+import {
+  createElement, createIcon, createContextMenu,
+  removeAllChildren, hideActiveOverlay, secondsToDuration,
+  switchPlayingMode, defaultPicture
+} from './renderer.js';
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -62,10 +66,6 @@ export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$
 const configDir = settings.getDirectory();
 
 export const artistsRegex = /,\s+|\s+ft.?\s+|\s+feat.?\s+/g;
-
-/**  @type { string }
-*/
-export const defaultPicture = join(__dirname, '../../missing.png');
 
 /**  @type { HTMLDivElement }
 */
@@ -1165,14 +1165,14 @@ function sortBasedOnKey(array, obj, key)
 function showArtistOverlay(storage, artist)
 {
   // only one overlay is to be shown at once
-  if (window.activeArtistOverlay)
+  if (window.activeOverlay)
     return;
 
   // the artist name
   const overlayElement = storage.artists[artist].overlayElement;
 
   // set the overlay as active
-  window.activeArtistOverlay = {
+  window.activeOverlay = {
     overlayElement: overlayElement,
     albumPlaceholders: [],
     trackPlaceholders: []
@@ -1195,7 +1195,7 @@ function showArtistOverlay(storage, artist)
       const placeholder = appendAlbumPlaceholder();
       const albumElement = storage.albums[albums[i]].element;
 
-      window.activeArtistOverlay.albumPlaceholders.push(placeholder);
+      window.activeOverlay.albumPlaceholders.push(placeholder);
 
       albumsContainer.replaceChild(placeholder, albumElement);
       overlayAlbumsContainer.appendChild(albumElement);
@@ -1210,7 +1210,7 @@ function showArtistOverlay(storage, artist)
       const placeholder = getTrackPlaceholder();
       const trackElement = storage.tracks[tracks[i]].element;
 
-      window.activeArtistOverlay.trackPlaceholders.push(placeholder);
+      window.activeOverlay.trackPlaceholders.push(placeholder);
 
       trackElement.parentElement.replaceChild(placeholder, trackElement);
       overlayTracksContainer.appendChild(trackElement);

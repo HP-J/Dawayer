@@ -106,6 +106,8 @@
   background-size: cover;
   background-position: center;
 
+  transform: scale(1.05);
+
   max-width: 175px;
   width: calc(25vw + 2vh);
   height: fit-content;
@@ -171,6 +173,8 @@
 {
   width: 100%;
   height: fit-content;
+
+  user-select: text;
 }
 
 .podcastOverlay.description:not(:empty)

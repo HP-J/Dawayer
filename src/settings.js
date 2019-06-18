@@ -112,15 +112,16 @@ export function cacheImage(image)
   const token = (image.data !== undefined) ? md5(image.data) : md5(image);
   const filename = join(cachedImagesDirectory, token);
 
+  // if already cached or currently caching
+  if (existsSync(filename) || currentlyCaching[token])
+    return token;
+
+  // notifier as the image is
+  currentlyCaching[token] = [];
+
   ensureDir(cachedImagesDirectory)
     .then(() =>
     {
-      // if already cached or currently caching
-      if (existsSync(filename) || currentlyCaching[token])
-        return;
-      
-      currentlyCaching[token] = [];
-
       // if buffer start write to disk
       if (image.data !== undefined)
       {

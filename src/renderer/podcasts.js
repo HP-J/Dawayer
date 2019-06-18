@@ -14,8 +14,31 @@ import feedParse from 'davefeedread';
 import {
   createElement, createIcon, createContextMenu,
   changePage, removeAllChildren, hideActiveOverlay,
-  secondsToHms, millisecondsToTimeAgo, podcastsButton
+  secondsToHms, millisecondsToTimeAgo, defaultPicture,
+  
 } from './renderer.js';
+
+/** @typedef { Object } FeedObject
+* @property { FeedHead } head
+* @property { FeedItem[] } items
+*/
+
+/** @typedef { Object } FeedHead
+* @property { string } title
+* @property { string } description
+* @property { string } copyright
+* @property { string } link
+* @property { string } language
+* @property { string[] } categories
+* @property { { url: string, title: string } } image
+*/
+
+/** @typedef { Object } FeedItem
+* @property { string } title
+* @property { string } summary
+* @property { string } date
+* @property { { url: string }[] } enclosures
+*/
 
 const { mainWindow } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -23,7 +46,13 @@ const podcastsContainer = document.body.querySelector('.podcasts.container');
 
 /** @type { HTMLDivElement }
 */
-let collectionOverlay;
+const collectionOverlay = createPodcastCollectionOverlay();
+
+const collectionContainer = collectionOverlay.querySelector('.podcastCollection.container');
+
+/** @type { Object<string, { description: string, picture: string, element: HTMLElement, feedUrl: string }> }
+*/
+const collection = {};
 
 export function initPodcasts()
 {
@@ -34,26 +63,32 @@ export function initPodcasts()
   // {
   //   getPodcastFeedUrl(podcast.results[0].collectionId).then((feedUrl) =>
   //   {
-  //     console.log(feedUrl);
+  //     addPodcastToCollection(feedUrl);
   //   });
   // });
 
-  // readFeedFile(join(homedir(), 'Documents/vergecast.xml'))
-  // // readFeedURL('https://feeds.megaphone.fm/vergecast')
-  //   .then((feed) =>
-  //   {
-  //     console.log(feed);
-  //   });
-
-  collectionOverlay = createPodcastCollectionOverlay();
-
   // TODO load podcasts from the collection json
+
+  // addPodcastToCollection('https://feeds.megaphone.fm/vergecast');
+  // addPodcastToCollection(join(homedir(), 'Documents/vergecast.xml'));
 
   // updatePodcastElement(appendPodcastPlaceholder(), {
   //   picture: join(homedir(), 'Documents/why.jpeg'),
-  //   artist: 'The Verge',
   //   title: 'Why\'d You Push That Button?',
-  //   summary: 'A Podcast About love and happiness',
+  //   description: 'A Podcast About love and happiness',
+  //   episodes:
+  //   [
+  //     {
+  //       title: 'How to buy a phone?!',
+  //       published: 1558130485221,
+  //       duration: 120
+  //     }
+  //   ]
+  // });
+
+  // addPodcastToCollection({
+  //   picture: join(homedir(), 'Documents/why.jpeg'),
+  //   title: 'Why\'d You Push That Button?'
   // });
 }
 
@@ -77,6 +112,8 @@ function appendPodcastPlaceholder()
 
   const episodeInfo = createElement('.podcast.episodeInfo');
   const episodeTitle = createElement('.podcast.episodeTitle');
+
+  episodeContainer.classList.add('clear');
 
   episodeInfo.innerText = 'No episodes are available';
 
@@ -115,7 +152,7 @@ function createPodcastOverlay()
   const overlayArtist = createElement('.podcastOverlay.artist');
   const overlayTitle = createElement('.podcastOverlay.title');
 
-  const overlaySummary = createElement('.podcastOverlay.summary');
+  const overlaydescription = createElement('.podcastOverlay.description');
 
   const podcastsText = createElement('.podcastOverlay.episodes.text');
   const podcastEpisodes = createElement('.podcastEpisodes.container');
@@ -130,7 +167,7 @@ function createPodcastOverlay()
   overlayCard.appendChild(overlayTitle);
 
   overlayContainer.appendChild(overlayCard);
-  overlayContainer.appendChild(overlaySummary);
+  overlayContainer.appendChild(overlaydescription);
 
   overlayContainer.appendChild(podcastsText);
   overlayContainer.appendChild(podcastEpisodes);
@@ -193,40 +230,47 @@ function createPodcastCollectionOverlay()
   return overlayWrapper;
 }
 
-/** @param { string } picture
-* @param { { picture: string, artist: string, title: string } } options
-*/
-function createPodcastCollectionItem(options)
+function appendPodcastCollectionItemPlaceholder()
 {
-  const itemWrapper = createElement('.podcastCollection.itemWrapper');
+  const itemWrapper = createElement('.podcastCollection.itemWrapper.placeholder');
   const itemContainer = createElement('.podcastCollection.itemContainer');
 
   const cover = createElement('.podcastCollection.cover');
-  const artist = createElement('.podcastCollection.artist');
   const title = createElement('.podcastCollection.title');
   const button = createElement('.podcastCollection.button');
 
-  cover.style.backgroundImage = `url(${options.picture})`;
-
-  artist.innerText = options.artist;
-  title.innerText = options.title;
-
-  // TODO change marks ✓
-  button.innerText = 'Remove';
-
   itemContainer.appendChild(cover);
-  itemContainer.appendChild(artist);
   itemContainer.appendChild(title);
   itemContainer.appendChild(button);
 
   itemWrapper.appendChild(itemContainer);
 
+  collectionContainer.appendChild(itemWrapper);
+
   return itemWrapper;
 }
 
 /** @param { HTMLDivElement } element
+* @param { { picture: string, title: string, buttonText: string } } options
+*/
+function updatePodcastCollectionItem(element, options)
+{
+  if (element.classList.contains('placeholder'))
+    element.classList.remove('placeholder');
+
+  if (options.picture)
+    element.querySelector('.podcastCollection.cover').style.backgroundImage = `url(${options.picture})`;
+
+  if (options.title)
+    element.querySelector('.podcastCollection.title').innerText = options.title;
+
+  if (options.buttonText)
+    element.querySelector('.podcastCollection.button').innerText = options.buttonText;
+}
+
+/** @param { HTMLDivElement } element
 * @param { HTMLDivElement } element
-* @param { { picture: string, artist: string, title: string, summary: string, episodes: { title: string, published: number, duration: number }[] } } options
+* @param { { picture: string, title: string, description: string, episodes: { title: string, published: number, duration: number }[] } } options
 */
 function updatePodcastElement(element, options)
 {
@@ -239,20 +283,14 @@ function updatePodcastElement(element, options)
     element.overlayElement.querySelector('.podcastOverlay.cover').style.backgroundImage = `url(${options.picture})`;
   }
 
-  if (options.artist)
-  {
-    element.querySelector('.podcast.artist').innerText =
-    element.overlayElement.querySelector('.podcastOverlay.artist').innerText = options.artist;
-  }
-
   if (options.title)
   {
     element.querySelector('.podcast.title').innerText =
     element.overlayElement.querySelector('.podcastOverlay.title').innerText = options.title;
   }
 
-  if (options.summary)
-    element.overlayElement.querySelector('.podcastOverlay.summary').innerText = options.summary;
+  if (options.description)
+    element.overlayElement.querySelector('.podcastOverlay.description').innerText = options.description;
 
   if (options.episodes)
   {
@@ -264,6 +302,8 @@ function updatePodcastElement(element, options)
     const episodeTitle = episodeContainer.querySelector('.podcast.episodeTitle');
 
     episodesText.innerText = '';
+
+    episodeContainer.classList.add('clear');
 
     episodeInfo.innerText = 'No episodes are available';
     episodeTitle.innerText = '';
@@ -278,6 +318,8 @@ function updatePodcastElement(element, options)
 
       // show latest episode on the hover effect
   
+      episodeContainer.classList.remove('clear');
+
       episodeInfo.innerText = `${millisecondsToTimeAgo(options.episodes[0].published)} · ${secondsToHms(options.episodes[0].duration)} left`;
       episodeTitle.innerText = options.episodes[0].title;
   
@@ -328,13 +370,98 @@ function updatePodcastElement(element, options)
   }
 }
 
-/** @param { string } filename
+/** used by the files picker in the collection overlay
+* to import multiple files in the same time
+* @param { string[] } files
 */
-function readFeedFile(filename)
+function addFromFiles(files)
+{
+  for (let i = 0; i < files.length; i++)
+  {
+    addPodcastToCollection(files[i]);
+  }
+}
+
+/** @param { FeedObject } feedUrl
+*/
+function addPodcastToCollection(url)
+{
+  const podcastElement = appendPodcastPlaceholder();
+  const collectionElement = appendPodcastCollectionItemPlaceholder();
+  
+  /** process the url and returns a feed object
+  * @param { string } url
+  */
+  function processFeed(url)
+  {
+    const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
+
+    // if url is a link
+    if (regex.test(url))
+      return readFeedLink(url);
+    // else if it's a file
+    else
+      return readFeedFile(url);
+  }
+
+  // process the url and returns a feed object
+  processFeed(url)
+    .then((feed) =>
+    {
+      // TODO save the podcast to the podcast collection json
+      // settings.set('collection', collection, 'podcasts');
+
+      // update the placeholders with info from the feed head
+
+      const img = new Image();
+
+      img.src = defaultPicture;
+
+      img.onload = () =>
+      {
+        updatePodcastElement(podcastElement, {
+          title: feed.head.title,
+          description: feed.head.description,
+          picture: img.src
+        });
+
+        updatePodcastCollectionItem(collectionElement, {
+          title: feed.head.title,
+          picture: img.src,
+          buttonText: 'Remove'
+        });
+
+        // removing the podcast from collection
+        collectionElement.onclick = () =>
+        {
+          podcastsContainer.removeChild(podcastElement);
+          collectionContainer.removeChild(collectionElement);
+
+          // TODO remove podcast from collection json
+        };
+      };
+
+      const picture = settings.cacheImage(feed.head.image.url);
+      settings.receiveCachedImage(picture).then((imagePath) => img.src = imagePath);
+    })
+    .catch(() =>
+    {
+      // error ocurred during adding the podcast
+      // rollback anything that has been added before the error
+
+      podcastsContainer.removeChild(podcastElement);
+      collectionContainer.removeChild(collectionElement);
+    });
+}
+
+/** @param { string } url
+* @returns { Promise<FeedObject> }
+*/
+function readFeedFile(url)
 {
   return new Promise((resolve, reject) =>
   {
-    readFile(filename, { encoding: 'utf8' })
+    readFile(url, { encoding: 'utf8' })
       .then((xmlFile) =>
       {
         feedParse.parseString(xmlFile, undefined, (err, feed) =>
@@ -357,8 +484,9 @@ function readFeedFile(filename)
 }
 
 /** @param { string } url
+* @returns { Promise<FeedObject> }
 */
-function readFeedURL(url)
+function readFeedLink(url)
 {
   return new Promise((resolve, reject) =>
   {
@@ -384,36 +512,15 @@ function readFeedURL(url)
   });
 }
 
-/** @param { string[] } files
-*/
-function addFromFiles(files)
-{
-  for (let i = 0; i < files.length; i++)
-  {
-    // read each file feed then add it to collection
-    readFeedFile(files[i]).then((feed) => addPodcastToCollection(feed));
-  }
-}
-
-/** @param { {} } feed
-*/
-function addPodcastToCollection(feed)
-{
-  // TODO save the podcast to the  podcast collection json
-  const container = collectionOverlay.querySelector('.podcastCollection.container');
-
-  container.appendChild(createPodcastCollectionItem(feed));
-}
-
 /** @param { HTMLElement } overlay
 */
 function showPodcastOverlay(overlay)
 {
   // only one overlay is to be shown at once
-  if (window.activeArtistOverlay)
+  if (window.activeOverlay)
     return;
   
-  window.activeArtistOverlay = {
+  window.activeOverlay = {
     overlayElement: overlay
   };
 

@@ -1,6 +1,7 @@
 import tippy from 'tippy.js';
 
 import { platform } from 'os';
+import { join } from 'path';
 
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -142,6 +143,10 @@ export let rewindTimeTooltip;
 /** @type { TippyInstance }
 */
 export let skipTimeTooltip;
+
+/**  @type { string }
+*/
+export const defaultPicture = join(__dirname, '../../missing.png');
 
 // Init
 
@@ -944,7 +949,7 @@ export function hideActiveOverlay()
 {
   /** @type { { overlayElement: HTMLElement, visibility: string, albumPlaceholders: HTMLElement[], trackPlaceholders: HTMLElement[] } }
   */
-  const activeOverlayObject = window.activeArtistOverlay;
+  const activeOverlayObject = window.activeOverlay;
 
   // if no overlay is currently active then return
   if (!activeOverlayObject)
@@ -988,7 +993,7 @@ export function hideActiveOverlay()
     document.body.removeChild(activeOverlayObject.overlayElement);
 
     // set the active overlay as null
-    window.activeArtistOverlay = undefined;
+    window.activeOverlay = undefined;
   }, 350);
 }
 

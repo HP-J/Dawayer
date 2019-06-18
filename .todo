@@ -1,9 +1,13 @@
 Performance Issues and Bugs: 
   ☐ add a substitute after the removal of lastfm apis (probably also the the same api as the streaming service)
+  ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts)
 
 Testing:
 
 Features:
+  ☐ render podcast episodes
+  ☐ cache and load podcasts
+
   ☐ redesign podcast element to look better after removing the artist label
   ☐ redesign podcast overlay to look better after removing the artist label
   ☐ redesign podcast overlay to show episodes summary

@@ -21,8 +21,8 @@ body.defaultMode
   --empty-now-playing-page-background: #381E28;
   --now-playing-page-shadow: rgba(56, 30, 40, 0.45);
 
-  --placeholders-1: #E6E6E6;
-  --placeholders-2: #DCD0D0;
+  --placeholders-1: #d0cbcb;
+  --placeholders-2: #b3aaaa;
   --search-placeholder: rgba(255, 255, 255, 0.43);
   --search-border: white;
   --scrollbar: white;
@@ -58,8 +58,8 @@ body.darkMode
   --empty-now-playing-page-background: #131212;
   --now-playing-page-shadow: rgba(19, 18, 18, 0.45);
 
-  --placeholders-1: #e6e6e6;
-  --placeholders-2: #DCD0D0;
+  --placeholders-1: #ccc3c3;
+  --placeholders-2: #868080;
   --search-placeholder: rgba(255, 255, 255, 0.43);
   --search-border: #e6e6e6;
   --scrollbar: #4b4b4b;
@@ -69,7 +69,7 @@ body.darkMode
   --unavailable-buttons-and-shadows: rgba(255, 255, 255, 0.5);
 
   --accent-color-shadows: #565575;
-  --maximized-queue-shadows: #292727;
+  --maximized-queue-shadows: #171616;
 }
 
 body

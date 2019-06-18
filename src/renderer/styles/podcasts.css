@@ -109,6 +109,8 @@
   width: 40%;
   height: 100%;
 
+  transform: scale(1.05);
+
   transition-property: left;
   transition-duration: 0.5s;
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -156,13 +158,13 @@
   color: var(--black-text);
 
   left: 0;
-  width: 45%;
+  width: 50%;
   height: 100%;
 
   font-weight: 700;
 
   overflow: hidden;
-  padding: 0 5% 0 10%;
+  padding: 0 5% 0 5%;
 
   transition-property: left;
   transition-duration: 0.5s;
@@ -213,8 +215,8 @@
   height: auto;
 }
 
-.podcast.episodeContainer.contextHover,
-.podcast.episodeContainer:hover
+.podcast.episodeContainer.contextHover:not(.clear),
+.podcast.episodeContainer:not(.clear):hover
 {
   text-decoration: underline;
 }
@@ -245,7 +247,9 @@
 
 .podcast.placeholder > .container > .title
 {
-  margin: 6% 8% 21% 12%
+  width: 35%;
+  height: 15%;
+  margin: auto;
 }
 
 .podcast.placeholder > .container
