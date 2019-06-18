@@ -726,7 +726,6 @@ function appendArtistPlaceholder()
 function createArtistOverlay()
 {
   const overlayWrapper = createElement('.artistOverlay.wrapper');
-  const overlayBackground = createElement('.artistOverlay.background');
   const overlayContainer = createElement('.artistOverlay.container');
 
   const overlayCard = createElement('.artistOverlay.card');
@@ -762,7 +761,6 @@ function createArtistOverlay()
   overlayContainer.appendChild(tracksContainer);
 
   overlayWrapper.appendChild(overlayContainer);
-  overlayWrapper.appendChild(overlayBackground);
 
   return overlayWrapper;
 }

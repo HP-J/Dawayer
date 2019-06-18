@@ -15,7 +15,7 @@ import {
   createElement, createIcon, createContextMenu,
   changePage, removeAllChildren, hideActiveOverlay,
   secondsToHms, millisecondsToTimeAgo, defaultPicture,
-  
+  podcastsButton
 } from './renderer.js';
 
 /** @typedef { Object } FeedObject
@@ -141,7 +141,6 @@ function appendPodcastPlaceholder()
 function createPodcastOverlay()
 {
   const overlayWrapper = createElement('.podcastOverlay.wrapper');
-  const overlayBackground = createElement('.podcastOverlay.background');
   const overlayContainer = createElement('.podcastOverlay.container');
 
   const overlayCard = createElement('.podcastOverlay.card');
@@ -152,7 +151,7 @@ function createPodcastOverlay()
   const overlayArtist = createElement('.podcastOverlay.artist');
   const overlayTitle = createElement('.podcastOverlay.title');
 
-  const overlaydescription = createElement('.podcastOverlay.description');
+  const overlayDescription = createElement('.podcastOverlay.description');
 
   const podcastsText = createElement('.podcastOverlay.episodes.text');
   const podcastEpisodes = createElement('.podcastEpisodes.container');
@@ -167,13 +166,12 @@ function createPodcastOverlay()
   overlayCard.appendChild(overlayTitle);
 
   overlayContainer.appendChild(overlayCard);
-  overlayContainer.appendChild(overlaydescription);
+  overlayContainer.appendChild(overlayDescription);
 
   overlayContainer.appendChild(podcastsText);
   overlayContainer.appendChild(podcastEpisodes);
 
   overlayWrapper.appendChild(overlayContainer);
-  overlayWrapper.appendChild(overlayBackground);
 
   return overlayWrapper;
 }
@@ -181,7 +179,6 @@ function createPodcastOverlay()
 function createPodcastCollectionOverlay()
 {
   const overlayWrapper = createElement('.podcastCollectionOverlay.wrapper');
-  const overlayBackground = createElement('.podcastCollectionOverlay.background');
   const overlayContainer = createElement('.podcastCollectionOverlay.container');
 
   const overlayFile = createElement('.podcastCollectionOverlay.file');
@@ -225,9 +222,114 @@ function createPodcastCollectionOverlay()
   overlayContainer.appendChild(overlayCollection);
 
   overlayWrapper.appendChild(overlayContainer);
-  overlayWrapper.appendChild(overlayBackground);
 
   return overlayWrapper;
+}
+
+/** @param { HTMLDivElement } element
+* @param { HTMLDivElement } element
+* @param { { picture: string, title: string, description: string } } options
+*/
+function updatePodcastElement(element, options)
+{
+  if (element.classList.contains('placeholder'))
+    element.classList.remove('placeholder');
+
+  if (options.picture)
+  {
+    element.querySelector('.podcast.cover').style.backgroundImage =
+    element.overlayElement.querySelector('.podcastOverlay.cover').style.backgroundImage = `url(${options.picture})`;
+  }
+
+  if (options.title)
+  {
+    element.querySelector('.podcast.title').innerText =
+    element.overlayElement.querySelector('.podcastOverlay.title').innerText = options.title;
+  }
+
+  if (options.description)
+    element.overlayElement.querySelector('.podcastOverlay.description').innerText = options.description;
+}
+
+/** @param { HTMLDivElement } element
+* @param { FeedItem[] } episodes
+*/
+function updatePodcastEpisodes(element, episodes)
+{
+  const episodesText = element.overlayElement.querySelector('.episodes.text');
+
+  const episodeContainer = element.querySelector('.podcast.episodeContainer');
+
+  const episodeInfo = episodeContainer.querySelector('.podcast.episodeInfo');
+  const episodeTitle = episodeContainer.querySelector('.podcast.episodeTitle');
+
+  episodesText.innerText = '';
+
+  episodeContainer.classList.add('clear');
+
+  episodeInfo.innerText = 'No episodes are available';
+  episodeTitle.innerText = '';
+
+  episodeContainer.oncontextmenu = undefined;
+
+  if (episodes.length > 0)
+  {
+    // overlay text label
+
+    episodesText.innerText = 'Episodes';
+
+    // show latest episode on the hover effect
+
+    episodeContainer.classList.remove('clear');
+
+    episodeInfo.innerText = `${millisecondsToTimeAgo(1558130485221)} · ${secondsToHms(120)} left`;
+    // episodeInfo.innerText = `${millisecondsToTimeAgo(episodes[0].published)} · ${secondsToHms(episodes[0].duration)} left`;
+    episodeTitle.innerText = episodes[0].title;
+
+    episodeContainer.onclick = (event) =>
+    {
+      // TODO queue podcast
+      event.stopPropagation();
+    };
+
+    // TODO queue podcast
+    createContextMenu(episodeContainer, {
+      'Play': () => {},
+      'Add to Queue': () => {}
+    }, element);
+
+    // list all episodes in the overlay
+
+    /**  @type { HTMLDivElement }
+    */
+    const episodesContainer = element.overlayElement.querySelector('.podcastEpisodes.container');
+
+    // remove current episodes to add new ones
+    removeAllChildren(episodesContainer);
+
+    // TODO add a load more button
+    for (let i = 0; i < Math.min(10, episodes.length); i++)
+    {
+      const episodeContainer = createElement('.podcastEpisode.container');
+      const episodeInfo = createElement('.podcastEpisode.info');
+      const episodeTitle = createElement('.podcastEpisode.title');
+
+      episodeInfo.innerText = `${millisecondsToTimeAgo(1558130485221)} · ${secondsToHms(120)} left`;
+      // episodeInfo.innerText = `${millisecondsToTimeAgo(episodes[i].published)} · ${secondsToHms(episodes[i].duration)} left`;
+      episodeTitle.innerText = episodes[i].title;
+
+      episodeContainer.appendChild(episodeInfo);
+      episodeContainer.appendChild(episodeTitle);
+
+      episodesContainer.appendChild(episodeContainer);
+
+      // TODO queue podcast
+      createContextMenu(episodeContainer, {
+        'Play': () => {},
+        'Add to Queue': () => {}
+      }, element);
+    }
+  }
 }
 
 function appendPodcastCollectionItemPlaceholder()
@@ -251,7 +353,7 @@ function appendPodcastCollectionItemPlaceholder()
 }
 
 /** @param { HTMLDivElement } element
-* @param { { picture: string, title: string, buttonText: string } } options
+* @param { { picture: string, title: string, buttonText: string, buttonCallback: () => void } } options
 */
 function updatePodcastCollectionItem(element, options)
 {
@@ -266,108 +368,9 @@ function updatePodcastCollectionItem(element, options)
 
   if (options.buttonText)
     element.querySelector('.podcastCollection.button').innerText = options.buttonText;
-}
 
-/** @param { HTMLDivElement } element
-* @param { HTMLDivElement } element
-* @param { { picture: string, title: string, description: string, episodes: { title: string, published: number, duration: number }[] } } options
-*/
-function updatePodcastElement(element, options)
-{
-  if (element.classList.contains('placeholder'))
-    element.classList.remove('placeholder');
-
-  if (options.picture)
-  {
-    element.querySelector('.podcast.cover').style.backgroundImage =
-    element.overlayElement.querySelector('.podcastOverlay.cover').style.backgroundImage = `url(${options.picture})`;
-  }
-
-  if (options.title)
-  {
-    element.querySelector('.podcast.title').innerText =
-    element.overlayElement.querySelector('.podcastOverlay.title').innerText = options.title;
-  }
-
-  if (options.description)
-    element.overlayElement.querySelector('.podcastOverlay.description').innerText = options.description;
-
-  if (options.episodes)
-  {
-    const episodesText = element.overlayElement.querySelector('.episodes.text');
-
-    const episodeContainer = element.querySelector('.podcast.episodeContainer');
-
-    const episodeInfo = episodeContainer.querySelector('.podcast.episodeInfo');
-    const episodeTitle = episodeContainer.querySelector('.podcast.episodeTitle');
-
-    episodesText.innerText = '';
-
-    episodeContainer.classList.add('clear');
-
-    episodeInfo.innerText = 'No episodes are available';
-    episodeTitle.innerText = '';
-
-    episodeContainer.oncontextmenu = undefined;
-
-    if (options.episodes && options.episodes.length > 0)
-    {
-      // overlay text label
-
-      episodesText.innerText = 'Episodes';
-
-      // show latest episode on the hover effect
-  
-      episodeContainer.classList.remove('clear');
-
-      episodeInfo.innerText = `${millisecondsToTimeAgo(options.episodes[0].published)} · ${secondsToHms(options.episodes[0].duration)} left`;
-      episodeTitle.innerText = options.episodes[0].title;
-  
-      episodeContainer.onclick = (event) =>
-      {
-        // TODO queue podcast
-        event.stopPropagation();
-      };
-
-      // TODO queue podcast
-      createContextMenu(episodeContainer, {
-        'Play': () => {},
-        'Add to Queue': () => {}
-      }, element);
-
-      // list all episodes in the overlay
-
-      /**  @type { HTMLDivElement }
-      */
-      const episodesContainer = element.overlayElement.querySelector('.podcastEpisodes.container');
-
-      // remove current episodes to add new ones
-      removeAllChildren(episodesContainer);
-
-      for (let i = 0; i < options.episodes.length; i++)
-      {
-        const episode = options.episodes[i];
-
-        const episodeContainer = createElement('.podcastEpisode.container');
-        const episodeInfo = createElement('.podcastEpisode.info');
-        const episodeTitle = createElement('.podcastEpisode.title');
-
-        episodeInfo.innerText = `${millisecondsToTimeAgo(episode.published)} · ${secondsToHms(episode.duration)} left`;
-        episodeTitle.innerText = episode.title;
-
-        episodeContainer.appendChild(episodeInfo);
-        episodeContainer.appendChild(episodeTitle);
-
-        episodesContainer.appendChild(episodeContainer);
-
-        // TODO queue podcast
-        createContextMenu(episodeContainer, {
-          'Play': () => {},
-          'Add to Queue': () => {}
-        }, element);
-      }
-    }
-  }
+  if (options.buttonCallback)
+    element.querySelector('.podcastCollection.button').onclick = options.buttonCallback;
 }
 
 /** used by the files picker in the collection overlay
@@ -385,10 +388,7 @@ function addFromFiles(files)
 /** @param { FeedObject } feedUrl
 */
 function addPodcastToCollection(url)
-{
-  const podcastElement = appendPodcastPlaceholder();
-  const collectionElement = appendPodcastCollectionItemPlaceholder();
-  
+{ 
   /** process the url and returns a feed object
   * @param { string } url
   */
@@ -404,6 +404,9 @@ function addPodcastToCollection(url)
       return readFeedFile(url);
   }
 
+  const podcastElement = appendPodcastPlaceholder();
+  const collectionElement = appendPodcastCollectionItemPlaceholder();
+  
   // process the url and returns a feed object
   processFeed(url)
     .then((feed) =>
@@ -428,21 +431,25 @@ function addPodcastToCollection(url)
         updatePodcastCollectionItem(collectionElement, {
           title: feed.head.title,
           picture: img.src,
-          buttonText: 'Remove'
+          buttonText: 'Remove',
+          buttonCallback: () =>
+          {
+            podcastsContainer.removeChild(podcastElement);
+            collectionContainer.removeChild(collectionElement);
+  
+            // TODO remove podcast from collection json
+          }
         });
-
-        // removing the podcast from collection
-        collectionElement.onclick = () =>
-        {
-          podcastsContainer.removeChild(podcastElement);
-          collectionContainer.removeChild(collectionElement);
-
-          // TODO remove podcast from collection json
-        };
       };
+
+      // load podcast picture
 
       const picture = settings.cacheImage(feed.head.image.url);
       settings.receiveCachedImage(picture).then((imagePath) => img.src = imagePath);
+
+      // load podcast episodes
+
+      updatePodcastEpisodes(podcastElement, feed.items);
     })
     .catch(() =>
     {

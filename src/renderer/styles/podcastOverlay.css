@@ -6,18 +6,18 @@
   display: flex;
   justify-content: center;
 
-  background-color: transparent;
+  background-color: var(--active-overlay-holder-and-shadows);
+  opacity: 0;
 
   top: 100%;
   left: 0;
   width: 100%;
   height: 100%;
 
-  pointer-events: none;
   overflow-x: hidden;
   overflow-y: overlay;
 
-  transition-property: top;
+  transition-property: top, opacity;
   transition-duration: 0.35s;
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -25,6 +25,7 @@
 .podcastOverlay.wrapper.active
 {
   top: 0;
+  opacity: 1;
 }
 
 .podcastOverlay.container
@@ -48,31 +49,6 @@
   margin: 3% 0;
 
   font-family: Montserrat, sans-serif;
-}
-
-.podcastOverlay.background
-{
-  z-index: -1;
-  position: fixed;
-
-  opacity: 0;
-  background-color: var(--active-overlay-holder-and-shadows);
-
-  pointer-events: all;
-
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  transition-property: opacity;
-  transition-duration: 0.25s;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-.podcastOverlay.wrapper.active > .podcastOverlay.background
-{
-  opacity: 1;
 }
 
 .podcastOverlay.container,
@@ -105,8 +81,6 @@
 
   background-size: cover;
   background-position: center;
-
-  transform: scale(1.05);
 
   max-width: 175px;
   width: calc(25vw + 2vh);
