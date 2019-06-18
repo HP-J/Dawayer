@@ -4,17 +4,21 @@ Performance Issues and Bugs:
 Testing:
 
 Features:
+  ☐ redesign podcast element to look better after removing the artist label
+  ☐ redesign podcast overlay to look better after removing the artist label
+  ☐ redesign podcast overlay to show episodes summary
+
   ☐ research feed suggestions & an api to get more accurate info about artist releases
     (probably the same api as the streaming service)
   
   ☐ research adding a streaming service support like (Spotify or Deezer or etc)
+
+  ☐ research statistics to show in the feed page
+
   ☐ using the feed page: add downloading feature and make it flexible, so that it can download podcasts or tracks alike
 
 UI/UX:
   ☐ sketch the feed page
-
-  ☐ dark mode
-  ☐ light mode
 
 CI/CD:
   ☐ release a Windows build after testing @help-needed

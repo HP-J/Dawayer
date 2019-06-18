@@ -143,43 +143,26 @@
   opacity: 0.75;
 }
 
-.podcast.artist
-{
-  grid-area: artist;
-  position: relative;
-
-  display: flex;
-  align-items: flex-end;
-
-  left: 0;
-  width: 45%;
-  height: 50%;
-
-  overflow: hidden;
-  font-weight: 900;
-
-  transition-property: left;
-  transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-.podcast.wrapper:not(.placeholder).contextHover > .container > .artist,
-.podcast.wrapper:not(.placeholder):hover > .container > .artist
-{
-  left: -20%;
-}
-
 .podcast.title
 {
   grid-area: title;
+
+  display: flex;
   position: relative;
+
+  justify-content: center;
+  align-items: center;
   
-  left: 40%;
-  top: -50%;
+  color: var(--black-text);
+
+  left: 0;
   width: 45%;
-  height: 45%;
+  height: 100%;
+
+  font-weight: 700;
 
   overflow: hidden;
+  padding: 0 5% 0 10%;
 
   transition-property: left;
   transition-duration: 0.5s;
@@ -189,14 +172,7 @@
 .podcast.wrapper:not(.placeholder).contextHover > .container > .title,
 .podcast.wrapper:not(.placeholder):hover > .container > .title
 {
-  left: 20%;
-}
-
-.podcast.artist,
-.podcast.title
-{
-  color: var(--black-text);
-  padding: 0 5% 0 10%;
+  left: -20%;
 }
 
 .podcast.episodesWrapper
@@ -257,7 +233,6 @@
 /* Content Placeholders */
 
 .podcast.placeholder > .container > .cover,
-.podcast.placeholder > .container > .artist,
 .podcast.placeholder > .container > .title
 {
   background-color: var(--placeholders-1);
@@ -266,11 +241,6 @@
   animation-duration: 1s;
   animation-direction: alternate;
   animation-iteration-count: infinite;
-}
-
-.podcast.placeholder > .container > .artist
-{
-  margin: 22% 29% 0 12%;
 }
 
 .podcast.placeholder > .container > .title
@@ -290,7 +260,6 @@
   font-size: calc(6px + 0.5vw + 0.5vh);
 }
 
-.podcast.artist,
 .podcast.episode,
 .podcast.episodeInfo
 {
@@ -310,7 +279,6 @@
     font-size: 9px;
   }
 
-  .podcast.artist,
   .podcast.episode,
   .podcast.episodeInfo
   {
@@ -331,7 +299,6 @@
     font-size: 12px;
   }
 
-  .podcast.artist,
   .podcast.episode,
   .podcast.episodeInfo
   {
