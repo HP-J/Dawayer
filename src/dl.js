@@ -42,78 +42,99 @@ function download(url, filepath, events, option)
   }
     
   // the file will have a temporary path during downloading
-  const temppath = filepath + Date.now();
+  const temppath = filepath + Date.now() + '.temp';
 
   const out = createWriteStream(temppath);
-  const req = request.get(url);
-
+  
   let isAbort = false;
-
+  let tryAgain = 5;
+  
   busyPaths[filepath] = events;
 
-  req.on('response', (res) =>
-  {
-    out.on('finish', () =>
-    {
-      // Check if the download was aborted on purpose
-      if (isAbort)
-        return;
-                
-      const isFullDown = totalSize === curSize || totalSize === -1;
-                
-      // Check if the file was fully downloaded
-      if (!isFullDown)
-      {
-        events.emit('error', 'The download was incomplete.', 'err_dlincomplete');
+  let req;
 
-        delete busyPaths[filepath];
-      }
-      else
+  function start()
+  {
+    req = request.get(url, { timeout: 2500 });
+
+    req
+      .on('response', (res) =>
       {
-        // rename/move the file to the correct place
-        rename(temppath, filepath, (err) =>
+        out.on('finish', () =>
         {
-          if (err)
+          // Check if the download was aborted on purpose
+          if (isAbort)
+            return;
+                    
+          const isFullDown = totalSize === curSize || totalSize === -1;
+                    
+          // Check if the file was fully downloaded
+          if (!isFullDown)
           {
             events.emit('error', 'The download was incomplete.', 'err_dlincomplete');
-
+  
             delete busyPaths[filepath];
           }
           else
           {
-            events.emit('progress', totalSize, totalSize);
-            events.emit('done', filepath, url, totalSize);
-
-            delete busyPaths[filepath];
+            // rename/move the file to the correct place
+            rename(temppath, filepath, (err) =>
+            {
+              if (err)
+              {
+                events.emit('error', 'The download was incomplete.', 'err_dlincomplete');
+  
+                delete busyPaths[filepath];
+              }
+              else
+              {
+                events.emit('progress', totalSize, totalSize);
+                events.emit('done', filepath, url, totalSize);
+  
+                delete busyPaths[filepath];
+              }
+            });
           }
         });
-      }
-    });
+  
+        let totalSize = parseInt(res.headers['content-length'], 10); //文件大小的长度
+  
+        // Set the totalSize to -1 if the server doesn't report it
+        if (isNaN(totalSize))
+          totalSize = -1;
+            
+        // 文件接收大小
+        let curSize = 0;
+  
+        res.on('data', (chunk) =>
+        {
+          curSize += chunk.length;
+                    
+          // 判读是否显示进度条
+          events.emit('progress', curSize, totalSize);
+        });
+      })
+      .on('error', (err) =>
+      {
+        if (err.message === 'ETIMEDOUT' && tryAgain > 0)
+        {
+          req.end();
 
-    let totalSize = parseInt(res.headers['content-length'], 10); //文件大小的长度
+          tryAgain = tryAgain - 1;
 
-    // Set the totalSize to -1 if the server doesn't report it
-    if (isNaN(totalSize))
-      totalSize = -1;
-        
-    // 文件接收大小
-    let curSize = 0;
+          start();
+        }
+        else
+        {
+          events.emit('error', err);
+  
+          delete busyPaths[filepath];
+        }
+      })
+      .pipe(out);
+  }
 
-    res.on('data', (chunk) =>
-    {
-      curSize += chunk.length;
-                
-      // 判读是否显示进度条
-      events.emit('progress', curSize, totalSize);
-    });
-  })
-    .on('error', (err) =>
-    {
-      events.emit('error', err);
-      
-      delete busyPaths[filepath];
-    })
-    .pipe(out);
+  start();
 
   return {
     request: req,
