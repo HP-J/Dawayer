@@ -18,6 +18,8 @@ import {
   podcastsButton
 } from './renderer.js';
 
+import { queueTracks, audioUrlTypeRegex } from './playback.js';
+
 /** @typedef { Object } FeedObject
 * @property { FeedHead } head
 * @property { FeedItem[] } items
@@ -35,6 +37,7 @@ import {
 
 /** @typedef { Object } FeedItem
 * @property { string } title
+* @property { string } author
 * @property { string } summary
 * @property { string } date
 * @property { { url: string }[] } enclosures
@@ -56,9 +59,11 @@ const collection = {};
 
 export function initPodcasts()
 {
+  // in the future this info may be useful
   // const enabled = settings.get('podcasts', false);
   // settings.onChange('podcasts', watchForPodcastsDisable);
 
+  // TODO add the search function to the UI
   // searchPodcasts('The Vergecast').then((podcast) =>
   // {
   //   getPodcastFeedUrl(podcast.results[0].collectionId).then((feedUrl) =>
@@ -71,30 +76,6 @@ export function initPodcasts()
 
   // addPodcastToCollection('https://feeds.megaphone.fm/vergecast');
   // addPodcastToCollection(join(homedir(), 'Documents/vergecast.xml'));
-
-  // updatePodcastElement(appendPodcastPlaceholder(), {
-  //   picture: join(homedir(), 'Documents/why.jpeg'),
-  //   title: 'Why\'d You Push That Button?',
-  //   description: 'A Podcast About love and happiness',
-  //   episodes:
-  //   [
-  //     {
-  //       title: 'How to buy a phone?!',
-  //       published: 1558130485221,
-  //       duration: 120
-  //     }
-  //   ]
-  // });
-
-  // addPodcastToCollection({
-  //   picture: join(homedir(), 'Documents/why.jpeg'),
-  //   title: 'Why\'d You Push That Button?'
-  // });
-}
-
-function watchForPodcastsDisable(state)
-{
-
 }
 
 function appendPodcastPlaceholder()
@@ -148,7 +129,6 @@ function createPodcastOverlay()
   const overlayCover = createElement('.podcastOverlay.cover');
   const overlayHide = createElement('.podcastOverlay.hide');
   const overlayDownward = createIcon('downward', '.podcastOverlay.downward');
-  const overlayArtist = createElement('.podcastOverlay.artist');
   const overlayTitle = createElement('.podcastOverlay.title');
 
   const overlayDescription = createElement('.podcastOverlay.description');
@@ -162,7 +142,6 @@ function createPodcastOverlay()
 
   overlayCard.appendChild(overlayCover);
   overlayCard.appendChild(overlayHide);
-  overlayCard.appendChild(overlayArtist);
   overlayCard.appendChild(overlayTitle);
 
   overlayContainer.appendChild(overlayCard);
@@ -200,12 +179,13 @@ function createPodcastCollectionOverlay()
         properties: [ 'openFile', 'multiSelections' ]
       }, (files) =>
       {
-        addFromFiles(files);
-
-        // hide the overlay and go to podcasts page
-        // as a feedback that the process is done
-        hideActiveOverlay();
-        changePage(podcastsButton);
+        if (addFromFiles(files))
+        {
+          // hide the overlay and go to podcasts page
+          // as a feedback that the process is done
+          hideActiveOverlay();
+          changePage(podcastsButton);
+        }
       }
     );
   };
@@ -252,51 +232,30 @@ function updatePodcastElement(element, options)
 }
 
 /** @param { HTMLDivElement } element
+* @param { string } picture
 * @param { FeedItem[] } episodes
 */
-function updatePodcastEpisodes(element, episodes)
+function updatePodcastEpisodes(element, picture, episodes)
 {
   const episodesText = element.overlayElement.querySelector('.episodes.text');
 
-  const episodeContainer = element.querySelector('.podcast.episodeContainer');
-
-  const episodeInfo = episodeContainer.querySelector('.podcast.episodeInfo');
-  const episodeTitle = episodeContainer.querySelector('.podcast.episodeTitle');
+  const latestEpisodeContainer = element.querySelector('.podcast.episodeContainer');
+  const latestEpisodeInfo = latestEpisodeContainer.querySelector('.podcast.episodeInfo');
+  const latestEpisodeTitle = latestEpisodeContainer.querySelector('.podcast.episodeTitle');
 
   episodesText.innerText = '';
 
-  episodeContainer.classList.add('clear');
+  latestEpisodeContainer.classList.add('clear');
 
-  episodeInfo.innerText = 'No episodes are available';
-  episodeTitle.innerText = '';
+  latestEpisodeInfo.innerText = 'No episodes are available';
+  latestEpisodeTitle.innerText = '';
 
-  episodeContainer.oncontextmenu = undefined;
+  latestEpisodeContainer.oncontextmenu = undefined;
 
   if (episodes.length > 0)
   {
     // overlay text label
-
     episodesText.innerText = 'Episodes';
-
-    // show latest episode on the hover effect
-
-    episodeContainer.classList.remove('clear');
-
-    episodeInfo.innerText = `${millisecondsToTimeAgo(1558130485221)} · ${secondsToHms(120)} left`;
-    // episodeInfo.innerText = `${millisecondsToTimeAgo(episodes[0].published)} · ${secondsToHms(episodes[0].duration)} left`;
-    episodeTitle.innerText = episodes[0].title;
-
-    episodeContainer.onclick = (event) =>
-    {
-      // TODO queue podcast
-      event.stopPropagation();
-    };
-
-    // TODO queue podcast
-    createContextMenu(episodeContainer, {
-      'Play': () => {},
-      'Add to Queue': () => {}
-    }, element);
 
     // list all episodes in the overlay
 
@@ -307,27 +266,57 @@ function updatePodcastEpisodes(element, episodes)
     // remove current episodes to add new ones
     removeAllChildren(episodesContainer);
 
-    // TODO add a load more button
+    // TODO add a load more button to overlay
+
     for (let i = 0; i < Math.min(10, episodes.length); i++)
     {
       const episodeContainer = createElement('.podcastEpisode.container');
       const episodeInfo = createElement('.podcastEpisode.info');
       const episodeTitle = createElement('.podcastEpisode.title');
 
-      episodeInfo.innerText = `${millisecondsToTimeAgo(1558130485221)} · ${secondsToHms(120)} left`;
-      // episodeInfo.innerText = `${millisecondsToTimeAgo(episodes[i].published)} · ${secondsToHms(episodes[i].duration)} left`;
+      // TODO when a podcast is played fetch it's duration and added to info
+      // episodeInfo.innerText = `${millisecondsToTimeAgo(Date.parse(episodes[i].date))} · ${secondsToHms(${durationInSeconds})} left`;
+
+      episodeInfo.innerText = millisecondsToTimeAgo(Date.parse(episodes[i].date));
       episodeTitle.innerText = episodes[i].title;
+
+      // latest episode on the hover effect
+      if (i === 0)
+      {
+        latestEpisodeContainer.classList.remove('clear');
+
+        latestEpisodeInfo.innerText = episodeInfo.innerText;
+        latestEpisodeTitle.innerText = episodeTitle.innerText;
+      }
 
       episodeContainer.appendChild(episodeInfo);
       episodeContainer.appendChild(episodeTitle);
 
       episodesContainer.appendChild(episodeContainer);
 
-      // TODO queue podcast
-      createContextMenu(episodeContainer, {
-        'Play': () => {},
-        'Add to Queue': () => {}
-      }, element);
+      const onclick = (event) =>
+      {
+        queuePodcast(episodes[i], picture, true);
+        
+        event.stopPropagation();
+      };
+
+      episodeContainer.onclick = onclick;
+
+      // latest episode on the hover effect
+      if (i === 0)
+        latestEpisodeContainer.onclick = onclick;
+
+      const contextMenu = {
+        'Play': () => queuePodcast(episodes[i], picture, true),
+        'Add to Queue': () => queuePodcast(episodes[i], picture, false)
+      };
+
+      createContextMenu(episodeContainer, contextMenu, episodeContainer);
+
+      // latest episode on the hover effect
+      if (i === 0)
+        createContextMenu(latestEpisodeContainer, contextMenu, element);
     }
   }
 }
@@ -379,13 +368,21 @@ function updatePodcastCollectionItem(element, options)
 */
 function addFromFiles(files)
 {
+  if (!files)
+    return false;
+  
   for (let i = 0; i < files.length; i++)
   {
     addPodcastToCollection(files[i]);
   }
+
+  if (files.length > 0)
+    return true;
+  
+  return false;
 }
 
-/** @param { FeedObject } feedUrl
+/** @param { string } feedUrl
 */
 function addPodcastToCollection(url)
 { 
@@ -394,10 +391,9 @@ function addPodcastToCollection(url)
   */
   function processFeed(url)
   {
-    const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
 
     // if url is a link
-    if (regex.test(url))
+    if (audioUrlTypeRegex.test(url))
       return readFeedLink(url);
     // else if it's a file
     else
@@ -449,7 +445,7 @@ function addPodcastToCollection(url)
 
       // load podcast episodes
 
-      updatePodcastEpisodes(podcastElement, feed.items);
+      updatePodcastEpisodes(podcastElement, picture, feed.items);
     })
     .catch(() =>
     {
@@ -539,6 +535,20 @@ function showPodcastOverlay(overlay)
   {
     overlay.classList.add('active');
   }, 100);
+}
+
+/** @param { FeedItem } episode
+* @param { string } picture
+* @param { boolean } clearQueue
+*/
+function queuePodcast(episode, picture, clearQueue)
+{
+  queueTracks(false, undefined, undefined, clearQueue, {
+    url: episode.enclosures[0].url,
+    title: episode.title,
+    artists: (episode.author) ? [ episode.author ] : undefined,
+    picture: picture
+  });
 }
 
 export function showPodcastCollectionOverlay()
