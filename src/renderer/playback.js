@@ -15,7 +15,7 @@ import { artistsRegex } from './storage.js';
 import {
   createElement, createContextMenu, removeAllChildren,
   setSeekTimeWithUI, switchPlayingMode, toggleSeekBarLoading,
-  defaultPicture
+  defaultPicture, toggleSeekBarBuffering, setSeekBarBuffering
 } from './renderer.js';
 
 /** @typedef { Object } QueueObject
@@ -423,6 +423,9 @@ export function rewindBackwards(time)
 
   const duration = getDuration();
 
+  if (duration <= 0)
+    return;
+
   const seekTime = Math.max(getSeekTime() - parseFloat(time), 0);
 
   setSeekTimeWithUI(seekTime / duration);
@@ -439,6 +442,9 @@ export function skipForward(time)
     time = skipTime;
 
   const duration = getDuration();
+
+  if (duration <= 0)
+    return;
 
   const seekTime = Math.min(parseFloat(time) + getSeekTime(), duration);
 
@@ -723,10 +729,15 @@ export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, cl
         queueElements.push(appendQueueItem());
       }
 
+      let insertAfterUrl;
+
       // if the queue should start playing from a certain track
       if (startingTrackUrl)
       {
-        resortQueue(queue.findIndex((item) => item.url === startingTrackUrl));
+        if (playingIndex < 0)
+          resortQueue(queue.findIndex((item) => item.url === startingTrackUrl));
+        else
+          insertAfterUrl = startingTrackUrl;
       }
       else
       {
@@ -747,7 +758,13 @@ export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, cl
   
       saveQueue();
       
-      shuffleQueue();
+      // make sure that the targeted track is played after the current playing track
+      // after the shuffle
+      if (insertAfterUrl)
+        shuffleQueue(queue.findIndex((item) => item.url === insertAfterUrl));
+      else
+        shuffleQueue();
+      
       changeQueue(quiet);
 
       // if the track playing should start from a certain seek-time
@@ -759,7 +776,9 @@ export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, cl
   });
 }
 
-function shuffleQueue()
+/** @param { number } insertAfterIndex
+*/
+function shuffleQueue(insertAfterIndex)
 {
   let newQueue;
 
@@ -793,12 +812,13 @@ function shuffleQueue()
   }
 
   // update the queue ui
-  resortQueue(playingIndex);
+  resortQueue(playingIndex, insertAfterIndex);
 }
 
-/** @param { string } fromIndex
+/** @param { number } fromIndex
+* @param { number } after
 */
-function resortQueue(fromIndex)
+function resortQueue(fromIndex, insertAfterIndex)
 {
   if (queue.length <= 0 || (fromIndex === undefined && playingIndex <= -1))
     return;
@@ -809,6 +829,19 @@ function resortQueue(fromIndex)
 
   // update the current track card
   updateCurrentCard(playingIndex);
+
+  if (insertAfterIndex > -1)
+  {
+    let replaceIndex = playingIndex + 1;
+
+    if (replaceIndex >= queue.length)
+      replaceIndex = 0;
+
+    const temp = queue[replaceIndex];
+
+    queue[replaceIndex] = queue[insertAfterIndex];
+    queue[insertAfterIndex] = temp;
+  }
 
   // if the queue was empty then remove the queue is empty element
   const clearElement = queueContainer.querySelector('.queueItem.clear');
@@ -1031,10 +1064,12 @@ function changeQueue(quiet)
 {
   // save the playing index
   savePlayingTrack();
-
+  
   // if playing index is -1, this is a clear, not a change
   if (playingIndex === -1 && !currentHowl)
   {
+    toggleSeekBarBuffering(false);
+    
     events.emit('track', undefined);
 
     return;
@@ -1064,6 +1099,8 @@ function changeQueue(quiet)
     // a new track is queued to play instantly,
     // so stop the current playing track
 
+    toggleSeekBarBuffering(false);
+
     currentHowl.stop();
     currentHowl.unload();
 
@@ -1087,6 +1124,7 @@ function changeQueue(quiet)
     src: url,
     // defaults to html5 for faster load times and remote streaming
     html5: true,
+    preload: false,
     format: audioExtensions
   });
 
@@ -1098,6 +1136,22 @@ function changeQueue(quiet)
   howl.on('pause', pauseEvent);
 
   howl.on('end', endEvent);
+
+  howl.on('load', bufferEvent);
+
+  howl.on('loaderror', (error) =>
+  {
+    console.error(error);
+
+    endEvent();
+  });
+
+  howl.on('playerror', (error) =>
+  {
+    console.error(error);
+
+    endEvent();
+  });
 
   // emit a track change event
   howl.once('load', () =>
@@ -1129,6 +1183,32 @@ function changeQueue(quiet)
     if (playingMode === 'playing')
       switchPlayingMode();
   }
+}
+
+function bufferEvent()
+{
+  const node = currentHowl._sounds[0]._node;
+
+  node.addEventListener('progress', () =>
+  {
+    const duration = currentHowl.duration();
+
+    if (duration > 0)
+    {
+      for (let i = 0; i < node.buffered.length; i++)
+      {
+        if (node.buffered.start(node.buffered.length - 1 - i) < node.currentTime)
+        {
+          const bufferProgress = (node.buffered.end(node.buffered.length - 1 - i) / duration) * 100;
+
+          toggleSeekBarBuffering(true);
+          setSeekBarBuffering(bufferProgress);
+          
+          break;
+        }
+      }
+    }
+  });
 }
 
 function playEvent()

@@ -13,6 +13,7 @@ body.defaultMode
 
   --empty-percentageBar: #806969;
   --filled-percentageBar: white;
+  --buffered-percentageBar: #797373;
   --accent-color: #7FFFD4;
   --queue-now-playing-card-background: #964141;
 
@@ -50,6 +51,7 @@ body.darkMode
 
   --empty-percentageBar: #4b4b4b;
   --filled-percentageBar: #d4d4d4;
+  --buffered-percentageBar: #797373;
   --accent-color: #8281a5;
   --queue-now-playing-card-background: #252020;
 

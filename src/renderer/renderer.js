@@ -589,6 +589,33 @@ export function toggleSeekBarLoading(state)
   }
 }
 
+/** @param { boolean } state
+*/
+export function toggleSeekBarBuffering(state)
+{
+  const indicator = seekBar.querySelector('.indicator');
+
+  if (state)
+  {
+    if (!indicator.classList.contains('buffering'))
+      indicator.classList.add('buffering');
+  }
+  else
+  {
+    if (indicator.classList.contains('buffering'))
+      indicator.classList.remove('buffering');
+  }
+}
+
+/** @param { number } progress
+*/
+export function setSeekBarBuffering(progress)
+{
+  const indicator = seekBar.querySelector('.indicator');
+
+  indicator.style.setProperty('--bar-percentage', progress + '%');
+}
+
 // Callbacks
 
 function resizeEnd()

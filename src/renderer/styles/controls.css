@@ -1,6 +1,6 @@
 .seekBar.container
 {
-  background: linear-gradient(90deg, var(--filled-percentageBar) var(--bar-percentage, 0%), rgba(0,0,0,0) 0%, var(--empty-percentageBar) 0%);
+  background-color: var(--empty-percentageBar);
 
   min-height: 6px;
   max-height: 8px;
@@ -25,6 +25,21 @@
   border-radius: 5px;
 }
 
+.seekBar.indicator.buffering:before
+{
+  content: "";
+  display: block;
+  position: relative;
+
+  background-color: var(--buffered-percentageBar);
+
+  left: 0;
+  width: var(--bar-percentage, 0%);
+  height: 100%;
+
+  border-radius: 5px;
+}
+
 .seekBar.indicator.loading:after
 {
   content: "";
@@ -37,13 +52,27 @@
 
   border-radius: 5px;
 
-  background-color: var(--filled-percentageBar);
+  background-color: var(--buffered-percentageBar);
 
   animation-name: loading-animation;
   animation-duration: 1s;
   animation-direction: normal;
   animation-iteration-count: infinite;
   animation-timing-function: cubic-bezier(0.46, 0.03, 0.52, 0.96);
+}
+
+.seekBar.main
+{
+  position: relative;
+
+  background-color: var(--filled-percentageBar);
+
+  left: 0;
+  top: -100%;
+  width: var(--bar-percentage, 0%);
+  height: 100%;
+
+  border-radius: 5px;
 }
 
 .volumeBar.container
