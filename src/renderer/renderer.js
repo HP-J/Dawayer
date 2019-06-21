@@ -772,6 +772,11 @@ export function createContextMenu(element, menuItems, parentElement)
       {
         document.body.removeChild(contextMenuWrapper);
 
+        element.classList.remove('contextHover');
+
+        if (parentElement)
+          parentElement.classList.remove('contextHover');
+
         contextMenuWrapper.hidden = true;
       }
     };
@@ -902,17 +907,17 @@ export function createContextMenu(element, menuItems, parentElement)
       contextMenuWrapper.inside = true;
     };
 
-    parentElement.addEventListener('mouseenter', () =>
-    {
-      contextMenuWrapper.insideParent = true;
-    });
-
     contextMenuWrapper.onmouseleave = () =>
     {
       contextMenuWrapper.inside = false;
 
       waitThenHide();
     };
+
+    parentElement.addEventListener('mouseenter', () =>
+    {
+      contextMenuWrapper.insideParent = true;
+    });
 
     parentElement.addEventListener('mouseleave', () =>
     {
