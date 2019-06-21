@@ -27,7 +27,9 @@
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.queue.container:hover, .controlBar.container.extended > .queue.container
+.queue.container:hover,
+.queue.container.contextHover,
+.controlBar.container.extended > .queue.container
 {
   box-shadow: 0px 0px 22px 4px var(--maximized-queue-shadows);
 
@@ -41,7 +43,7 @@
   position: relative;
   display: grid;
 
-  grid-template-columns: 25% 1fr;
+  grid-template-columns: 20% 1fr;
   grid-template-rows: auto auto;
   grid-template-areas: "cover artist" "cover title";
   grid-column-gap: 3%;
@@ -166,6 +168,18 @@
 {
   width: 100%;
   height: auto;
+
+  font-family: Montserrat, sans-serif;
+}
+
+.queue.itemsContainer:empty:before
+{
+  content: 'Nothing is queued to play.';
+  display: block;
+
+  color: var(--unavailable-buttons-and-shadows);
+
+  font-weight: 900;
 }
 
 .queueItem.container
@@ -182,10 +196,8 @@
   overflow: hidden;
   user-select: none;
 
-  width: max-content;
+  width: fit-content;
   height: auto;
-
-  font-family: Montserrat, sans-serif;
 
   transition-property: color;
   transition-duration: 0.25s;
@@ -202,6 +214,8 @@
   cursor: pointer;
 }
 
+.queueItem.container:not(.clear).contextHover > .queueItem.title,
+.queueItem.container:not(.clear).contextHover > .queueItem.artist,
 .queueItem.container:not(.clear):hover > .queueItem.title,
 .queueItem.container:not(.clear):hover > .queueItem.artist
 {
@@ -269,7 +283,8 @@
 }
 
 .queueItem.title,
-.queue.playing.title
+.queue.playing.title,
+.queue.itemsContainer:empty:before
 {
   font-size: calc(5px + 0.35vw + 0.4vh);
 }
@@ -293,7 +308,8 @@
   }
 
   .queueItem.title,
-  .queue.playing.title
+  .queue.playing.title,
+  .queue.itemsContainer:empty:before
   {
     font-size: calc(5px + 0.6vw + 0.4vh);
   }
@@ -337,7 +353,8 @@
   }
 
   .queueItem.title,
-  .queue.playing.title
+  .queue.playing.title,
+  .queue.itemsContainer:empty:before
   {
     font-size: 9px;
   }
@@ -362,7 +379,8 @@
   }
 
   .queueItem.title,
-  .queue.playing.title
+  .queue.playing.title,
+  .queue.itemsContainer:empty:before
   {
     font-size: 11px;
   }

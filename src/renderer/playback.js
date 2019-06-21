@@ -10,13 +10,28 @@ import { Howl, Howler as howler } from 'howler';
 
 import * as settings from '../settings.js';
 
-import { artistsRegex, audioExtensionsRegex } from './storage.js';
+import { artistsRegex } from './storage.js';
 
 import {
   createElement, createContextMenu, removeAllChildren,
   setSeekTimeWithUI, switchPlayingMode, toggleSeekBarLoading,
   defaultPicture
 } from './renderer.js';
+
+/** @typedef { Object } QueueObject
+* @property { string } url
+* @property { number } index
+* @property { string } title
+* @property { string[] } artists
+* @property { string } album
+* @property { string } picture
+*/
+
+export const audioExtensions =[ 'mp3', 'mpeg', 'opus', 'ogg', 'wav', 'aac', 'acc' ];
+
+export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.flac$/;
+
+export const audioUrlTypeRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
 
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
@@ -25,7 +40,7 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 const events = new EventEmitter();
 
-/**  @type { [ { url: string, index: number, title: string, artists: string[], album: string, picture: string, duration: number } ] }
+/** @type { QueueObject[] }
 */
 let queue = [];
 
@@ -92,7 +107,12 @@ export function initPlayback()
   */
   let args = remote.getGlobal('argv');
   
-  args = args.filter((arg) => typeof arg === 'string' && arg.match(audioExtensionsRegex));
+  args = args.filter((arg) => typeof arg === 'string' && arg.match(audioExtensionsRegex)).map((x) =>
+  {
+    return {
+      url: x
+    };
+  });
   
   if (args.length > 0)
     queueTracks(false, undefined, undefined, true, ...args);
@@ -102,8 +122,13 @@ export function initPlayback()
   // allows the main process to queue tracks on the case it might needs to
   ipcRenderer.on('queueTracks', (...args) =>
   {
-    args = args.filter((arg) => typeof arg === 'string' && arg.match(audioExtensionsRegex));
-    
+    args = args.filter((arg) => typeof arg === 'string' && arg.match(audioExtensionsRegex)).map((x) =>
+    {
+      return {
+        url: x
+      };
+    });
+
     if (args.length > 0)
       queueTracks(false, undefined, undefined, true, ...args);
   });
@@ -118,24 +143,22 @@ export function initPlayback()
 export function getDuration()
 {
   if (playingIndex > -1 && currentHowl && currentHowl.state() === 'loaded')
-    return queue[playingIndex].duration;
+    return currentHowl.duration();
   else
     return -1;
 }
 
 export function getSeekTime()
 {
-  if (playingIndex > -1 && currentHowl && currentHowl.state() === 'loaded')
-  {
-    const seekTime = currentHowl.seek();
-    
-    if (typeof seekTime === 'number')
-      return seekTime;
-    else if (currentHowl.seekTimeProgress)
-      return currentHowl.seekTimeProgress / 1000;
-    else
-      return 0;
-  }
+  if (playingIndex <= -1 || !currentHowl || currentHowl.state() !== 'loaded')
+    return 0;
+  
+  const seekTime = currentHowl.seek();
+  
+  if (typeof seekTime === 'number')
+    return seekTime;
+  else if (currentHowl.seekTimeProgress)
+    return currentHowl.seekTimeProgress / 1000;
   else
     return 0;
 }
@@ -159,7 +182,7 @@ export function setPlayingIndex(index)
 */
 export function setSeekTime(time, visualOnly, isInPercentage)
 {
-  function set(time)
+  function set(time, isInPercentage)
   {
     if (isInPercentage)
       time = time * getDuration();
@@ -202,18 +225,21 @@ export function setSeekTime(time, visualOnly, isInPercentage)
     {
       if (currentHowl.state() !== 'loaded')
       {
-        currentHowl.setTimeOnLoad = time;
+        currentHowl.setTimeOnLoad = {
+          time: time,
+          isInPercentage: isInPercentage
+        };
 
         currentHowl.once('load', () =>
         {
-          set(currentHowl.setTimeOnLoad);
+          set(currentHowl.setTimeOnLoad.time, currentHowl.setTimeOnLoad.isInPercentage);
 
           events.emit('seekTime', getSeekTime());
         });
       }
       else
       {
-        set(time);
+        set(time, isInPercentage);
 
         events.emit('seekTime', getSeekTime());
       }
@@ -389,15 +415,15 @@ export function setRepeatMode(mode)
 */
 export function rewindBackwards(time)
 {
-  if (playingIndex <= -1)
+  if (playingIndex <= -1 || !currentHowl || currentHowl.state() !== 'loaded')
     return;
 
   if (typeof time !== 'number')
     time = rewindTime;
 
-  const duration = queue[playingIndex].duration;
+  const duration = getDuration();
 
-  const seekTime = Math.max(getSeekTime() - time, 0);
+  const seekTime = Math.max(getSeekTime() - parseFloat(time), 0);
 
   setSeekTimeWithUI(seekTime / duration);
 }
@@ -406,16 +432,16 @@ export function rewindBackwards(time)
 */
 export function skipForward(time)
 {
-  if (playingIndex <= -1)
+  if (playingIndex <= -1 || !currentHowl || currentHowl.state() !== 'loaded')
     return;
 
   if (typeof time !== 'number')
     time = skipTime;
 
-  const duration = queue[playingIndex].duration;
+  const duration = getDuration();
 
-  const seekTime = Math.min(getSeekTime() + time, duration);
-  
+  const seekTime = Math.min(parseFloat(time) + getSeekTime(), duration);
+
   setSeekTimeWithUI(seekTime / duration);
 }
 
@@ -524,52 +550,6 @@ function updateCurrentCard(index)
   }
 }
 
-/** @param { Storage } storage
-* @param { string } title
-* @param { string } url
-* @returns { Promise<{ title: string, artists: string[], album: string, picture: string, duration: number }> }
-*/
-function getTrackMetadata(storage, url)
-{
-  if (storage && storage.tracks[url])
-  {
-    return new Promise((resolve) =>
-    {
-      resolve({
-        title: storage.tracks[url].title,
-        artists: storage.tracks[url].artists,
-        album: storage.tracks[url].album,
-        picture: storage.tracks[url].picture,
-        duration: storage.tracks[url].duration
-      });
-    });
-  }
-  else
-  {
-    return getMetadata(url, { duration: true })
-      .then(metadata =>
-      {
-        const title = metadata.common.title || basename(url, extname(url));
-        let artists = metadata.common.artists || [ 'Unknown Artist' ];
-
-        // auto split artists by comma
-        artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
-
-        const obj = {
-          title: title,
-          artists: artists,
-          album: metadata.common.album,
-          duration: metadata.format.duration
-        };
-
-        if (metadata.common.picture && metadata.common.picture.length > 0)
-          obj.picture = settings.cacheImage(metadata.common.picture[0]);
-
-        return obj;
-      });
-  }
-}
-
 /** @param { number } index
 * @param { string } title
 * @param { string } artist
@@ -598,125 +578,155 @@ export function on(eventName, callback)
   events.on(eventName, callback);
 }
 
-/** the main way to handle queuing tracks in dawayer, using the storage object to obtain the required metadata
+/** queue tracks that are cached on the storage object by
+* obtaining the cached metadata instead of parsing the file over and over again
 * @param { Storage } storage
-* @param { string } playingTrackUrl
-* @param { number } urls
-* @param { boolean } clear
-* @param { string } tracks
+* @param { string } startingTrackUrl
+* @param { boolean } clearQueue
+* @param { string[] } urls
 */
-export function queueStorageTracks(storage, playingTrackUrl, seekTime, clear, ...tracks)
+export function queueStorageTracks(storage, startingTrackUrl, clearQueue, ...urls)
 {
-  return new Promise((resolve) =>
+  /** @type { QueueObject[] }
+  */
+  const tracks = [];
+
+  for (let i = 0; i < urls.length; i++)
   {
-    if (clear)
+    const url = urls[i];
+
+    tracks.push({
+      url: url,
+      title: storage.tracks[url].title,
+      artists: storage.tracks[url].artists,
+      album: storage.tracks[url].album,
+      picture: storage.tracks[url].picture
+    });
+  }
+
+  return queueTracks(false, startingTrackUrl, undefined, clearQueue, ...tracks);
+}
+
+/** can be used to queue tracks from file or remote urls
+* @param { boolean } quiet
+* @param { string } startingTrackUrl
+* @param { number } startingTrackPercentage
+* @param { boolean } clearQueue
+* @param { QueueObject[] } tracks
+*/
+export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, clearQueue, ...tracks)
+{
+  return new Promise((resolve, reject) =>
+  {
+    if (clearQueue)
       partialClearQueue();
-    
+
+    let loading = false;
+
+    // feedback that queuing is in progress
+    // incase missing metadata takes couple of seconds to load
+    if (queue.length <= 0)
+    {
+      toggleSeekBarLoading(true);
+
+      loading = true;
+    }
+
     const promises = [];
 
     for (let i = 0; i < tracks.length; i++)
     {
-      const exists = queue.find((obj) => obj.url === tracks[i]);
+      /** @type { QueueObject }
+      */
+      const queueObject = {};
 
-      // if the same track already exists in the queue
-      if (exists && tracks.length === 1)
+      queueObject.index = queue.length;
+
+      // essential variables
+      queueObject.url = tracks[i].url;
+      queueObject.title = tracks[i].title;
+      queueObject.artists = tracks[i].artists;
+
+      // non-essential variables
+      queueObject.album = tracks[i].album;
+      queueObject.picture = tracks[i].picture;
+
+      if (!queueObject.url)
+        continue;
+
+      // if essential variables are missing
+
+      if (!queueObject.title || !queueObject.artists)
       {
-        resortQueue(exists.index);
-      }
-      else if (!exists)
-      {
-        promises.push(getTrackMetadata(storage, tracks[i]).then((obj) =>
+        // if remote url
+        if (audioUrlTypeRegex.test(queueObject.url))
         {
-          queue.push({
-            url: tracks[i],
-            index: queue.length,
-            title: obj.title,
-            artists: obj.artists,
-            album: obj.album,
-            picture: obj.picture,
-            duration: obj.duration
-          });
+          if (!queueObject.title)
+            queueObject.title = basename(queueObject.url, extname(queueObject.url));
 
-          queueElements.push(appendQueueItem());
-        }));
-      }
-    }
-
-    Promise.all(promises).then(() =>
-    {
-      if (playingTrackUrl)
-      {
-        resortQueue(queue.findIndex((item) => item.url === playingTrackUrl));
-      }
-      else
-      {
-        if (playingIndex < 0)
-        {
-          let newIndex = 0;
-
-          if (shuffleMode === 'shuffled')
-            newIndex = Math.floor(Math.random() * queue.length);
-
-          resortQueue(newIndex);
+          if (!queueObject.artists)
+            queueObject.artists = [ 'Unknown Artist' ];
         }
+        // else if file url
         else
         {
-          resortQueue(playingIndex);
+          promises.push(getMetadata(queueObject.url)
+            .then(metadata =>
+            {
+              const title = metadata.common.title || basename(queueObject.url, extname(queueObject.url));
+
+              // if title is missing
+              if (!queueObject.title)
+                queueObject.title = title;
+
+              // if artists is missing
+              if (!queueObject.artists)
+              {
+                const artists = metadata.common.artists || [ 'Unknown Artist' ];
+                
+                // auto split artists by comma
+                queueObject.artists = union(...[].concat(artists).map((v) => v.split(artistsRegex)));
+              }
+
+              // fill other non-essential variables if they were missing
+
+              if (!queueObject.album)
+                queueObject.artists = metadata.common.album;
+
+              if (!queueObject.picture)
+                queueObject.picture =  settings.cacheImage(metadata.common.picture[0]);
+            }));
         }
       }
 
-      saveQueue();
-      
-      shuffleQueue();
-      changeQueue();
-
-      if (seekTime)
-        setSeekTimeWithUI(seekTime / getDuration());
-
-      resolve();
-    });
-  });
-}
-
-/** should be used to load track from urls, used to load saved queues or files that are not stored
-* @param { boolean } quiet
-* @param { string } playingTrackUrl
-* @param { number } playingPercentage
-* @param { boolean } clear
-* @param { string[] } urls
-*/
-function queueTracks(quiet, playingTrackUrl, playingPercentage, clear, ...urls)
-{
-  return new Promise((resolve) =>
-  {
-    if (clear)
-      partialClearQueue();
-
-    const promises = [];
-
-    for (let i = 0; i < urls.length; i++)
-    {
-      promises.push(getTrackMetadata(undefined, urls[i]).then((obj) =>
-      {
-        queue.push({
-          url: urls[i],
-          index: queue.length,
-          title: obj.title,
-          artists: obj.artists,
-          album: obj.album,
-          picture: obj.picture,
-          duration: obj.duration
-        });
-  
-        queueElements.push(appendQueueItem());
-      }));
+      queue.push(queueObject);
     }
   
     Promise.all(promises).then(() =>
     {
-      if (playingTrackUrl)
+      if (loading)
+        toggleSeekBarLoading(false);
+
+      // if queue is empty then we didn't queue anything with this call
+      // return an error
+      if (queue.length <= 0)
       {
-        resortQueue(queue.findIndex((item) => item.url === playingTrackUrl));
+        reject('Empty Queue');
+
+        return;
+      }
+
+      // make sure queue UI elements equals the number of track on queue
+      // before they get updated
+      while (queueElements.length < queue.length)
+      {
+        queueElements.push(appendQueueItem());
+      }
+
+      // if the queue should start playing from a certain track
+      if (startingTrackUrl)
+      {
+        resortQueue(queue.findIndex((item) => item.url === startingTrackUrl));
       }
       else
       {
@@ -740,8 +750,9 @@ function queueTracks(quiet, playingTrackUrl, playingPercentage, clear, ...urls)
       shuffleQueue();
       changeQueue(quiet);
 
-      if (playingPercentage)
-        setSeekTimeWithUI(playingPercentage);
+      // if the track playing should start from a certain seek-time
+      if (startingTrackPercentage)
+        setSeekTimeWithUI(startingTrackPercentage);
 
       resolve();
     });
@@ -888,7 +899,7 @@ function resortQueue(fromIndex)
           currentHowl.eventCanceled = undefined;
         }
       }
-    }, queueContainer.parentElement);
+    }, queueContainer.parentElement.parentElement);
 
     if (playingIndex > i)
     {
@@ -953,13 +964,6 @@ function clearQueue()
 
   // remove all the tracks from the queue ui
   removeAllChildren(queueContainer);
-
-  // add element to notify the user that the queue is empty
-  const queueEmptyElement = appendQueueItem();
-
-  // set the title and make it less visible
-  queueEmptyElement.children[2].innerText = 'Nothing is queued to play.';
-  queueEmptyElement.classList.add('played', 'clear');
 }
 
 /** partially clears the queue to allow a new queue to take the spotlight
@@ -986,7 +990,12 @@ function partialClearQueue()
 
 function saveQueue()
 {
-  settings.set('queueTracks', queue.map(item => item.url));
+  settings.set('queueTracks', queue.map(item =>
+  {
+    return {
+      url: item.url
+    };
+  }));
 }
 
 function savePlayingTrack()
@@ -1076,6 +1085,9 @@ function changeQueue(quiet)
 
   const howl = new Howl({
     src: url,
+    // defaults to html5 for faster load times and remote streaming
+    html5: true,
+    format: audioExtensions
   });
 
   howl.url = url;
@@ -1095,7 +1107,7 @@ function changeQueue(quiet)
       artists: queue[playingIndex].artists,
       album: queue[playingIndex].album,
       picture: queue[playingIndex].picture,
-      duration: queue[playingIndex].duration
+      duration: getDuration()
     });
   });
 
@@ -1146,10 +1158,12 @@ function updateSeekTimeEvent()
 
   currentHowl.seekTimeProgress = currentHowl.seekTimeProgress + delta;
 
+  const duration = getDuration();
+
   setSeekTimeWithUI(
     Math.min(
-      (currentHowl.seekTimeProgress / 1000) / queue[playingIndex].duration,
-      queue[playingIndex].duration
+      (currentHowl.seekTimeProgress / 1000) / duration,
+      duration
     ), true);
 
   currentHowl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTimeEvent);

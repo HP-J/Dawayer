@@ -41,7 +41,7 @@
 
   animation-name: loading-animation;
   animation-duration: 1s;
-  animation-direction: alternate;
+  animation-direction: normal;
   animation-iteration-count: infinite;
   animation-timing-function: cubic-bezier(0.46, 0.03, 0.52, 0.96);
 }

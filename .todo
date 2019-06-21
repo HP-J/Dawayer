@@ -2,19 +2,20 @@ Performance Issues and Bugs:
   ☐ add a substitute after the removal of lastfm apis (probably also the the same api as the streaming service)
   ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts)
 
-  ☐ does queue have context menus? if yes they don't have contextHover styles yet.
+  ☐ a way for podcasts to get seek-time and duration from the playback.js
+  ☐ saved queues if they have any remote urls it won't save the artist or the title
 
 Testing:
+  ☐ test caching queue and loading it on app start
+  ☐ test opening dawayer with a track url in args
+
+  ☐ ordering another queuing process while a queuing process is already taking place might cause Dawayer to break
 
 Features:
   ☐ a load more button to load more podcast episodes
-  ☐ cache and load podcasts
 
-  ☐ redesign podcast element to look better after removing the artist label
-  ☐ redesign podcast element to auto height with the height of the title
-  
-  ☐ redesign podcast overlay to look better after removing the artist label
-  ☐ redesign podcast overlay to show episodes summary
+  ☐ cache and load podcasts
+  ☐ search functions in the collection overlay and its items have add button
 
   ☐ research feed suggestions & an api to get more accurate info about artist releases
     (probably the same api as the streaming service)

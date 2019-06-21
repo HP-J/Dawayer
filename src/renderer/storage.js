@@ -12,7 +12,7 @@ import * as settings from '../settings.js';
 import { parseFile as getMetadata } from 'music-metadata';
 
 import { appendDirectoryNode } from './options.js';
-import { queueStorageTracks } from './playback.js';
+import { queueStorageTracks, audioExtensionsRegex } from './playback.js';
 
 import {
   createElement, createIcon, createContextMenu,
@@ -58,8 +58,6 @@ const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 * @property { Object<string, Artist> } artists
 * @property { Object<string, Track> } tracks
 */
-
-export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.m4a$|.flac$/;
 
 /* the base directory for the app config files
 */
@@ -1070,17 +1068,16 @@ function storageNavigation(storage, ...keys)
   {
     // clear the queue then play the track
     if (keys[0] === 'play-track')
-      queueStorageTracks(storage, undefined, undefined, true, keys[1]);
+      queueStorageTracks(storage, undefined, true, keys[1]);
     // queue the track at bottom
     else
-      queueStorageTracks(storage, undefined, undefined, false, keys[1]);
+      queueStorageTracks(storage, undefined, false, keys[1]);
   }
   // play the album from a selected track
   else if (keys[0] === 'play-album-track' || keys[0] === 'add-album-track')
   {
     queueStorageTracks(storage,
       keys[2],
-      undefined,
       (keys[0] === 'play-album-track'),
       ...storage.albums[keys[1]].tracks);
   }
@@ -1089,10 +1086,10 @@ function storageNavigation(storage, ...keys)
   {
     // clear the queue then play the album
     if (keys[0] === 'play-album')
-      queueStorageTracks(storage, undefined, undefined, true, ...storage.albums[keys[1]].tracks);
+      queueStorageTracks(storage, undefined, true, ...storage.albums[keys[1]].tracks);
     // queue the album at bottom
     else
-      queueStorageTracks(storage, undefined, undefined, false, ...storage.albums[keys[1]].tracks);
+      queueStorageTracks(storage, undefined, false, ...storage.albums[keys[1]].tracks);
   }
   // play the artist's tracks and/or albums
   else if (keys[0] === 'play-artist' || keys[0] === 'add-artist')
@@ -1110,10 +1107,10 @@ function storageNavigation(storage, ...keys)
 
     // clear the queue then play the tracks
     if (keys[0] === 'play-artist')
-      queueStorageTracks(storage, undefined, undefined, true, ...tracks);
+      queueStorageTracks(storage, undefined, true, ...tracks);
     // queue the tracks at bottom
     else
-      queueStorageTracks(storage, undefined, undefined, false, ...tracks);
+      queueStorageTracks(storage, undefined, false, ...tracks);
   }
 }
 
