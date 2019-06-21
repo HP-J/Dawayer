@@ -760,10 +760,7 @@ export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, cl
       
       // make sure that the targeted track is played after the current playing track
       // after the shuffle
-      if (insertAfterUrl)
-        shuffleQueue(queue.findIndex((item) => item.url === insertAfterUrl));
-      else
-        shuffleQueue();
+      shuffleQueue(insertAfterUrl);
       
       changeQueue(quiet);
 
@@ -776,9 +773,9 @@ export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, cl
   });
 }
 
-/** @param { number } insertAfterIndex
+/** @param { string } insertAfterUrl
 */
-function shuffleQueue(insertAfterIndex)
+function shuffleQueue(insertAfterUrl)
 {
   let newQueue;
 
@@ -812,7 +809,7 @@ function shuffleQueue(insertAfterIndex)
   }
 
   // update the queue ui
-  resortQueue(playingIndex, insertAfterIndex);
+  resortQueue(playingIndex, queue.findIndex((item) => item.url === insertAfterUrl));
 }
 
 /** @param { number } fromIndex

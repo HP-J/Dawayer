@@ -3,13 +3,13 @@ Performance Issues and Bugs:
   ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts)
 
   ☐ a way for podcasts to get seek-time and duration from the playback.js
-  ☐ saved queues if they have any remote urls it won't save the artist or the title
+  ☐ saved queues if they have any remote urls it won't save/load the artist or the title
 
 Testing:
-  ☐ test caching queue and loading it on app start
-  ☐ test opening dawayer with a track url in args
+  ☐ test loading saved queue on app start
+  ☐ test opening dawayer with a file and remote urls in args
 
-  ☐ ordering another queuing process while a queuing process is already taking place might cause Dawayer to break
+  ☐ calling another queuing process while a queuing process is already taking place might cause Dawayer to break
 
 Features:
   ☐ a load more button to load more podcast episodes
@@ -28,7 +28,10 @@ Features:
 
 UI/UX:
   ☐ sketch the feed page
+  ☐ sketch the way that a streaming service will fit in Dawayer UI
 
 CI/CD:
+  ☐ release a PWA (needs a lot of work to replace the incompatible dependencies from Dawayer)
+
   ☐ release a Windows build after testing @help-needed
   ☐ release a macOS build after testing @help-needed
