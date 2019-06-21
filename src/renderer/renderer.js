@@ -627,6 +627,11 @@ export function changePage(element, callback)
 {
   const selected = document.querySelector('.menuItem.selected');
 
+  // hide any active tooltip
+  // if the user clicked on a tooltip to change page
+  // it shouldn't stick around after
+  tippy.hideAll();
+
   if (selected !== element)
   {
     selected.classList.remove('selected');
