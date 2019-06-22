@@ -97,9 +97,12 @@ export function initPlayback()
   {
     if (event.key === ' ')
     {
-      event.preventDefault();
-
-      switchPlayingMode();
+      if (document.activeElement.tagName !== 'INPUT')
+      {
+        event.preventDefault();
+        
+        switchPlayingMode();
+      }
     }
   });
 
