@@ -15,7 +15,7 @@ import { artistsRegex } from './storage.js';
 import {
   createElement, createContextMenu, removeAllChildren,
   setSeekTimeWithUI, switchPlayingMode, toggleSeekBarLoading,
-  defaultPicture, toggleSeekBarBuffering, setSeekBarBuffering
+  defaultPicture, toggleSeekBarBuffered, setSeekBarBuffered
 } from './renderer.js';
 
 /** @typedef { Object } QueueObject
@@ -160,8 +160,8 @@ export function getSeekTime()
   
   if (typeof seekTime === 'number')
     return seekTime;
-  else if (currentHowl.seekTimeProgress)
-    return currentHowl.seekTimeProgress / 1000;
+  else if (currentHowl.last)
+    return currentHowl.last;
   else
     return 0;
 }
@@ -190,10 +190,11 @@ export function setSeekTime(time, visualOnly, isInPercentage)
     if (isInPercentage)
       time = time * getDuration();
 
+    toggleSeekBarBuffered(false);
+    setSeekBarBuffered(0);
+
     currentHowl.seek(time);
 
-    currentHowl.seekTimeProgress = time * 1000;
-    
     events.emit('position', getSeekTime());
   }
 
@@ -1068,7 +1069,8 @@ function changeQueue(quiet)
   // if playing index is -1, this is a clear, not a change
   if (playingIndex === -1 && !currentHowl)
   {
-    toggleSeekBarBuffering(false);
+    toggleSeekBarBuffered(false);
+    setSeekBarBuffered(0);
     
     events.emit('track', undefined);
 
@@ -1099,7 +1101,8 @@ function changeQueue(quiet)
     // a new track is queued to play instantly,
     // so stop the current playing track
 
-    toggleSeekBarBuffering(false);
+    toggleSeekBarBuffered(false);
+    setSeekBarBuffered(0);
 
     currentHowl.stop();
     currentHowl.unload();
@@ -1201,8 +1204,8 @@ function bufferEvent()
         {
           const bufferProgress = (node.buffered.end(node.buffered.length - 1 - i) / duration) * 100;
 
-          toggleSeekBarBuffering(true);
-          setSeekBarBuffering(bufferProgress);
+          toggleSeekBarBuffered(true);
+          setSeekBarBuffered(bufferProgress);
           
           break;
         }
@@ -1213,7 +1216,6 @@ function bufferEvent()
 
 function playEvent()
 {
-  currentHowl.seekTimeProgress = currentHowl.seek() * 1000;
   currentHowl.last = undefined;
 
   currentHowl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTimeEvent);
@@ -1227,22 +1229,30 @@ function pauseEvent()
 
 function updateSeekTimeEvent()
 {
-  const now = Date.now();
+  const current = getSeekTime();
 
-  if (currentHowl.last === undefined)
-    currentHowl.last = now;
+  // if track is buffering
+  if (current === currentHowl.last)
+  {
+    toggleSeekBarLoading(true);
 
-  const delta = now - currentHowl.last;
+    currentHowl.updateSeekTimeHandle = requestAnimationFrame(updateSeekTimeEvent);
 
-  currentHowl.last = now;
-
-  currentHowl.seekTimeProgress = currentHowl.seekTimeProgress + delta;
+    return;
+  }
+  // track is not buffering
+  else
+  {
+    toggleSeekBarLoading(false);
+  }
+  
+  currentHowl.last = current;
 
   const duration = getDuration();
 
   setSeekTimeWithUI(
     Math.min(
-      (currentHowl.seekTimeProgress / 1000) / duration,
+      current / duration,
       duration
     ), true);
 

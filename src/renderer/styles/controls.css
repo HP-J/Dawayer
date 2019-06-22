@@ -73,6 +73,10 @@
   height: 100%;
 
   border-radius: 5px;
+
+  transition: width;
+  transition-duration: 0.1s;
+  transition-timing-function: linear;
 }
 
 .volumeBar.container

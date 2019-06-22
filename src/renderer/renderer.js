@@ -591,7 +591,7 @@ export function toggleSeekBarLoading(state)
 
 /** @param { boolean } state
 */
-export function toggleSeekBarBuffering(state)
+export function toggleSeekBarBuffered(state)
 {
   const indicator = seekBar.querySelector('.indicator');
 
@@ -609,7 +609,7 @@ export function toggleSeekBarBuffering(state)
 
 /** @param { number } progress
 */
-export function setSeekBarBuffering(progress)
+export function setSeekBarBuffered(progress)
 {
   const indicator = seekBar.querySelector('.indicator');
 
