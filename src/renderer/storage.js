@@ -194,26 +194,6 @@ export function initStorage()
 
   const savedAudioDirectories = settings.get('audioDirectories');
 
-  // skip button hides any active artist overlay
-  window.addEventListener('keydown', (event) =>
-  {
-    // escape button hides any active overlay
-    if (event.key === 'Escape')
-    {
-      event.preventDefault();
-
-      hideActiveOverlay();
-    }
-
-    // space button switches between pause and play
-    if (event.key === 'Space')
-    {
-      event.preventDefault();
-
-      switchPlayingMode();
-    }
-  });
-
   // if no audio directories are found
   // then use the OS default directory for music
   if (!savedAudioDirectories || savedAudioDirectories.length <= 0)

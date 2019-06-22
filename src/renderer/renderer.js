@@ -220,6 +220,28 @@ function initEvents()
 
   // window events
 
+  window.addEventListener('keydown', (event) =>
+  {
+    // escape button hides any active overlay
+    if (event.key === 'Escape')
+    {
+      event.preventDefault();
+
+      hideActiveOverlay();
+    }
+  
+    // space button switches the playing mode
+    if (event.key === ' ')
+    {
+      if (document.activeElement.tagName !== 'INPUT')
+      {
+        event.preventDefault();
+        
+        switchPlayingMode();
+      }
+    }
+  });
+
   window.onload = onload;
   window.onresize = onresize;
 }
@@ -643,7 +665,6 @@ function onresize()
   // set a new resize-end timeout
   resizeEndTimeout = setTimeout(resizeEnd, 25);
 }
-
 
 // Page Transactions
 

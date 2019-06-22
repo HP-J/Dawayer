@@ -92,20 +92,6 @@ export function initPlayback()
 
   // loading the queue will take those settings into account
 
-  // space button switches the playing mode
-  window.addEventListener('keydown', (event) =>
-  {
-    if (event.key === ' ')
-    {
-      if (document.activeElement.tagName !== 'INPUT')
-      {
-        event.preventDefault();
-        
-        switchPlayingMode();
-      }
-    }
-  });
-
   /** @type { string[] }
   */
   let args = remote.getGlobal('argv');
@@ -701,7 +687,7 @@ export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, cl
               // fill other non-essential variables if they were missing
 
               if (!queueObject.album)
-                queueObject.artists = metadata.common.album;
+                queueObject.album = metadata.common.album;
 
               if (!queueObject.picture)
                 queueObject.picture =  settings.cacheImage(metadata.common.picture[0]);
