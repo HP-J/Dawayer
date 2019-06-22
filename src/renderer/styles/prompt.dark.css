@@ -1,0 +1,106 @@
+@font-face
+{
+  font-family: Montserrat;
+  src: url(../fonts/Montserrat/Montserrat-SemiBold.ttf);
+  font-weight: 500;
+}
+
+@font-face
+{
+  font-family: Montserrat;
+  src: url(../fonts/Montserrat/Montserrat-Bold.ttf);
+  font-weight: 900;
+}
+
+body
+{
+  --queue-and-options-background: #1b1818;
+  --white-text: #e6e6e6;
+  --accent-color: #8281a5;
+
+  --search-border: #e6e6e6;
+
+  color: var(--white-text);
+  background-color: var(--queue-and-options-background);
+}
+
+#container
+{
+  display: flex;
+}
+
+#label
+{
+  margin: 0;
+  padding: 0;
+}
+
+#data-container
+{
+  text-align: unset;
+}
+
+#data
+{
+  background-color: unset;
+
+  color: var(--white-text);
+  caret-color: var(--white-text);
+
+  width: 100%;
+
+  font-family: Montserrat, sans-serif;
+  font-weight: 500;
+  font-size: 0.8em;
+
+  padding: 0;
+  margin: 15px 0;
+
+  border: 0;
+  border-bottom: 2px var(--search-border) solid;
+}
+
+#data:invalid
+{
+  border-bottom: 2px red solid;
+}
+
+#data:focus
+{
+  outline: 0;
+}
+
+#buttons
+{
+  padding: 0 5px 0 0;
+}
+
+#buttons > button
+{
+  border-radius: 0;
+  border: 0;
+  margin: 0 0 0 5px;
+
+  color: var(--white-text);
+  background-color: transparent;
+
+  cursor: pointer;
+
+  line-height: unset;
+  font-size: 0.9em;
+  font-weight: 900;
+  text-transform: uppercase;
+
+  padding: 0;
+}
+
+#buttons > button:focus
+{
+  border: 0;
+  outline: 0;
+}
+
+#buttons > button:hover
+{
+  color: var(--accent-color);
+}

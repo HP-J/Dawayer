@@ -1,5 +1,7 @@
 import { BrowserWindow, Menu, app, screen, dialog, ipcMain } from 'electron';
 
+import prompt from 'electron-prompt';
+
 import path from 'path';
 import url from 'url';
 
@@ -16,37 +18,75 @@ let mainWindow;
 
 const menuTemplate = Menu.buildFromTemplate([
   {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Open File', accelerator: 'CmdOrCtrl+O', click()
+        {
+          dialog.showOpenDialog(mainWindow, {
+            title: 'Choose the Audio Files You Want to Play',
+            properties: [ 'openFile', 'multiSelections' ]
+          }, (files) =>
+          {
+            if (files && files.length > 0)
+              mainWindow.webContents.send('queueTracks', ...files);
+          });
+        }
+      },
+      {
+        label: 'Open Stream', click()
+        {
+          prompt({
+            title: 'Choose the Audio Stream URL',
+            label: '',
+            customStylesheet:
+            (settings.get('colorMode', 'default') === 'default') ?
+              path.join(__dirname, '../renderer/styles/prompt.default.css')  :
+              path.join(__dirname, '../renderer/styles/prompt.dark.css'),
+            inputAttrs: {
+              type: 'url',
+              required: true
+            }
+          }, mainWindow).then((value) =>
+          {
+            if (value)
+              mainWindow.webContents.send('queueTracks', value);
+          });
+        }
+      }
+    ]
+  },
+  {
     label: 'Window',
-    submenu:
-  [
-    {
-      label: 'Reload', accelerator: 'CmdOrCtrl+R', click()
+    submenu: [
       {
-        mainWindow.reload();
-      }
-    },
-    {
-      label: 'Zoom In', accelerator: 'CmdOrCtrl+=', role: 'zoomin'
-    },
-    {
-      label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', role: 'zoomout'
-    },
-    {
-      label: 'Reset Zoom', accelerator: 'CmdOrCtrl+Shift+=', role: 'resetzoom'
-    },
-    {
-      label: 'Developer Tools', accelerator: 'CmdOrCtrl+Shift+I', click()
+        label: 'Reload', accelerator: 'CmdOrCtrl+R', click()
+        {
+          mainWindow.reload();
+        }
+      },
       {
-        mainWindow.webContents.toggleDevTools();
-      }
-    },
-    {
-      label: 'Quit', accelerator: 'CmdOrCtrl+Q', click()
+        label: 'Zoom In', accelerator: 'CmdOrCtrl+=', role: 'zoomin'
+      },
       {
-        app.quit();
-      }
-    },
-  ]
+        label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', role: 'zoomout'
+      },
+      {
+        label: 'Reset Zoom', accelerator: 'CmdOrCtrl+Shift+=', role: 'resetzoom'
+      },
+      {
+        label: 'Developer Tools', accelerator: 'CmdOrCtrl+Shift+I', click()
+        {
+          mainWindow.webContents.toggleDevTools();
+        }
+      },
+      {
+        label: 'Quit', accelerator: 'CmdOrCtrl+Q', click()
+        {
+          app.quit();
+        }
+      },
+    ]
   }
 ]);
 
@@ -85,9 +125,6 @@ function createWindow()
   const x = (!savedPosition || isDebug()) ? Math.round((screenSize.width - width) / 2) : savedPosition[0];
   const y =  (!savedPosition || isDebug()) ? Math.round((screenSize.height - height) / 2) : savedPosition[1];
 
-  // replace the default menu
-  Menu.setApplicationMenu(menuTemplate);
-
   mainWindow = new BrowserWindow(
     {
       webPreferences: {
@@ -106,6 +143,9 @@ function createWindow()
       y: y
     }
   );
+
+  // replace the default menu
+  mainWindow.setMenu(menuTemplate);
 
   setWindow(mainWindow);
   setApp(app);

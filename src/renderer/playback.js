@@ -1110,9 +1110,12 @@ function changeQueue(quiet)
 
   const url = queue[playingIndex].url;
 
+  // defaults to html5 for faster load times and remote streaming,
+  // however, there is always a price, html audio needs a user first interaction to play
+  // this means that if the user opens a file with Dawayer before touching the UI we can't autoplay it
+  // it has to start in the paused state
   const howl = new Howl({
     src: url,
-    // defaults to html5 for faster load times and remote streaming
     html5: true,
     format: audioExtensions
   });
