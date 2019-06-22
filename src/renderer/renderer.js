@@ -148,6 +148,8 @@ export let skipTimeTooltip;
 */
 export const defaultPicture = join(__dirname, '../../missing.png');
 
+export let firstInteraction = false;
+
 // Init
 
 function initEvents()
@@ -218,10 +220,12 @@ function initEvents()
   
   settings.onChange('podcasts', togglePodcastsPage);
 
-  // window events
+  // window events and first interaction protection
 
   window.addEventListener('keydown', (event) =>
   {
+    firstInteraction = true;
+
     // escape button hides any active overlay
     if (event.key === 'Escape')
     {
@@ -240,6 +244,16 @@ function initEvents()
         switchPlayingMode();
       }
     }
+  });
+
+  window.addEventListener('mousedown', () =>
+  {
+    firstInteraction = true;
+  });
+
+  window.addEventListener('contextmenu', () =>
+  {
+    firstInteraction = true;
   });
 
   window.onload = onload;

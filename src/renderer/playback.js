@@ -15,7 +15,8 @@ import { artistsRegex } from './storage.js';
 import {
   createElement, createContextMenu, removeAllChildren,
   setSeekTimeWithUI, switchPlayingMode, toggleSeekBarLoading,
-  defaultPicture, toggleSeekBarBuffered, setSeekBarBuffered
+  defaultPicture, firstInteraction, toggleSeekBarBuffered,
+  setSeekBarBuffered
 } from './renderer.js';
 
 /** @typedef { Object } QueueObject
@@ -1113,7 +1114,6 @@ function changeQueue(quiet)
     src: url,
     // defaults to html5 for faster load times and remote streaming
     html5: true,
-    preload: false,
     format: audioExtensions
   });
 
@@ -1130,16 +1130,12 @@ function changeQueue(quiet)
 
   howl.on('loaderror', (error) =>
   {
-    console.error(error);
-
-    endEvent();
+    throw new Error(error);
   });
 
   howl.on('playerror', (error) =>
   {
-    console.error(error);
-
-    endEvent();
+    throw new Error(error);
   });
 
   // emit a track change event
@@ -1157,8 +1153,8 @@ function changeQueue(quiet)
   // set the seek-bar ui
   setSeekTimeWithUI(0, true);
 
-  // start playback
-  if (!quiet)
+  //  if there was a user first interaction and quiet play is false
+  if (!quiet && firstInteraction)
   {
     // if playing mode is set to paused then set it to playing
     if (playingMode === 'paused')
