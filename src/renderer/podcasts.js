@@ -6,7 +6,10 @@ import { homedir } from 'os';
 import { join } from 'path';
 import { readFile } from 'fs-extra';
 
-import { searchPodcasts, getPodcastFeedUrl } from './apple-podcasts.js';
+import {
+  searchPodcasts as searchApplePodcasts,
+  getPodcastFeedUrl as getApplePodcastFeedUrl
+} from './apple-podcasts.js';
 
 import Parser from 'rss-parser';
 
@@ -54,11 +57,14 @@ const podcastsContainer = document.body.querySelector('.podcasts.container');
 */
 const collectionOverlay = createPodcastCollectionOverlay();
 
+const overlaySearchBar = collectionOverlay.querySelector('.podcastCollectionOverlay.searchBar');
 const collectionContainer = collectionOverlay.querySelector('.podcastCollection.container');
 
 /** @type { Object<string, { description: string, picture: string, element: HTMLElement, feedUrl: string }> }
 */
 const collection = {};
+
+let podcastOverlaySearchDelay;
 
 export function initPodcasts()
 {
@@ -72,6 +78,9 @@ export function initPodcasts()
   });
 
   // TODO load podcasts from the collection json
+
+  // set the search bar oninput callback
+  overlaySearchBar.oninput = podcastOverlaySearch;
 
   // addPodcastToCollection('https://feeds.megaphone.fm/vergecast');
   // addPodcastToCollection(join(homedir(), 'Documents/vergecast.xml'));
@@ -491,8 +500,9 @@ function readFeedLink(url)
 }
 
 /** @param { HTMLElement } overlay
+* @param { HTMLElement } autofocus
 */
-function showPodcastOverlay(overlay)
+function showPodcastOverlay(overlay, autofocus)
 {
   // only one overlay is to be shown at once
   if (window.activeOverlay)
@@ -505,11 +515,50 @@ function showPodcastOverlay(overlay)
   // add the overlay to the body
   document.body.appendChild(overlay);
 
+  // auto focus on this item when the overlay is shown
+  if (autofocus)
+    autofocus.focus();
+
   // triggers the animation
   setTimeout(() =>
   {
     overlay.classList.add('active');
   }, 100);
+}
+
+function podcastOverlaySearch()
+{
+  clearTimeout(podcastOverlaySearchDelay);
+
+  podcastOverlaySearchDelay = setTimeout(() =>
+  {
+    const input = overlaySearchBar.value;
+
+    // if empty add all collection podcasts sorted alphabetically
+    if (!input)
+    {
+      removeAllChildren(collectionContainer);
+
+      return;
+    }
+
+    // if not add collection podcasts that fit the input on top alphabetically
+    // then add all apple podcasts that fit the input alphabetically
+
+    searchApplePodcasts(input).then((response) =>
+    {
+      removeAllChildren(collectionContainer);
+
+      // add all collection podcasts that fit the input alphabetically
+
+      // add all apple podcasts that fit the input alphabetically
+
+      //   getPodcastFeedUrl(podcast.results[0].collectionId).then((feedUrl) =>
+      //   {
+      //     addPodcastToCollection(feedUrl);
+      //   });
+    });
+  }, 500);
 }
 
 /** @param { FeedItem } episode
@@ -529,5 +578,5 @@ function queuePodcast(episode, title, picture, clearQueue)
 
 export function showPodcastCollectionOverlay()
 {
-  showPodcastOverlay(collectionOverlay);
+  showPodcastOverlay(collectionOverlay, overlaySearchBar);
 }
