@@ -1179,6 +1179,9 @@ function bufferEvent()
 
   node.addEventListener('progress', () =>
   {
+    if (!currentHowl)
+      return;
+    
     const duration = currentHowl.duration();
 
     if (duration > 0)
@@ -1234,7 +1237,7 @@ function updateSeekTimeEvent()
   currentHowl.last = current;
 
   const duration = getDuration();
-
+  
   setSeekTimeWithUI(
     Math.min(
       current / duration,

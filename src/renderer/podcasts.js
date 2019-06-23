@@ -8,8 +8,7 @@ import { readFile } from 'fs-extra';
 
 import { searchPodcasts, getPodcastFeedUrl } from './apple-podcasts.js';
 
-import request from 'request-promise-native';
-import feedParse from 'davefeedread';
+import Parser from 'rss-parser';
 
 import {
   createElement, createIcon, createContextMenu,
@@ -45,6 +44,10 @@ import { queueTracks, audioUrlTypeRegex } from './playback.js';
 
 const { mainWindow } = remote.require(join(__dirname, '../main/window.js'));
 
+/** @type { Parser }
+*/
+let parser;
+
 const podcastsContainer = document.body.querySelector('.podcasts.container');
 
 /** @type { HTMLDivElement }
@@ -63,14 +66,10 @@ export function initPodcasts()
   // const enabled = settings.get('podcasts', false);
   // settings.onChange('podcasts', watchForPodcastsDisable);
 
-  // TODO add the search function to the UI
-  // searchPodcasts('The Vergecast').then((podcast) =>
-  // {
-  //   getPodcastFeedUrl(podcast.results[0].collectionId).then((feedUrl) =>
-  //   {
-  //     addPodcastToCollection(feedUrl);
-  //   });
-  // });
+  // initialize the parser
+  parser = new Parser({
+    maxRedirects: 5
+  });
 
   // TODO load podcasts from the collection json
 
@@ -232,10 +231,11 @@ function updatePodcastElement(element, options)
 }
 
 /** @param { HTMLDivElement } element
+* @param { string } title
 * @param { string } picture
 * @param { FeedItem[] } episodes
 */
-function updatePodcastEpisodes(element, picture, episodes)
+function updatePodcastEpisodes(element, title, picture, episodes)
 {
   const episodesText = element.overlayElement.querySelector('.episodes.text');
 
@@ -277,7 +277,7 @@ function updatePodcastEpisodes(element, picture, episodes)
       // TODO when a podcast is played fetch it's duration and added to info
       // episodeInfo.innerText = `${millisecondsToTimeAgo(Date.parse(episodes[i].date))} · ${secondsToHms(${durationInSeconds})} left`;
 
-      episodeInfo.innerText = millisecondsToTimeAgo(Date.parse(episodes[i].date));
+      episodeInfo.innerText = millisecondsToTimeAgo(Date.parse(episodes[i].pubDate));
       episodeTitle.innerText = episodes[i].title;
 
       // latest episode on the hover effect
@@ -296,7 +296,7 @@ function updatePodcastEpisodes(element, picture, episodes)
 
       const onclick = (event) =>
       {
-        queuePodcast(episodes[i], picture, true);
+        queuePodcast(episodes[i], title, picture, true);
         
         event.stopPropagation();
       };
@@ -308,8 +308,8 @@ function updatePodcastEpisodes(element, picture, episodes)
         latestEpisodeContainer.onclick = onclick;
 
       const contextMenu = {
-        'Play': () => queuePodcast(episodes[i], picture, true),
-        'Add to Queue': () => queuePodcast(episodes[i], picture, false)
+        'Play': () => queuePodcast(episodes[i], title, picture, true),
+        'Add to Queue': () => queuePodcast(episodes[i], title, picture, false)
       };
 
       createContextMenu(episodeContainer, contextMenu, episodeContainer);
@@ -385,13 +385,12 @@ function addFromFiles(files)
 /** @param { string } feedUrl
 */
 function addPodcastToCollection(url)
-{ 
+{
   /** process the url and returns a feed object
   * @param { string } url
   */
   function processFeed(url)
   {
-
     // if url is a link
     if (audioUrlTypeRegex.test(url))
       return readFeedLink(url);
@@ -419,13 +418,13 @@ function addPodcastToCollection(url)
       img.onload = () =>
       {
         updatePodcastElement(podcastElement, {
-          title: feed.head.title,
-          description: feed.head.description,
+          title: feed.title,
+          description: feed.description,
           picture: img.src
         });
 
         updatePodcastCollectionItem(collectionElement, {
-          title: feed.head.title,
+          title: feed.title,
           picture: img.src,
           buttonText: 'Remove',
           buttonCallback: () =>
@@ -440,18 +439,21 @@ function addPodcastToCollection(url)
 
       // load podcast picture
 
-      const picture = settings.cacheImage(feed.head.image.url);
+      const picture = settings.cacheImage(feed.image.url);
       settings.receiveCachedImage(picture).then((imagePath) => img.src = imagePath);
 
       // load podcast episodes
 
-      updatePodcastEpisodes(podcastElement, picture, feed.items);
+      updatePodcastEpisodes(podcastElement, feed.title, picture, feed.items);
     })
-    .catch(() =>
+    .catch((err) =>
     {
       // error ocurred during adding the podcast
-      // rollback anything that has been added before the error
 
+      // log the error
+      console.error(err);
+
+      // rollback anything that has been added before the error
       podcastsContainer.removeChild(podcastElement);
       collectionContainer.removeChild(collectionElement);
     });
@@ -464,25 +466,14 @@ function readFeedFile(url)
 {
   return new Promise((resolve, reject) =>
   {
-    readFile(url, { encoding: 'utf8' })
-      .then((xmlFile) =>
+    readFile(url)
+      .then((buffer) =>
       {
-        feedParse.parseString(xmlFile, undefined, (err, feed) =>
-        {
-          if (err)
-          {
-            reject(err);
-
-            return;
-          }
-          
-          resolve(feed);
-        });
+        parser.parseString(buffer.toString())
+          .then((feed) => resolve(feed))
+          .catch((err) => reject(err));
       })
-      .catch((err) =>
-      {
-        reject(err);
-      });
+      .catch((err) => reject(err));
   });
 }
 
@@ -493,25 +484,9 @@ function readFeedLink(url)
 {
   return new Promise((resolve, reject) =>
   {
-    request(url, { encoding: 'utf8', timeout: 30000 })
-      .then((xmlFile) =>
-      {
-        feedParse.parseString(xmlFile, undefined, (err, feed) =>
-        {
-          if (err)
-          {
-            reject(err);
-
-            return;
-          }
-          
-          resolve(feed);
-        });
-      })
-      .catch((err) =>
-      {
-        reject(err);
-      });
+    parser.parseURL(url)
+      .then((feed) => resolve(feed))
+      .catch((err) => reject(err));
   });
 }
 
@@ -538,15 +513,16 @@ function showPodcastOverlay(overlay)
 }
 
 /** @param { FeedItem } episode
+* @param { string } title
 * @param { string } picture
 * @param { boolean } clearQueue
 */
-function queuePodcast(episode, picture, clearQueue)
+function queuePodcast(episode, title, picture, clearQueue)
 {
   queueTracks(false, undefined, undefined, clearQueue, {
-    url: episode.enclosures[0].url,
+    url: episode.enclosure.url,
     title: episode.title,
-    artists: (episode.author) ? [ episode.author ] : undefined,
+    artists: [ title ],
     picture: picture
   });
 }

@@ -24,7 +24,7 @@ const menuTemplate = Menu.buildFromTemplate([
         label: 'Open File', accelerator: 'CmdOrCtrl+O', click()
         {
           dialog.showOpenDialog(mainWindow, {
-            title: 'Choose the Audio Files You Want to Play',
+            title: 'Choose the audio files',
             properties: [ 'openFile', 'multiSelections' ]
           }, (files) =>
           {
@@ -36,13 +36,17 @@ const menuTemplate = Menu.buildFromTemplate([
       {
         label: 'Open Stream', click()
         {
+          const mode = settings.get('colorMode', 'default');
+          
+          let stylePath = path.join(__dirname, '../renderer/styles/prompt.default.css');
+
+          if (mode === 'dark')
+            stylePath = path.join(__dirname, '../renderer/styles/prompt.dark.css');
+          
           prompt({
-            title: 'Choose the Audio Stream URL',
+            title: 'Choose the audio stream url',
             label: '',
-            customStylesheet:
-            (settings.get('colorMode', 'default') === 'default') ?
-              path.join(__dirname, '../renderer/styles/prompt.default.css')  :
-              path.join(__dirname, '../renderer/styles/prompt.dark.css'),
+            customStylesheet: stylePath,
             inputAttrs: {
               type: 'url',
               required: true
