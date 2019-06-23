@@ -2,20 +2,17 @@ Performance Issues and Bugs:
   ☐ add a substitute after the removal of lastfm apis (probably also the the same api as the streaming service)
   ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts)
 
-  ☐ a way for podcasts to get seek-time and duration from the playback.js
   ☐ saved queues if they have any remote urls it won't save/load the artist or the title
 
 Testing:
   ☐ test loading saved queue on app start
   ☐ test opening dawayer with a file and remote urls in args
 
-  ☐ calling another queuing process while a queuing process is already taking place might cause Dawayer to break
-
 Features:
-  ☐ a load more button to load more podcast episodes
+  ☐ search functions in the collection overlay and its items have add button
 
   ☐ cache and load podcasts
-  ☐ search functions in the collection overlay and its items have add button
+  ☐ a load more button to load more podcast episodes
 
   ☐ research feed suggestions & an api to get more accurate info about artist releases
     (probably the same api as the streaming service)
@@ -31,7 +28,9 @@ UI/UX:
   ☐ sketch the way that a streaming service will fit in Dawayer UI
 
 CI/CD:
-  ☐ release a PWA (needs a lot of work to replace the incompatible dependencies from Dawayer)
+  ☐ release a PWA [ needs a lot of work to replace the incompatible dependencies (fs and music-metadata) ]
 
-  ☐ release a Windows build after testing @help-needed
+  ☐ release a Windows build after testing @help-needed?
+    ☐ we might be able to test platform sensitive features using wine
+
   ☐ release a macOS build after testing @help-needed

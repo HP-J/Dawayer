@@ -23,26 +23,26 @@ import {
 import { queueTracks, audioUrlTypeRegex } from './playback.js';
 
 /** @typedef { Object } FeedObject
-* @property { FeedHead } head
-* @property { FeedItem[] } items
-*/
-
-/** @typedef { Object } FeedHead
 * @property { string } title
 * @property { string } description
 * @property { string } copyright
+* @property { string } feedUrl
 * @property { string } link
 * @property { string } language
-* @property { string[] } categories
+* @property { { subtitle: string, author: string, categories: string[] } } itunes
 * @property { { url: string, title: string } } image
+* @property { FeedItem[] } items
 */
 
 /** @typedef { Object } FeedItem
 * @property { string } title
-* @property { string } author
-* @property { string } summary
-* @property { string } date
-* @property { { url: string }[] } enclosures
+* @property { string } content
+* @property { string } contentSnippet
+* @property { string } guid
+* @property { string } isoDate
+* @property { string } pubDate
+* @property { { subtitle: string, episode: string, duration: string } } itunes
+* @property { { url: string } } enclosure
 */
 
 const { mainWindow } = remote.require(join(__dirname, '../main/window.js'));
@@ -137,6 +137,9 @@ function createPodcastOverlay()
   const overlayCover = createElement('.podcastOverlay.cover');
   const overlayHide = createElement('.podcastOverlay.hide');
   const overlayDownward = createIcon('downward', '.podcastOverlay.downward');
+
+  const overlayInfo = createElement('.podcastOverlay.info');
+  const overlayAuthor = createElement('.podcastOverlay.author');
   const overlayTitle = createElement('.podcastOverlay.title');
 
   const overlayDescription = createElement('.podcastOverlay.description');
@@ -148,9 +151,13 @@ function createPodcastOverlay()
 
   overlayHide.appendChild(overlayDownward);
 
+  overlayInfo.appendChild(overlayAuthor);
+  overlayInfo.appendChild(overlayTitle);
+
   overlayCard.appendChild(overlayCover);
   overlayCard.appendChild(overlayHide);
-  overlayCard.appendChild(overlayTitle);
+
+  overlayCard.appendChild(overlayInfo);
 
   overlayContainer.appendChild(overlayCard);
   overlayContainer.appendChild(overlayDescription);
@@ -216,7 +223,7 @@ function createPodcastCollectionOverlay()
 
 /** @param { HTMLDivElement } element
 * @param { HTMLDivElement } element
-* @param { { picture: string, title: string, description: string } } options
+* @param { { picture: string, author: string, title: string, description: string } } options
 */
 function updatePodcastElement(element, options)
 {
@@ -228,12 +235,15 @@ function updatePodcastElement(element, options)
     element.querySelector('.podcast.cover').style.backgroundImage =
     element.overlayElement.querySelector('.podcastOverlay.cover').style.backgroundImage = `url(${options.picture})`;
   }
-
+  
   if (options.title)
   {
     element.querySelector('.podcast.title').innerText =
     element.overlayElement.querySelector('.podcastOverlay.title').innerText = options.title;
   }
+
+  if (options.author)
+    element.overlayElement.querySelector('.podcastOverlay.author').innerText = options.author;
 
   if (options.description)
     element.overlayElement.querySelector('.podcastOverlay.description').innerText = options.description;
@@ -283,10 +293,12 @@ function updatePodcastEpisodes(element, title, picture, episodes)
       const episodeInfo = createElement('.podcastEpisode.info');
       const episodeTitle = createElement('.podcastEpisode.title');
 
-      // TODO when a podcast is played fetch it's duration and added to info
-      // episodeInfo.innerText = `${millisecondsToTimeAgo(Date.parse(episodes[i].date))} · ${secondsToHms(${durationInSeconds})} left`;
+      if (episodes[i].itunes && episodes[i].itunes.duration)
+        episodeInfo.innerText =
+        `${millisecondsToTimeAgo(Date.parse(episodes[i].pubDate))} · ${secondsToHms(parseFloat(episodes[i].itunes.duration))}`;
+      else
+        episodeInfo.innerText = millisecondsToTimeAgo(Date.parse(episodes[i].pubDate));
 
-      episodeInfo.innerText = millisecondsToTimeAgo(Date.parse(episodes[i].pubDate));
       episodeTitle.innerText = episodes[i].title;
 
       // latest episode on the hover effect
@@ -427,6 +439,7 @@ function addPodcastToCollection(url)
       img.onload = () =>
       {
         updatePodcastElement(podcastElement, {
+          author: (feed.itunes && feed.itunes.author) ? feed.itunes.author : undefined,
           title: feed.title,
           description: feed.description,
           picture: img.src
