@@ -1014,7 +1014,11 @@ function saveQueue()
   settings.set('queueTracks', queue.map(item =>
   {
     return {
-      url: item.url
+      url: item.url,
+      title: item.title,
+      artists: item.artists,
+      album: item.album,
+      picture: item.picture
     };
   }));
 }
