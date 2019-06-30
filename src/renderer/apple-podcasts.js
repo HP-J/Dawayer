@@ -54,8 +54,6 @@ class SearchQuery
     this.media = 'podcast';
     this.entry = query.entry;
 
-    // this.attribute = query.attribute
-
     this.limit = query.limit;
     this.lang = query.lang;
   }
@@ -64,7 +62,7 @@ class SearchQuery
 /** search for a podcast on apple podcasts using a term
 * @param { string | { term: string, country: string, entry: string, lang: string, limit: number } } options
 */
-export function searchPodcasts(options)
+export function searchApplePodcasts(options)
 {
   options = options || {};
 
@@ -81,33 +79,4 @@ export function searchPodcasts(options)
   {
     return Promise.resolve(response.data);
   });
-}
-
-/** using the collection id provided by search or elsewhere get the feed url for that specific podcast
-* @returns { string } the feed url of the podcast owned by that collection id
-* @param { number } collectionId
-*/
-export function getPodcastFeedUrl(collectionId)
-{
-  return instance.get('/lookup', { params: { id: collectionId } })
-    .then((response) =>
-    {
-      const data = response.data;
-
-      if (data.resultCount < 1)
-        return Promise.reject('invalid itunes id');
-
-      const podcast = data.results[0];
-
-      return Promise.resolve(podcast);
-    })
-    .then((podcast) =>
-    {
-      const feedUrl = podcast.feedUrl;
-
-      if (typeof feedUrl !== 'string')
-        return Promise.reject('invalid itunes id');
-
-      return feedUrl;
-    });
 }

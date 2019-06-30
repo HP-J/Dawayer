@@ -55,7 +55,12 @@ function download(url, filepath, events, option)
 
   function start()
   {
-    req = request.get(url, { timeout: 2500 });
+    req = request.get(url, {
+      gzip: true,
+      forever: true,
+      timeout: 5000,
+      maxRedirects: 20
+    });
 
     req
       .on('response', (res) =>

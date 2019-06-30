@@ -1,34 +1,31 @@
 Performance Issues and Bugs: 
-  ☐ add a substitute after the removal of lastfm apis (probably also the the same api as the streaming service)
-  ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts)
+  ☐ add a substitute after the removal of lastfm apis (probably also the the same api as the streaming service) @low
+  ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts) @low
 
 Testing:
-  ☐ test loading saved queue on app start
-  ☐ test opening dawayer with a file and remote urls in args
 
 Features:
-  ☐ search functions in the collection overlay and its items have add button
+  ☐ cache and load podcasts @high 
 
-  ☐ cache and load podcasts
-  ☐ a load more button to load more podcast episodes
+  ☐ a load more button to load more podcast episodes @high 
 
-  ☐ research feed suggestions & an api to get more accurate info about artist releases
+  ☐ research feed suggestions & an api to get more accurate info about artist releases @low 
     (probably the same api as the streaming service)
   
-  ☐ research adding a streaming service support like (Spotify or Deezer or etc)
+  ☐ research adding a streaming service support like (Spotify or Deezer or etc) @low
 
-  ☐ research statistics to show in the feed page
+  ☐ research statistics to show in the feed page @low
 
-  ☐ using the feed page: add downloading feature and make it flexible, so that it can download podcasts or tracks alike
+  ☐ using the feed page: add downloading feature and make it flexible, so that it can download podcasts or tracks alike @low
 
 UI/UX:
-  ☐ sketch the feed page
-  ☐ sketch the way that a streaming service will fit in Dawayer UI
+  ☐ sketch the feed page @low
+  ☐ sketch the way that a streaming service will fit in Dawayer UI @low 
 
 CI/CD:
   ☐ release a PWA [ needs a lot of work to replace the incompatible dependencies (fs and music-metadata) ]
 
-  ☐ release a Windows build after testing @help-needed?
-    ☐ we might be able to test platform sensitive features using wine
+  ☐ release a Windows build after testing @help-needed
+    ☐ we might be able to test platform sensitive features using wine @low 
 
   ☐ release a macOS build after testing @help-needed

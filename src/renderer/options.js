@@ -4,8 +4,6 @@ import { join } from 'path';
 import { readJSON, readFile, pathExists } from 'fs-extra';
 import { tmpdir } from 'os';
 
-import request from 'request-promise-native';
-
 import * as settings from '../settings.js';
 import download from '../dl.js';
 
@@ -469,8 +467,13 @@ function checkForUpdates()
 
   checkElement.classList.add('clean');
 
-  // request the server's build.json
-  request('https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/' + localData.branch + '/raw/build.json?job=build', {  json: true, timeout: 30000 })
+  window.fetch('https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/' + localData.branch + '/raw/build.json?job=build', {
+    keepalive: true,
+    cache: 'no-cache',
+    redirect: 'follow',
+    mode: 'cors'
+  })
+    .then((res) => res.json())
     .then((remoteData) =>
     {
       // if commit id is different, and there's an available package for this platform

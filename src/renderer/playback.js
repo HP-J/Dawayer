@@ -32,8 +32,6 @@ export const audioExtensions =[ 'mp3', 'mpeg', 'opus', 'ogg', 'wav', 'aac', 'acc
 
 export const audioExtensionsRegex = /.mp3$|.mpeg$|.opus$|.ogg$|.wav$|.aac$|.flac$/;
 
-export const audioUrlTypeRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
-
 const { isDebug } = remote.require(join(__dirname, '../main/window.js'));
 
 /** @typedef { import('./storage.js').Storage } Storage
@@ -656,7 +654,7 @@ export function queueTracks(quiet, startingTrackUrl, startingTrackPercentage, cl
       if (!queueObject.title || !queueObject.artists)
       {
         // if remote url
-        if (audioUrlTypeRegex.test(queueObject.url))
+        if (queueObject.url.startsWith('http://') || queueObject.url.startsWith('https://'))
         {
           if (!queueObject.title)
             queueObject.title = basename(queueObject.url, extname(queueObject.url));

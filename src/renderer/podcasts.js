@@ -6,10 +6,7 @@ import { homedir } from 'os';
 import { join } from 'path';
 import { readFile } from 'fs-extra';
 
-import {
-  searchPodcasts as searchApplePodcasts,
-  getPodcastFeedUrl as getApplePodcastFeedUrl
-} from './apple-podcasts.js';
+import { searchApplePodcasts } from './apple-podcasts.js';
 
 import Parser from 'rss-parser';
 
@@ -20,7 +17,7 @@ import {
   podcastsButton
 } from './renderer.js';
 
-import { queueTracks, audioUrlTypeRegex } from './playback.js';
+import { queueTracks } from './playback.js';
 
 /** @typedef { Object } FeedObject
 * @property { string } title
@@ -200,6 +197,10 @@ function createPodcastCollectionOverlay()
           // as a feedback that the process is done
           hideActiveOverlay();
           changePage(podcastsButton);
+
+          // clear the search bar the the results
+          overlaySearchBar.value = '';
+          removeAllChildren(collectionContainer);
         }
       }
     );
@@ -413,7 +414,7 @@ function addPodcastToCollection(url)
   function processFeed(url)
   {
     // if url is a link
-    if (audioUrlTypeRegex.test(url))
+    if (url.startsWith('http://') || url.startsWith('https://'))
       return readFeedLink(url);
     // else if it's a file
     else
@@ -451,10 +452,10 @@ function addPodcastToCollection(url)
           buttonText: 'Remove',
           buttonCallback: () =>
           {
+            // TODO remove podcast from collection json
+            
             podcastsContainer.removeChild(podcastElement);
             collectionContainer.removeChild(collectionElement);
-  
-            // TODO remove podcast from collection json
           }
         });
       };
@@ -506,8 +507,20 @@ function readFeedLink(url)
 {
   return new Promise((resolve, reject) =>
   {
-    parser.parseURL(url)
-      .then((feed) => resolve(feed))
+    window.fetch(url,
+      {
+        keepalive: true,
+        cache: 'no-cache',
+        redirect: 'follow',
+        mode: 'cors'
+      })
+      .then((res) => res.text())
+      .then((feed) =>
+      {
+        parser.parseString(feed)
+          .then((feed) => resolve(feed))
+          .catch((err) => reject(err));
+      })
       .catch((err) => reject(err));
   });
 }
@@ -541,13 +554,15 @@ function showPodcastOverlay(overlay, autofocus)
 
 function podcastOverlaySearch()
 {
+  const delay = 500;
+
   clearTimeout(podcastOverlaySearchDelay);
 
   podcastOverlaySearchDelay = setTimeout(() =>
   {
     const input = overlaySearchBar.value;
 
-    // if empty add all collection podcasts sorted alphabetically
+    // TODO if empty then all collection podcasts sorted alphabetically
     if (!input)
     {
       removeAllChildren(collectionContainer);
@@ -555,23 +570,50 @@ function podcastOverlaySearch()
       return;
     }
 
-    // if not add collection podcasts that fit the input on top alphabetically
-    // then add all apple podcasts that fit the input alphabetically
+    // TODO add all collection podcasts that fit the input alphabetically
 
+    // add all apple podcasts that fit the input alphabetically
     searchApplePodcasts(input).then((response) =>
     {
       removeAllChildren(collectionContainer);
 
-      // add all collection podcasts that fit the input alphabetically
+      for (let i = 0; i < Math.min(response.results.length, 20); i++)
+      {
+        const podcast = response.results[i];
+        
+        const collectionElement = appendPodcastCollectionItemPlaceholder();
 
-      // add all apple podcasts that fit the input alphabetically
+        const img = new Image();
 
-      //   getPodcastFeedUrl(podcast.results[0].collectionId).then((feedUrl) =>
-      //   {
-      //     addPodcastToCollection(feedUrl);
-      //   });
+        img.src = defaultPicture;
+
+        img.onload = () =>
+        {
+          updatePodcastCollectionItem(collectionElement, {
+            title: podcast.collectionName,
+            buttonText: 'Add',
+            picture: img.src,
+            buttonCallback: () =>
+            {
+              addPodcastToCollection(podcast.feedUrl);
+
+              // hide the overlay and go to podcasts page
+              // as a feedback that the process is done
+              hideActiveOverlay();
+              changePage(podcastsButton);
+
+              // clear the search bar the the results
+              overlaySearchBar.value = '';
+              removeAllChildren(collectionContainer);
+            }
+          });
+        };
+
+        const picture = settings.cacheImage(podcast.artworkUrl100);
+        settings.receiveCachedImage(picture).then((imagePath) => img.src = imagePath);
+      }
     });
-  }, 500);
+  }, delay);
 }
 
 /** @param { FeedItem } episode
