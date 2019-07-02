@@ -5,9 +5,11 @@ Performance Issues and Bugs:
 Testing:
 
 Features:
-  ☐ cache and load podcasts @high 
+  ☐ adding collection podcasts to search overlay whenever it occurs @high 
 
   ☐ a load more button to load more podcast episodes @high 
+
+  ☐ refreshing collection podcasts @high 
 
   ☐ research feed suggestions & an api to get more accurate info about artist releases @low 
     (probably the same api as the streaming service)

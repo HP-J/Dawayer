@@ -467,36 +467,38 @@ function checkForUpdates()
 
   checkElement.classList.add('clean');
 
-  window.fetch('https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/' + localData.branch + '/raw/build.json?job=build', {
-    keepalive: true,
-    cache: 'no-cache',
-    redirect: 'follow',
-    mode: 'cors'
-  })
-    .then((res) => res.json())
-    .then((remoteData) =>
+  download('https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/' + localData.branch + '/raw/build.json?job=build', {
+    onDone: (path) =>
     {
-      // if commit id is different, and there's an available package for this platform
-      if (remoteData.commit !== localData.commit)
-      {
-        if (remoteData[localData.package])
+      readJSON(path)
+        .then((remoteData) =>
         {
-          updateDownload(remoteData[localData.package], remoteData.commit);
-        }
-        else
-        {
-          checkElement.innerText = 'An update exists but is not available for your package';
+          // if commit id is different, and there's an available package for this platform
+          if (remoteData.commit !== localData.commit)
+          {
+            if (remoteData[localData.package])
+            {
+              updateDownload(remoteData[localData.package], remoteData.commit);
+            }
+            else
+            {
+              checkElement.innerText = 'An update exists but is not available for your package';
 
-          setTimeout(resetUpdateElement, 4000);
-        }
-      }
-      else
-      {
-        checkElement.innerText = 'Up-to-date';
+              setTimeout(resetUpdateElement, 4000);
+            }
+          }
+          else
+          {
+            checkElement.innerText = 'Up-to-date';
 
-        setTimeout(resetUpdateElement, 3000);
-      }
-    }).catch(resetUpdateElement);
+            setTimeout(resetUpdateElement, 3000);
+          }
+        })
+        .catch(resetUpdateElement);
+
+    },
+    onError: resetUpdateElement
+  });
 }
 
 function resetUpdateElement()

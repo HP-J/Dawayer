@@ -88,14 +88,14 @@ function download(url, filepath, events, option)
               if (err)
               {
                 events.emit('error', 'The download was incomplete.', 'err_dlincomplete');
-  
+
                 delete busyPaths[filepath];
               }
               else
               {
                 events.emit('progress', totalSize, totalSize);
                 events.emit('done', filepath, url, totalSize);
-  
+
                 delete busyPaths[filepath];
               }
             });
@@ -114,7 +114,7 @@ function download(url, filepath, events, option)
         res.on('data', (chunk) =>
         {
           curSize += chunk.length;
-                    
+
           // 判读是否显示进度条
           events.emit('progress', curSize, totalSize);
         });
@@ -132,7 +132,7 @@ function download(url, filepath, events, option)
         else
         {
           events.emit('error', err);
-  
+
           delete busyPaths[filepath];
         }
       })

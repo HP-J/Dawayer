@@ -2,9 +2,10 @@ import { remote } from 'electron';
 
 import * as settings from '../settings.js';
 
-import { homedir } from 'os';
 import { join } from 'path';
-import { readFile } from 'fs-extra';
+import { readFile, readJson, ensureDir, readdir, writeFile, unlink } from 'fs-extra';
+
+import download from '../dl.js';
 
 import { searchApplePodcasts } from './apple-podcasts.js';
 
@@ -57,9 +58,7 @@ const collectionOverlay = createPodcastCollectionOverlay();
 const overlaySearchBar = collectionOverlay.querySelector('.podcastCollectionOverlay.searchBar');
 const collectionContainer = collectionOverlay.querySelector('.podcastCollection.container');
 
-/** @type { Object<string, { description: string, picture: string, element: HTMLElement, feedUrl: string }> }
-*/
-const collection = {};
+const collectionDir = join(settings.getDirectory(), 'Podcasts');
 
 let podcastOverlaySearchDelay;
 
@@ -74,7 +73,32 @@ export function initPodcasts()
     maxRedirects: 5
   });
 
-  // TODO load podcasts from the collection json
+  // load podcasts from the collection
+
+  // ensure the collection directory exists
+  ensureDir(collectionDir).then(() =>
+  {
+    // read  the collection directory
+    readdir(collectionDir).then((files) =>
+    {
+      for (let i = 0; i < files.length; i++)
+      {
+        // create a placeholder
+        const podcastElement = appendPodcastPlaceholder();
+        const collectionElement = appendPodcastCollectionItemPlaceholder();
+
+        // read the podcast feed and update the placeholders
+        readJson(join(collectionDir, files[i]))
+          .then((feed) => addPodcastToUI(feed, podcastElement, collectionElement))
+          .catch(() =>
+          {
+            // rollback anything that has been added before the error
+            podcastsContainer.removeChild(podcastElement);
+            collectionContainer.removeChild(collectionElement);
+          });
+      }
+    });
+  });
 
   // set the search bar oninput callback
   overlaySearchBar.oninput = podcastOverlaySearch;
@@ -428,46 +452,14 @@ function addPodcastToCollection(url)
   processFeed(url)
     .then((feed) =>
     {
-      // TODO save the podcast to the podcast collection json
-      // settings.set('collection', collection, 'podcasts');
-
-      // update the placeholders with info from the feed head
-
-      const img = new Image();
-
-      img.src = defaultPicture;
-
-      img.onload = () =>
-      {
-        updatePodcastElement(podcastElement, {
-          author: (feed.itunes && feed.itunes.author) ? feed.itunes.author : undefined,
-          title: feed.title,
-          description: feed.description,
-          picture: img.src
-        });
-
-        updatePodcastCollectionItem(collectionElement, {
-          title: feed.title,
-          picture: img.src,
-          buttonText: 'Remove',
-          buttonCallback: () =>
-          {
-            // TODO remove podcast from collection json
-            
-            podcastsContainer.removeChild(podcastElement);
-            collectionContainer.removeChild(collectionElement);
-          }
-        });
-      };
-
-      // load podcast picture
-
-      const picture = settings.cacheImage(feed.image.url);
-      settings.receiveCachedImage(picture).then((imagePath) => img.src = imagePath);
+      // update the placeholders
+      const picture = addPodcastToUI(feed, podcastElement, collectionElement);
 
       // load podcast episodes
-
       updatePodcastEpisodes(podcastElement, feed.title, picture, feed.items);
+      
+      // save the podcast to collection
+      return writeFile(join(collectionDir, feed.title), JSON.stringify(feed));
     })
     .catch((err) =>
     {
@@ -480,6 +472,54 @@ function addPodcastToCollection(url)
       podcastsContainer.removeChild(podcastElement);
       collectionContainer.removeChild(collectionElement);
     });
+}
+
+/** @param { FeedObject } feed
+* @param { HTMLElement } podcastElement
+* @param { HTMLElement } collectionElement
+*/
+function addPodcastToUI(feed, podcastElement, collectionElement)
+{
+  // update the placeholders with info from the feed head
+
+  const img = new Image();
+
+  img.src = defaultPicture;
+
+  img.onload = () =>
+  {
+    updatePodcastElement(podcastElement, {
+      author: (feed.itunes && feed.itunes.author) ? feed.itunes.author : undefined,
+      title: feed.title,
+      description: feed.description,
+      picture: img.src
+    });
+
+    updatePodcastCollectionItem(collectionElement, {
+      title: feed.title,
+      picture: img.src,
+      buttonText: 'Remove',
+      buttonCallback: () =>
+      {
+        // remove podcast from collection
+        unlink(join(collectionDir, feed.title));
+        
+        podcastsContainer.removeChild(podcastElement);
+        collectionContainer.removeChild(collectionElement);
+      }
+    });
+  };
+
+  // load podcast picture
+
+  const picture = settings.cacheImage(feed.image.url);
+
+  settings.receiveCachedImage(picture).then((imagePath) => img.src = imagePath);
+
+  // load podcast episodes
+  updatePodcastEpisodes(podcastElement, feed.title, picture, feed.items);
+
+  return picture;
 }
 
 /** @param { string } url
@@ -507,21 +547,16 @@ function readFeedLink(url)
 {
   return new Promise((resolve, reject) =>
   {
-    window.fetch(url,
+    download(url, {
+      onDone: (path) =>
       {
-        keepalive: true,
-        cache: 'no-cache',
-        redirect: 'follow',
-        mode: 'cors'
-      })
-      .then((res) => res.text())
-      .then((feed) =>
-      {
-        parser.parseString(feed)
+        readFile(path)
+          .then((file) => parser.parseString(file.toString()))
           .then((feed) => resolve(feed))
           .catch((err) => reject(err));
-      })
-      .catch((err) => reject(err));
+      },
+      onError: reject
+    });
   });
 }
 
