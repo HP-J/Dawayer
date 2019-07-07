@@ -3,14 +3,14 @@
   "productName": "Dawayer",
   "version": "0.1.0",
   "description": "",
-  "main": "compiled/main/main.js",
+  "main": "build/main/main.js",
   "private": true,
   "scripts": {
-    "run": "electron ./compiled/main/main.js --debug",
+    "run": "electron ./build/main/main.js --debug",
     "svgo": "svgo --config='{ \"plugins\": [ { \"removeAttrs\": { \"attrs\": \"(fill|stroke)\" } } ] }' ./assets",
-    "sprite": "create-svg-sprite --input ./assets --output ./compiled",
-    "dev": "(trap 'kill 0' SIGINT; npm run sprite & npx babel src --out-dir compiled --copy-files --source-maps --watch & npx pug src --out compiled --pretty --watch)",
-    "compile": "npm run svgo && npm run sprite && npx babel src --out-dir compiled --copy-files --no-comments --minified && npx pug src --out compiled && rm compiled/*.pug"
+    "sprite": "create-svg-sprite --input ./assets --output ./build",
+    "start": "(trap 'kill 0' SIGINT; npm run sprite & npx babel src --out-dir build --copy-files --source-maps --watch & npx pug src --out build --pretty --watch)",
+    "build": "npm run svgo && npm run sprite && npx babel src --out-dir build --copy-files --no-comments --minified && npx pug src --out build && rm build/*.pug"
   },
   "build": {
     "appId": "com.herpproject.dawayer",

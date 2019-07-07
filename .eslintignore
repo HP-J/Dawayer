@@ -3,5 +3,5 @@
 afterPack.js
 babel.config.js
 
-/compiled
+/build
 /public

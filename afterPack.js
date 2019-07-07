@@ -6,9 +6,9 @@ exports.default = async function(context)
   var projectDir = context.packager.projectDir;
   var outputDir = join(context.appOutDir, '/resources/app');
 
-  // copy the compiled files as is
-  copySync(join(projectDir, '/compiled'), join(outputDir, '/compiled'));
+  // copy the build files as is
+  copySync(join(projectDir, '/build'), join(outputDir, '/build'));
   
-  console.log('  • copied all compiled files into output directory successfully.');
+  console.log('  • copied all build files into output directory successfully.');
 }
 

@@ -28,9 +28,9 @@ build:
     # the builds supported by the app builtin update system
     - "DOWNLOAD_URLS=\"$NSIS_URL $DEB_URL\""
 
-    # install dependencies & compile the code
+    # install dependencies & build the code
     - "npm install"
-    - "npm run compile"
+    - "npm run build"
 
     # build nsis installer for windows
     # - "echo $(node -e \"$BUILD_JSON_EVAL\" $CI_COMMIT_REF_NAME $CI_COMMIT_SHA $CI_PIPELINE_ID \"$DATE\" \"nsis\") > build.json"

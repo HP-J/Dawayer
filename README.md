@@ -30,7 +30,7 @@ Dawayer is still in development with main features being added gradually, we're 
 [deb](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.deb?job=build) |
 [tar.xz](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build)
 
-# Compile It Yourself
+# Build It Yourself
 If you want to try the latest features from the development branch, or your platform don't get an official release, or want to help in Dawayer's development.  
 
 (make sure you install Git and NPM on your device first)  
@@ -38,8 +38,8 @@ open a terminal in a new folder and write:
 
 - git clone "https://gitlab.com/hpj/Dawayer.git" .  
 - npm install  
-- npm run compile  
-- npx electron "./compiled/main/main.js"
+- npm run build  
+- npx electron "./build/main/main.js"
 
 # Licenses
 This project is licensed under the [MIT](https://gitlab.com/hpj/Dawayer/blob/development/LICENSE) License.  
