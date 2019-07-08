@@ -5,11 +5,9 @@ Performance Issues and Bugs:
 Testing:
 
 Features:
-  ☐ adding collection podcasts to search overlay whenever it occurs @high 
-
   ☐ a load more button to load more podcast episodes @high 
 
-  ☐ refreshing collection podcasts @high 
+  ☐ refreshing podcasts to get new episodes @high 
 
   ☐ research feed suggestions & an api to get more accurate info about artist releases @low 
     (probably the same api as the streaming service)
@@ -25,9 +23,9 @@ UI/UX:
   ☐ sketch the way that a streaming service will fit in Dawayer UI @low 
 
 CI/CD:
-  ☐ release a PWA [ needs a lot of work to replace the incompatible dependencies (fs and music-metadata) ]
+  ☐ release a PWA [ needs a lot of work to replace the incompatible dependencies (fs and music-metadata) ] @low
+    [ Herp Project is currently too busy to maintain a thrid PWA] 
 
-  ☐ release a Windows build after testing @help-needed
-    ☐ we might be able to test platform sensitive features using wine @low 
+  ☐ release a Windows build (will be released with next release pipeline) @high 
 
   ☐ release a macOS build after testing @help-needed

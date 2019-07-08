@@ -55,6 +55,10 @@ const podcastsContainer = document.body.querySelector('.podcasts.container');
 */
 const collectionOverlay = createPodcastCollectionOverlay();
 
+/** @type { Object<string, boolean> }
+*/
+const collectionItems = {};
+
 const overlaySearchBar = collectionOverlay.querySelector('.podcastCollectionOverlay.searchBar');
 const collectionContainer = collectionOverlay.querySelector('.podcastCollection.container');
 
@@ -452,6 +456,10 @@ function addPodcastToCollection(url)
   processFeed(url)
     .then((feed) =>
     {
+      // if the podcast is already added
+      if (collectionItems[feed.feedUrl])
+        throw new Error('this podcast is already added');
+      
       // update the placeholders
       const picture = addPodcastToUI(feed, podcastElement, collectionElement);
 
@@ -503,11 +511,18 @@ function addPodcastToUI(feed, podcastElement, collectionElement)
       {
         // remove podcast from collection
         unlink(join(collectionDir, feed.title));
-        
+
+        // remove podcast from ui
         podcastsContainer.removeChild(podcastElement);
+        
         collectionContainer.removeChild(collectionElement);
+        // free the podcast feed url, so the user can add the same podcast again
+        delete collectionItems[feed.feedUrl];
       }
     });
+
+    // set the podcast feed url as busy, so the user can't add the same podcast more than once
+    collectionItems[feed.feedUrl] = true;
   };
 
   // load podcast picture
@@ -595,28 +610,62 @@ function podcastOverlaySearch()
 
   podcastOverlaySearchDelay = setTimeout(() =>
   {
+    /** @type { string }
+    */
     const input = overlaySearchBar.value;
 
-    // TODO if empty then all collection podcasts sorted alphabetically
-    if (!input)
+    for (let i = 0; i < collectionContainer.children.length; i++)
     {
-      removeAllChildren(collectionContainer);
+      const child = collectionContainer.children[i];
 
-      return;
+      // remove all pervious search results items
+      if (child.searchResult)
+      {
+        collectionContainer.removeChild(child);
+      }
+      // if search input is empty then show all collection items
+      else if (input.length <= 0)
+      {
+        child.style.setProperty('display', '');
+      }
+      // if search input is not empty then show only collection items that fit the input
+      else
+      {
+        const title = child.querySelector('.podcastCollection.title').innerText.toLowerCase();
+        
+        if (
+          title.includes(input.toLowerCase()) ||
+          input.toLowerCase().includes(title)
+        )
+          child.style.setProperty('display', '');
+        else
+          child.style.setProperty('display', 'none');
+      }
     }
 
-    // TODO add all collection podcasts that fit the input alphabetically
-
-    // add all apple podcasts that fit the input alphabetically
+    // add all apple podcasts that fit the input
     searchApplePodcasts(input).then((response) =>
     {
-      removeAllChildren(collectionContainer);
+      for (let i = 0; i < collectionContainer.children.length; i++)
+      {
+        const child = collectionContainer.children[i];
 
-      for (let i = 0; i < Math.min(response.results.length, 20); i++)
+        // remove all pervious search results items
+        if (child.searchResult)
+          collectionContainer.removeChild(child);
+      }
+
+      for (let i = 0; i < Math.min(response.results.length, 16); i++)
       {
         const podcast = response.results[i];
+
+        if (collectionItems[podcast.feedUrl])
+          continue;
         
         const collectionElement = appendPodcastCollectionItemPlaceholder();
+
+        collectionElement.searchResult = true;
+        collectionElement.input = input;
 
         const img = new Image();
 
