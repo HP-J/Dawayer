@@ -1,31 +1,27 @@
 Performance Issues and Bugs: 
   ☐ add a substitute after the removal of lastfm apis (probably also the the same api as the streaming service) @low
-  ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts) @low
+
+  ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts) @high
 
 Testing:
 
 Features:
-  ☐ a load more button to load more podcast episodes @high 
+  ☐ research statistics to show in the feed page @high
 
-  ☐ refreshing podcasts to get new episodes @high 
-
+  ☐ research adding a streaming service support like (Spotify or Deezer or etc) @low
+  
   ☐ research feed suggestions & an api to get more accurate info about artist releases @low 
     (probably the same api as the streaming service)
-  
-  ☐ research adding a streaming service support like (Spotify or Deezer or etc) @low
-
-  ☐ research statistics to show in the feed page @low
 
   ☐ using the feed page: add downloading feature and make it flexible, so that it can download podcasts or tracks alike @low
 
 UI/UX:
-  ☐ sketch the feed page @low
+  ☐ sketch the feed page @high
+
   ☐ sketch the way that a streaming service will fit in Dawayer UI @low 
 
 CI/CD:
   ☐ release a PWA [ needs a lot of work to replace the incompatible dependencies (fs and music-metadata) ] @low
     [ Herp Project is currently too busy to maintain a thrid PWA] 
-
-  ☐ release a Windows build (will be released with next release pipeline) @high 
 
   ☐ release a macOS build after testing @help-needed

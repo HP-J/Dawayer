@@ -291,9 +291,14 @@ function updatePodcastElement(element, options)
 * @param { string } feedUrl
 * @param { string } picture
 * @param { FeedItem[] } episodes
+* @param { number } fromIndex
+* @param { number } toLength
 */
-function updatePodcastEpisodes(element, title, feedUrl, picture, episodes)
+function updatePodcastEpisodes(element, title, feedUrl, picture, episodes, fromIndex, toLength)
 {
+  fromIndex = fromIndex || 0;
+  toLength = toLength || 10;
+
   const episodesText = element.overlayElement.querySelector('.episodes.text');
   const episodesRefresh = element.overlayElement.querySelector('.refresh.text');
   const episodesLoad = element.overlayElement.querySelector('.load.text');
@@ -358,15 +363,23 @@ function updatePodcastEpisodes(element, title, feedUrl, picture, episodes)
     const episodesContainer = element.overlayElement.querySelector('.podcastEpisodes.container');
 
     // remove current episodes to add new ones
-    removeAllChildren(episodesContainer);
 
-    // TODO add a load more button to overlay
+    if (fromIndex === 0)
+      removeAllChildren(episodesContainer);
 
-    for (let i = 0; i < Math.min(10, episodes.length); i++)
+    episodesLoad.onclick = () =>
+    {
+      updatePodcastEpisodes(element, title, feedUrl, picture, episodes, Math.max(0, episodesContainer.children.length), 5);
+    };
+
+    if (fromIndex + toLength >= episodes.length)
+      episodesLoad.innerText = '';
+
+    for (let i = fromIndex; i < Math.min(fromIndex + toLength, episodes.length); i++)
     {
       if (!episodes[i].title)
         continue;
-      
+
       const episodeContainer = createElement('.podcastEpisode.container');
       const episodeInfo = createElement('.podcastEpisode.info');
       const episodeTitle = createElement('.podcastEpisode.title');
