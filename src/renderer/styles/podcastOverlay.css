@@ -198,6 +198,33 @@
   margin: 3% 0 5px 0;
 }
 
+.podcastOverlay.refresh.text,
+.podcastOverlay.load.text
+{
+  cursor: pointer;
+}
+
+.podcastOverlay.refresh.text:not(:empty)
+{
+  margin: 3% 0 5px 5px;
+}
+
+.podcastOverlay.load.text:not(:empty)
+{
+  flex-basis: 100%;
+  display: flex;
+
+  justify-content: center;
+
+  margin: 3% 0 0 0;
+}
+
+.podcastOverlay.refresh.text:hover,
+.podcastOverlay.load.text:hover
+{
+  text-decoration: underline;
+}
+
 .podcastEpisodes.container
 {
   flex-basis: 100%;

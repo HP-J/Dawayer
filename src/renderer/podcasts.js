@@ -169,8 +169,12 @@ function createPodcastOverlay()
 
   const overlayDescription = createElement('.podcastOverlay.description');
 
-  const podcastsText = createElement('.podcastOverlay.episodes.text');
+  const podcastsEpisodesText = createElement('.podcastOverlay.episodes.text');
+  const podcastsEpisodesRefresh = createElement('.podcastOverlay.refresh.text');
+  
   const podcastEpisodes = createElement('.podcastEpisodes.container');
+
+  const podcastsEpisodesLoad = createElement('.podcastOverlay.load.text');
 
   overlayHide.onclick = hideActiveOverlay;
 
@@ -187,8 +191,12 @@ function createPodcastOverlay()
   overlayContainer.appendChild(overlayCard);
   overlayContainer.appendChild(overlayDescription);
 
-  overlayContainer.appendChild(podcastsText);
+  overlayContainer.appendChild(podcastsEpisodesText);
+  overlayContainer.appendChild(podcastsEpisodesRefresh);
+  
   overlayContainer.appendChild(podcastEpisodes);
+
+  overlayContainer.appendChild(podcastsEpisodesLoad);
 
   overlayWrapper.appendChild(overlayContainer);
 
@@ -280,18 +288,26 @@ function updatePodcastElement(element, options)
 
 /** @param { HTMLDivElement } element
 * @param { string } title
+* @param { string } feedUrl
 * @param { string } picture
 * @param { FeedItem[] } episodes
 */
-function updatePodcastEpisodes(element, title, picture, episodes)
+function updatePodcastEpisodes(element, title, feedUrl, picture, episodes)
 {
   const episodesText = element.overlayElement.querySelector('.episodes.text');
+  const episodesRefresh = element.overlayElement.querySelector('.refresh.text');
+  const episodesLoad = element.overlayElement.querySelector('.load.text');
 
   const latestEpisodeContainer = element.querySelector('.podcast.episodeContainer');
   const latestEpisodeInfo = latestEpisodeContainer.querySelector('.podcast.episodeInfo');
   const latestEpisodeTitle = latestEpisodeContainer.querySelector('.podcast.episodeTitle');
 
-  episodesText.innerText = '';
+  episodesText.innerText =
+  episodesRefresh.innerText =
+  episodesLoad.innerText =  '';
+
+  episodesRefresh.onclick =
+  episodesLoad.onclick = undefined;
 
   latestEpisodeContainer.classList.add('clear');
 
@@ -300,10 +316,40 @@ function updatePodcastEpisodes(element, title, picture, episodes)
 
   latestEpisodeContainer.oncontextmenu = undefined;
 
-  if (episodes.length > 0)
+  if (Array.isArray(episodes))
   {
-    // overlay text label
-    episodesText.innerText = 'Episodes';
+    // overlay texts
+    if (episodes[0] === 'refresh')
+    {
+      episodesText.innerText = 'Episodes are refreshing...';
+    }
+    else
+    {
+      episodesText.innerText = 'Episodes -';
+      episodesRefresh.innerText = 'Refresh';
+      episodesLoad.innerText = 'Load More';
+    }
+
+    episodesRefresh.onclick = () =>
+    {
+      // as a feed back to the user that the queue is refreshing
+      updatePodcastEpisodes(element, title, feedUrl, picture, [ 'refresh' ]);
+
+      processFeed(feedUrl)
+        .then((feed) =>
+        {
+          // updated the episodes in the overlay
+          updatePodcastEpisodes(element, title, feedUrl, picture, feed.items);
+
+          // save new feed locally
+          writeFile(join(collectionDir, title), JSON.stringify(feed));
+        })
+        .catch(() =>
+        {
+          // in case that the refresh fails we should re-add the episodes we have
+          updatePodcastEpisodes(element, title, feedUrl, picture, episodes);
+        });
+    };
 
     // list all episodes in the overlay
 
@@ -318,6 +364,9 @@ function updatePodcastEpisodes(element, title, picture, episodes)
 
     for (let i = 0; i < Math.min(10, episodes.length); i++)
     {
+      if (!episodes[i].title)
+        continue;
+      
       const episodeContainer = createElement('.podcastEpisode.container');
       const episodeInfo = createElement('.podcastEpisode.info');
       const episodeTitle = createElement('.podcastEpisode.title');
@@ -432,23 +481,23 @@ function addFromFiles(files)
   return false;
 }
 
+/** process the url and returns a feed object
+* @param { string } url
+*/
+function processFeed(url)
+{
+  // if url is a link
+  if (url.startsWith('http://') || url.startsWith('https://'))
+    return readFeedLink(url);
+  // else if it's a file
+  else
+    return readFeedFile(url);
+}
+
 /** @param { string } feedUrl
 */
 function addPodcastToCollection(url)
 {
-  /** process the url and returns a feed object
-  * @param { string } url
-  */
-  function processFeed(url)
-  {
-    // if url is a link
-    if (url.startsWith('http://') || url.startsWith('https://'))
-      return readFeedLink(url);
-    // else if it's a file
-    else
-      return readFeedFile(url);
-  }
-
   const podcastElement = appendPodcastPlaceholder();
   const collectionElement = appendPodcastCollectionItemPlaceholder();
   
@@ -464,7 +513,7 @@ function addPodcastToCollection(url)
       const picture = addPodcastToUI(feed, podcastElement, collectionElement);
 
       // load podcast episodes
-      updatePodcastEpisodes(podcastElement, feed.title, picture, feed.items);
+      updatePodcastEpisodes(podcastElement, feed.title, feed.feedUrl, picture, feed.items);
       
       // save the podcast to collection
       return writeFile(join(collectionDir, feed.title), JSON.stringify(feed));
@@ -532,7 +581,7 @@ function addPodcastToUI(feed, podcastElement, collectionElement)
   settings.receiveCachedImage(picture).then((imagePath) => img.src = imagePath);
 
   // load podcast episodes
-  updatePodcastEpisodes(podcastElement, feed.title, picture, feed.items);
+  updatePodcastEpisodes(podcastElement, feed.title, feed.feedUrl, picture, feed.items);
 
   return picture;
 }
@@ -541,6 +590,7 @@ function addPodcastToUI(feed, podcastElement, collectionElement)
 * @returns { Promise<FeedObject> }
 */
 function readFeedFile(url)
+
 {
   return new Promise((resolve, reject) =>
   {
