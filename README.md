@@ -2,7 +2,7 @@
 
 Dawayer is an audio player built with web technologies it lets you play local files, download and stream podcasts, stream music from a streaming service, Dawayer also has a feed page that gives you personalized playlists, statistics about your listening habits and notifies you when your favorite artist published a new track or a new podcast episode.
 
-Dawayer is still in development with main features being added gradually, we're currently adding Podcasts, Dark Mode, MPRIS Support, and next update we'll add the feed and the streaming service.
+Dawayer is still in development with main features being added gradually, we're currently adding the feed and the streaming service support.
 
 #### Features
 - Play podcasts.
@@ -21,7 +21,7 @@ Dawayer is still in development with main features being added gradually, we're 
 
 # Download
 
-**We need people to test Windows and macOS versions before we can release them.**
+**We need people to test macOS version before we can release them.**
 
 **And we're also going to be working on a PWA when we're done adding the rest of the main features.**
 
@@ -29,6 +29,8 @@ Dawayer is still in development with main features being added gradually, we're 
 [AUR](https://aur.archlinux.org/packages/dawayer) |
 [deb](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.deb?job=build) |
 [tar.xz](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer.tar.xz?job=build)
+- **Windows:**
+[Setup](https://gitlab.com/hpj/Dawayer/-/jobs/artifacts/release/raw/public/Dawayer-Setup.exe?job=build)
 
 # Build It Yourself
 If you want to try the latest features from the development branch, or your platform don't get an official release, or want to help in Dawayer's development.  
