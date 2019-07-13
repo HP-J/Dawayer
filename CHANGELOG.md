@@ -6,4 +6,4 @@
 - we're aware of Lastfm API changes, we removed all of their APIs from Dawayer as a response, sorry for the inconvenience, we will have a solution soon.
 - fixed a bug where shuffle always plays the first track instead of a random track.
 - fixed a bug where the previous button was doing the opposite of what it should be doing.
-- other bug fixed and minor performance improvements.
+- other bug fixes and minor performance improvements.
