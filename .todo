@@ -3,10 +3,18 @@ Performance Issues and Bugs:
 
   ☐ rewrite storage scanning and caching to append placeholders before it reads the track's metadata (like podcasts) @high
 
+  ☐ Podcasts if you load more then exit the overlay the podcast element shows no episodes are available @critical
+  ☐ Albums scrollbar doesn't show up @critical
+  ☐ some podcasts show runtime of 1 second @critical
+  ☐ Linux Unplugged errors out on adding @critical
+
 Testing:
+  ☐ MPRIS loop button might be broken @critical
 
 Features:
-  ☐ Podcasts auto-refresh on startup and every 15 minutes @critical 
+  ☐ Podcasts auto-refresh on startup and every 15 minutes @critical
+  
+  ☐ adding a podcast by feedUrl @critical
 
   ☐ research statistics to show in the feed page @high
 

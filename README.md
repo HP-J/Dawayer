@@ -21,9 +21,7 @@ Dawayer is still in development with main features being added gradually, we're 
 
 # Download
 
-**We need people to test macOS version before we can release them.**
-
-**And we're also going to be working on a PWA when we're done adding the rest of the main features.**
+**We need people to test macOS version before we can release it.**
 
 - **Linux:**
 [AUR](https://aur.archlinux.org/packages/dawayer) |
