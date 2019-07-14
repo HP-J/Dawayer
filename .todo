@@ -6,6 +6,8 @@ Performance Issues and Bugs:
 Testing:
 
 Features:
+  ☐ Podcasts auto-refresh on startup and every 15 minutes @critical 
+
   ☐ research statistics to show in the feed page @high
 
   ☐ research adding a streaming service support like (Spotify or Deezer or etc) @low

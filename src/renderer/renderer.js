@@ -409,9 +409,9 @@ function setupPages()
   // set the default pages
   // the pages the user first sees when they starts the application
 
-  menuContainer.children.item(2).classList.add('selected');
+  menuContainer.children.item(1).classList.add('selected');
 
-  selectedPage = pagesContainer.children.item(2);
+  selectedPage = pagesContainer.children.item(1);
   selectedLocalIcon = localIconsContainer.children.item(0);
   selectedLocalSubPage = localSubPagesContainer.children.item(0);
 
