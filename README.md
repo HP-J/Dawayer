@@ -36,7 +36,7 @@ If you want to try the latest features from the development branch, or your plat
 (make sure you install Git and NPM on your device first)  
 open a terminal in a new folder and write:
 
-- git clone "https://gitlab.com/hpj/Dawayer.git" .  
+- git clone "https://github.com/HP-J/Dawayer" .  
 - npm install  
 - npm run build  
 - npx electron "./build/main/main.js"
