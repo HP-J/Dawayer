@@ -106,7 +106,7 @@
     "@babel/preset-env": "^7.5.4",
     "babel-eslint": "^10.0.2",
     "create-svg-sprite": "^1.0.4",
-    "electron": "^4.2.6",
+    "electron": "^7.2.4",
     "electron-builder": "^21.0.15",
     "eslint": "^6.0.1",
     "pug": "^2.0.4",
