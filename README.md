@@ -14,8 +14,9 @@ It was also supposed to be able to stream music from a streaming service, and ha
 
 ![Albums Page](pictures/albums-dark.png)
 <!-- ![Tracks Page](pictures/tracks.png) -->
-![Artists Page](pictures/artists.png)
 ![Now Playing Page](pictures/playing.png)
+![Artists Page](pictures/artists.png)
+![Podcasts Page](pictures/podcast.png)
 <!-- ![Artist's Page](pictures/artistOverlay.png) -->
 
 <!-- # Download
