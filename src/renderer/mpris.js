@@ -2,7 +2,7 @@ import { remote } from 'electron';
 
 import { join } from 'path';
 
-import Player from 'mpris-service';
+// import Player from 'mpris-service';
 
 import * as settings from '../settings.js';
 

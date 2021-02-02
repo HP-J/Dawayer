@@ -395,9 +395,9 @@ function init()
   shuffleButton.classList.add(getShuffleMode());
   repeatButton.classList.add(getRepeatMode());
 
-  // enable MPRIS Player if on linux
-  if (currentPlatform === 'linux')
-    initMPRISPlayer();
+  // FIX enable MPRIS Player if on linux
+  // if (currentPlatform === 'linux')
+  //   initMPRISPlayer();
 
   // setup UI elements
 
@@ -1077,6 +1077,9 @@ export function secondsToDuration(seconds)
 
   seconds = Math.floor(seconds - minutes * 60).toString();
 
+  if (Number.isNaN(minutes) || Number.isNaN(seconds))
+    return '';
+
   if (seconds.length > 2)
     seconds.substring(0, 2);
   else if (seconds.length === 1)
@@ -1094,6 +1097,9 @@ export function secondsToHms(seconds)
   const hs = Math.floor(seconds / 3600);
   const ms = Math.floor(seconds % 3600 / 60);
   const ss = Math.floor(seconds % 3600 % 60);
+
+  if (Number.isNaN(hs) || Number.isNaN(ms) || Number.isNaN(ss))
+    return '';
 
   const hoursString = hs > 0 ? hs + (hs == 1 ? ' hour' : ' hours') : '';
   const minutesString = ms > 0 ? ms + (ms == 1 ? ' minute' : ' minutes') : '';

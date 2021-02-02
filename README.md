@@ -1,25 +1,24 @@
 # Welcome to Dawayer
 
-Dawayer is an audio player built with web technologies it lets you play local files, download and stream podcasts, stream music from a streaming service, Dawayer also has a feed page that gives you personalized playlists, statistics about your listening habits and notifies you when your favorite artist published a new track or a new podcast episode.
+Dawayer was a audio player built with web technologies it lets you play local files and stream podcasts.
 
-Dawayer is still in development with main features being added gradually, we're currently adding the feed and the streaming service support.
+It was also supposed to be able to stream music from a streaming service, and have a feed page that gives you personalized playlists, statistics about your listening habits and notifies you when your favorite artist published a new track or a new podcast episode, but the app was cancelled before any of those two features made it through.
 
 #### Features
 - Play podcasts.
 - Play local audio files.
-- Gives you personalized playlists and statistics.
+- <strike>Gives you personalized playlists and statistics</strike>.
 - All the other modern audio player features like saving your seek-time and queue between sessions and etc...
-- MPRIS Player support for linux.
+- <strike>MPRIS Player support for linux</strike>.
 - Dark Mode.
 
-#### Screenshots
-![Albums Page](pictures/albums.png)
-![Tracks Page](pictures/tracks.png)
+![Albums Page](pictures/albums-dark.png)
+<!-- ![Tracks Page](pictures/tracks.png) -->
 ![Artists Page](pictures/artists.png)
 ![Now Playing Page](pictures/playing.png)
-![Artist's Page](pictures/artistOverlay.png)
+<!-- ![Artist's Page](pictures/artistOverlay.png) -->
 
-# Download
+<!-- # Download
 
 **We need people to test macOS version before we can release it.**
 
@@ -28,18 +27,14 @@ Dawayer is still in development with main features being added gradually, we're 
 [deb](https://github.com/HP-J/Dawayer/releases/download/70879867/Dawayer.deb) |
 [tar.xz](https://github.com/HP-J/Dawayer/releases/download/70879867/Dawayer.tar.xz)
 - **Windows:**
-[Setup](https://github.com/HP-J/Dawayer/releases/download/70879867/Dawayer-Setup.exe)
+[Setup](https://github.com/HP-J/Dawayer/releases/download/70879867/Dawayer-Setup.exe) -->
 
-# Build It Yourself
-If you want to try the latest features from the development branch, or your platform don't get an official release, or want to help in Dawayer's development.  
+# Build
+Since te app was canceled the best way to get it is to build it yourself (some fixes never made it to any full release).
 
-(make sure you install Git and NPM on your device first)  
-open a terminal in a new folder and write:
-
-- git clone "https://github.com/HP-J/Dawayer" .  
-- npm install  
-- npm run build  
-- npx electron "./build/main/main.js"
+- `git clone https://github.com/hpj/Dawayer && cd Dawayer`
+- `npm install && npm run build`
+- `npx electron ./build/main/main.js`
 
 # Licenses
 This project is licensed under the [MIT](https://github.com/HP-J/Dawayer/blob/development/LICENSE) License.  

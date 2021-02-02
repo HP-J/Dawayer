@@ -422,21 +422,22 @@ function appendAbout()
       }
     });
 
+  // FIX auto-update is broken since we moved out of GitLab
   // if there's enough data to support the auto-update system,
   // then add a check for updates button
-  if (localData && localData.branch && localData.commit && localData.package)
-  {
-    if (!checkElement)
-    {
-      checkElement = createElement('.option.about.button.check');
+  // if (localData && localData.branch && localData.commit && localData.package)
+  // {
+  //   if (!checkElement)
+  //   {
+  //     checkElement = createElement('.option.about.button.check');
 
-      checkElement.innerText = 'Check for Updates';
+  //     checkElement.innerText = 'Check for Updates';
 
-      checkElement.onclick = checkForUpdates;
-    }
+  //     checkElement.onclick = checkForUpdates;
+  //   }
     
-    aboutButtonsElement.appendChild(checkElement);
-  }
+  //   aboutButtonsElement.appendChild(checkElement);
+  // }
 }
 
 /** @param { number } rewind
@@ -463,6 +464,8 @@ function changeSkipTiming(skip)
 
 function checkForUpdates()
 {
+  // FIX auto-update is broken since we moved out of GitLab
+
   checkElement.innerText = 'Checking...';
 
   checkElement.classList.add('clean');
